@@ -1,0 +1,181 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="vaadin-month-calendar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #title {
+        text-align: center;
+      }
+      #monthGrid div {
+        display: inline-block;
+        text-align: center;
+        width: 14.285714286%;
+        box-sizing: border-box;
+      }
+      div.weekday {
+        text-transform: uppercase;
+        font-size: 80%;
+        color: #999;
+      }
+      div[data-date] {
+        cursor: pointer;
+      }
+      div.today {
+        border: 1px solid red;
+      }
+      div.selected {
+        color: red;
+      }
+    </style>
+
+    <div id="title">[[_getTitle(month, _monthNames)]]</div>
+    <div id="monthGrid" on-tap="_handleTap"></div>
+  </template>
+  <script>
+    Polymer({
+      is: 'vaadin-month-calendar',
+
+      properties: {
+
+        /**
+         * A `Date` object defining the month to be displayed. Only year and
+         * month properties are actually used.
+         */
+        month: {
+          type: Date,
+          value: new Date()
+        },
+
+        /**
+         * A `Date` object for the currently selected date.
+         */
+        value: {
+          type: Date,
+          notify: true,
+          observer: '_updateClassNames'
+        },
+
+        _monthNames: {
+          value: [
+            'January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October','November', 'December'
+          ]
+        },
+
+        _weekDayNames: {
+          value: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        },
+
+        _firstDayOfWeek: {
+          type: Number,
+          value: 0
+        },
+      },
+
+      observers: [
+        '_initializeDom(month, _monthNames, _weekDayNames, _firstDayOfWeek)'
+      ],
+
+      _initializeDom: function() {
+        this.$.monthGrid.innerHTML = '';
+
+        this._renderWeekDayNames();
+        this._renderMonthGrid();
+        this._updateClassNames();
+      },
+
+      _getTitle: function(month) {
+        return this._monthNames[month.getMonth()];
+      },
+
+      _dateEquals: function(date1, date2) {
+        return date1.getFullYear() === date2.getFullYear() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getDate() === date2.getDate();
+      },
+
+      _dateAdd: function(date, delta) {
+        date.setDate(date.getDate() + delta);
+      },
+
+      _renderWeekDayNames: function() {
+        // Get the _weekDayNames in correct order as defined by _firstDayOfWeek.
+        var weekDays = this._weekDayNames.slice(this._firstDayOfWeek).concat(this._weekDayNames.slice(0, this._firstDayOfWeek));
+
+        weekDays.forEach(function(weekDay) {
+          var element = document.createElement('div');
+          element.textContent = weekDay;
+          element.classList.add('weekday');
+
+          Polymer.dom(this.$.monthGrid).appendChild(element);
+        }.bind(this));
+      },
+
+      _renderMonthGrid: function() {
+        // First day of the month (at noon).
+        var date = new Date(this.month.getFullYear(), this.month.getMonth(), 1, 12, 0, 0);
+
+        // Rewind to first day of the week.
+        while (date.getDay() !== this._firstDayOfWeek) {
+          this._dateAdd(date, -1);
+        }
+
+        var startMonth = date.getMonth();
+        var batch = document.createDocumentFragment();
+        while (date.getMonth() === this.month.getMonth() || date.getMonth() === startMonth) {
+          var element = this._createDateElement(date);
+          batch.appendChild(element);
+
+          // Advance to next day.
+          this._dateAdd(date, 1);
+        }
+        Polymer.dom(this.$.monthGrid).appendChild(batch);
+      },
+
+      _getDataAttr: function(date) {
+        // Format the date as '2016-12-31'.
+        if (date) {
+          var dataAttr = date.getFullYear();
+          dataAttr += '-';
+          dataAttr += date.getMonth() < 9 ? '0' : '';
+          dataAttr += (date.getMonth() + 1);
+          dataAttr += '-';
+          dataAttr += date.getDate() < 10 ? '0' : '';
+          dataAttr += date.getDate();
+          return dataAttr;
+        } else {
+          return '';
+        }
+      },
+
+      _createDateElement: function(date) {
+        var element = document.createElement('div');
+        if (date.getMonth() === this.month.getMonth()) {
+          element.setAttribute('data-date', this._getDataAttr(date));
+          element.textContent = date.getDate();
+        }
+        return element;
+      },
+
+      _handleTap: function(e) {
+        if (e.target.hasAttribute('data-date')) {
+          this.value = new Date(e.target.getAttribute('data-date'));
+        }
+      },
+
+      _updateClassNames: function() {
+        var dataAttrValue = this._getDataAttr(this.value);
+        var dataAttrToday = this._getDataAttr(new Date());
+
+        Polymer.dom(this.$.monthGrid).querySelectorAll('div[data-date]').forEach(function(elem) {
+          var dataAttr = elem.getAttribute('data-date');
+          Polymer.Base.toggleClass('selected', dataAttr === dataAttrValue, elem);
+          Polymer.Base.toggleClass('today', dataAttr === dataAttrToday, elem);
+        });
+      }
+    });
+  </script>
+</dom-module>
