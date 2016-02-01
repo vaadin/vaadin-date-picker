@@ -1,0 +1,163 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="vaadin-month-calendar">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #title {
+        text-align: center;
+      }
+      #monthGrid div {
+        display: inline-block;
+        text-align: center;
+        width: 14.285714286%;
+        box-sizing: border-box;
+      }
+      div.weekday {
+        text-transform: uppercase;
+        font-size: 80%;
+        color: #999;
+      }
+      div[date] {
+        cursor: pointer;
+      }
+      div[today] {
+        border: 1px solid red;
+      }
+      div[selected] {
+        color: red;
+      }
+    </style>
+
+    <div id="title">[[_getTitle(month, _monthNames)]]</div>
+    <div id="monthGrid" on-tap="_handleTap">
+      <!-- Do not add white-space between tags to keep inline-block elements aligning correctly. -->
+      <template is="dom-repeat" items="[[_getWeekDayNames(_weekDayNames, _firstDayOfWeek)]]"><div class="weekday">[[item]]</div></template>
+      <template is="dom-repeat" items="[[_days]]"><div today$="[[_isToday(item)]]" selected$="[[_isSelected(item, value)]]" date$="[[_getDateAttr(item, month)]]">[[_getDate(item)]]</div></template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'vaadin-month-calendar',
+
+      properties: {
+
+        /**
+         * A `Date` object defining the month to be displayed. Only year and
+         * month properties are actually used.
+         */
+        month: {
+          type: Date,
+          value: new Date()
+        },
+
+        /**
+         * A `Date` object for the currently selected date.
+         */
+        value: {
+          type: Date,
+          notify: true
+        },
+
+        _monthNames: {
+          value: [
+            'January', 'February', 'March', 'April', 'May', 'June', 'July',
+            'August', 'September', 'October','November', 'December'
+          ]
+        },
+
+        _weekDayNames: {
+          value: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        },
+
+        _firstDayOfWeek: {
+          type: Number,
+          value: 0
+        },
+
+        _days: {
+          computed: '_getDays(month, _firstDayOfWeek)'
+        }
+      },
+
+      _getTitle: function(month) {
+        return this._monthNames[month.getMonth()];
+      },
+
+      _dateEquals: function(date1, date2) {
+        if (date1 instanceof Date && date2 instanceof Date) {
+          return date1.getFullYear() === date2.getFullYear() &&
+                 date1.getMonth() === date2.getMonth() &&
+                 date1.getDate() === date2.getDate();
+        } else {
+          return false;
+        }
+      },
+
+      _dateAdd: function(date, delta) {
+        date.setDate(date.getDate() + delta);
+      },
+
+      _getWeekDayNames: function(weekDayNames, firstDayOfWeek) {
+        return weekDayNames.slice(firstDayOfWeek).concat(weekDayNames.slice(0, firstDayOfWeek));
+      },
+
+      _getDate: function(date) {
+        return date.getMonth() === this.month.getMonth() ? date.getDate() : '';
+      },
+
+      _isSelected: function(date, value) {
+        return this._dateEquals(value, date);
+      },
+
+      _isToday: function(date) {
+        return this._dateEquals(new Date(), date);
+      },
+
+      _getDays: function() {
+        // First day of the month (at noon).
+        var date = new Date(this.month.getFullYear(), this.month.getMonth(), 1, 12, 0, 0);
+
+        // Rewind to first day of the week.
+        while (date.getDay() !== this._firstDayOfWeek) {
+          this._dateAdd(date, -1);
+        }
+
+        var days = [];
+        var startMonth = date.getMonth();
+        while (date.getMonth() === this.month.getMonth() || date.getMonth() === startMonth) {
+          days.push(new Date(date));
+
+          // Advance to next day.
+          this._dateAdd(date, 1);
+        }
+        return days;
+      },
+
+      _getDateAttr: function(date, month) {
+        // Format the date as '2016-12-31'.
+        if (date && month && date.getMonth() === month.getMonth()) {
+          var dataAttr = date.getFullYear();
+          dataAttr += '-';
+          dataAttr += date.getMonth() < 9 ? '0' : '';
+          dataAttr += (date.getMonth() + 1);
+          dataAttr += '-';
+          dataAttr += date.getDate() < 10 ? '0' : '';
+          dataAttr += date.getDate();
+          return dataAttr;
+        } else {
+          return false;
+        }
+      },
+
+      _handleTap: function(e) {
+        if (e.target.hasAttribute('date')) {
+          this.value = new Date(e.target.getAttribute('date'));
+        }
+      }
+
+    });
+  </script>
+</dom-module>
