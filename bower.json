@@ -20,7 +20,10 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "iron-dropdown": "polymerelements/iron-dropdown#~1.1.0",
+    "iron-input": "polymerelements/iron-input#~1.0.8",
     "iron-list": "polymerelements/iron-list#~1.2.0",
+    "paper-input": "polymerelements/paper-input#~1.1.5",
     "polymer": "Polymer/polymer#^1.2.0"
   },
   "devDependencies": {
