@@ -9,9 +9,14 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+
+        font: inherit;
+        @apply(--paper-font-common-base);
       }
       #title {
+        font-size: 120%;
         text-align: center;
+        padding: 0.4em 0;
       }
       #monthGrid {
         display: flex;
@@ -22,23 +27,46 @@
         width: 14.285714286%;
         box-sizing: border-box;
         cursor: pointer;
+        padding: 0.4em 0;
       }
       #monthGrid div.weekday {
         text-transform: uppercase;
-        font-size: 80%;
+        font-size: 70%;
         color: #999;
         cursor: default;
       }
       #monthGrid div[today] {
-        border: 1px solid red;
+        position: relative;
       }
-      #monthGrid div[selected] {
-        color: red;
+      #monthGrid div[today]:before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border: 2px solid #03a9f4;
+        border-radius: 50%;
+        box-sizing: border-box;
+        width: 1.6em;
+        height: 1.6em;
+        margin-left: -0.8em;
+        margin-top: -0.8em;
+      }
+      #monthGrid div[today][selected]:before,
+      #monthGrid:not([touch-device]) div[today]:hover:before {
+        border-color: #fff;
+      }
+      #monthGrid div[selected],
+      #monthGrid:not([touch-device]) div:not(.weekday):not(:empty):hover {
+        color: #fff;
+        background: #03a9f4;
+        box-sizing: border-box;
+        border-radius: 2px;
       }
     </style>
 
     <div id="title">[[_getTitle(month, _monthNames)]]</div>
-    <div id="monthGrid" on-tap="_handleTap">
+    <div id="monthGrid" on-tap="_handleTap" touch-device$="[[touchDevice]]">
       <template is="dom-repeat" items="[[_getWeekDayNames(_weekDayNames, _firstDayOfWeek)]]">
         <div class="weekday">[[item]]</div>
       </template>
@@ -68,6 +96,22 @@
         selectedDate: {
           type: Date,
           notify: true
+        },
+
+        /**
+         * True if the device supports touch events.
+         */
+        touchDevice: {
+          type: Boolean,
+          reflectToAttribute: true,
+          value: function() {
+            try {
+              document.createEvent('TouchEvent');
+              return true;
+            } catch (e) {
+              return false;
+            }
+          }
         },
 
         _monthNames: {
