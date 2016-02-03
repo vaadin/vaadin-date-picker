@@ -30,10 +30,27 @@
         cursor: default;
       }
       #monthGrid div[today] {
-        border: 1px solid red;
+        position: relative;
+      }
+      #monthGrid div[today]:not([selected]):before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border: 2px solid var(--default-primary-color, #03a9f4);
+        border-radius: 50%;
+        box-sizing: border-box;
+        width: 1.4em;
+        height: 1.4em;
+        margin-left: -0.7em;
+        margin-top: -0.7em;
       }
       #monthGrid div[selected] {
-        color: red;
+        color: #fff;
+        background: var(--default-primary-color, #03a9f4);
+        box-sizing: border-box;
+        border-radius: 2px;
       }
     </style>
 
