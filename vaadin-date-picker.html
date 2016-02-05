@@ -13,10 +13,17 @@
         display: inline-block;
       }
 
-      #overlay {
+      #dropdowncontent {
         width: 100vw;
-        max-width: 400px;
         height: 100vh;
+        overflow: visible;
+      }
+
+      #overlay {
+        width: 100%;
+        height: 100%;
+        max-width: 350px;
+        min-width: 170px;
       }
 
       #inputcontainer:not([hideclear]) #input {
@@ -41,8 +48,10 @@
       <iron-icon id="clear" suffix on-tap="_clear" icon="clear"></iron-icon>
     </paper-input-container>
 
-    <iron-dropdown id="dropdown" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
-      <vaadin-date-picker-overlay selected-date="{{value}}" class="dropdown-content" id="overlay"></vaadin-date-picker-overlay>
+    <iron-dropdown id="dropdown" on-tap="_onDropdownTap" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
+      <div class="dropdown-content" id="dropdowncontent">
+        <vaadin-date-picker-overlay selected-date="{{value}}" id="overlay"></vaadin-date-picker-overlay>
+      </div>
     </iron-dropdown>
 
   </template>
@@ -93,6 +102,12 @@
 
       _clear: function() {
         this.value = '';
+      },
+
+      _onDropdownTap: function(e) {
+        if (e.target === this.$.dropdowncontent) {
+          this.$.dropdown.close();
+        }
       }
 
     });
