@@ -63,7 +63,7 @@
         border-color: #fff;
       }
 
-      #monthGrid div[selected] {
+      #monthGrid div[selected]:not(:empty) {
         color: #fff;
         background: #03a9f4;
         box-sizing: border-box;
@@ -176,7 +176,7 @@
       },
 
       _handleTap: function(e) {
-        if (e.target.date) {
+        if (e.target.date && e.target.textContent) {
           this.selectedDate = e.target.date;
         }
       }
