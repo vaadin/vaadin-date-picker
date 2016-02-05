@@ -29,8 +29,11 @@
         text-align: center;
         width: 14.285714286%;
         box-sizing: border-box;
-        cursor: pointer;
         padding: 0.4em 0;
+      }
+
+      #monthGrid div:not(:empty) {
+        cursor: pointer;
       }
 
       #monthGrid div.weekday {
@@ -77,7 +80,7 @@
         <div class="weekday">[[item]]</div>
       </template>
       <template is="dom-repeat" items="[[_getDays(month, _firstDayOfWeek)]]">
-        <div today$="[[_isToday(item)]]" selected$="[[_isSelected(item, selectedDate)]]" date="[[item]]">[[_getDate(item)]]</div>
+        <div today$="[[_isToday(item)]]" selected$="[[_isSelected(item, selectedDate)]]" date="[[_getDateProperty(item)]]">[[_getDate(item)]]</div>
       </template>
     </div>
   </template>
@@ -145,6 +148,10 @@
 
       _getDate: function(date) {
         return date.getMonth() === this.month.getMonth() ? date.getDate() : '';
+      },
+
+      _getDateProperty: function(date) {
+        return date.getMonth() === this.month.getMonth() ? date : undefined;
       },
 
       _isSelected: function(date, selectedDate) {
