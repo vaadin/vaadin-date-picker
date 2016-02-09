@@ -28,6 +28,10 @@
         dropdown = datepicker.$.dropdown;
       });
 
+      afterEach(function(done) {
+        datepicker.async(done, 1);
+      });
+
       describe('Sizing', function() {
 
         beforeEach(function() {
