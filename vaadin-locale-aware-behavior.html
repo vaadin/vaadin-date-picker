@@ -1,0 +1,47 @@
+<script src="../moment/min/moment.min.js"></script>
+<script>
+  window.vaadin = window.vaadin || {};
+  vaadin.elements = vaadin.elements || {};
+  vaadin.elements.datepicker = vaadin.elements.datepicker || {};
+
+  vaadin.elements.datepicker.LocaleAwareBehavior = {
+    properties: {
+      /**
+       * Locale of this element used for formatting and naming of months and days.
+       */
+      locale: {
+        type: String,
+        value: 'en',
+        observer: '_localeChanged'
+      },
+
+      // A locale that is loaded and ready to be used.
+      _readyLocale: {
+        type: String,
+        observer: '_readyLocaleChanged'
+      }
+    },
+
+    _localeChanged: function(locale) {
+      var done = function() {
+        this._readyLocale = locale;
+      }.bind(this);
+
+      if (!moment.localeData(locale)) {
+        // Load additional locales as needed.
+        var scriptElem = document.createElement('script');
+        scriptElem.src = this.resolveUrl('../moment/locale/' + locale + '.js');
+        scriptElem.addEventListener('load', done);
+
+        document.head.appendChild(scriptElem);
+      } else {
+        // Already ready for use.
+        done();
+      }
+    },
+
+    _readyLocaleChanged: function() {
+      // Override if needed.
+    }
+  };
+</script>

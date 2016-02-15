@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="vaadin-locale-aware-behavior.html">
 
 <dom-module id="vaadin-month-calendar">
   <template>
@@ -88,6 +89,10 @@
     Polymer({
       is: 'vaadin-month-calendar',
 
+      behaviors: [
+        vaadin.elements.datepicker.LocaleAwareBehavior
+      ],
+
       properties: {
 
         /**
@@ -107,21 +112,17 @@
           notify: true
         },
 
-        _monthNames: {
-          value: [
-            'January', 'February', 'March', 'April', 'May', 'June', 'July',
-            'August', 'September', 'October', 'November', 'December'
-          ]
-        },
+        _monthNames: Array,
 
-        _weekDayNames: {
-          value: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-        },
+        _weekDayNames: Array,
 
-        _firstDayOfWeek: {
-          type: Number,
-          value: 0
-        }
+        _firstDayOfWeek: Number
+      },
+
+      _readyLocaleChanged: function(locale) {
+        this._weekDayNames = moment.localeData(locale)._weekdaysShort;
+        this._monthNames = moment.localeData(locale)._months;
+        this._firstDayOfWeek = moment.localeData(locale)._week.dow;
       },
 
       _getTitle: function(month) {
