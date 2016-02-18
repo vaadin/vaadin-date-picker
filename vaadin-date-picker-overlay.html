@@ -42,7 +42,7 @@
       <div id="yearLabl">[[_yearAfterXMonths(_visibleMonthIndex)]]</div>
       <paper-button id="todayBtn" on-tap="_scrollToCurrentMonth">
         <iron-icon icon="event"></iron-icon>
-        TODAY
+        [[__today__]]
       </paper-button>
     </div>
 
@@ -72,14 +72,21 @@
          * for example `en-gb`, `fi`, `es`, etc.
          */
         locale: {
-          type: String
+          type: String,
+          observer: '_onLocaleChanged'
         },
 
         _originDate: {
           value: new Date()
         },
 
-        _visibleMonthIndex: Number
+        _visibleMonthIndex: Number,
+
+        __today__: String
+      },
+
+      _onLocaleChanged: function() {
+        this.__today__ = vaadin.elements.datepicker.today || 'Today';
       },
 
       /**

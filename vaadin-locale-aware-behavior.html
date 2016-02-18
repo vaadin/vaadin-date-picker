@@ -21,6 +21,12 @@
 
     _localeChanged: function(locale) {
       var done = function() {
+        // FIXME: Just a hack as a first implementation.
+        // we take advantage of the fact that moment.calendar sets
+        // the word today at first position because the today
+        // word itself is not defined anywhere.
+        vaadin.elements.datepicker.today =
+          moment().calendar(Date.now()).replace(/(.+?) .*/,'$1');
         this.fire('locale-ready', {
           locale: locale
         }, {
