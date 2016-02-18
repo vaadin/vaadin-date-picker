@@ -58,7 +58,7 @@
         var date = new Date(2000, 1, 1);
         overlay.scrollToDate(date);
         waitUntilScrolledTo(date, function() {
-          tap(overlay.$.today_btn);
+          tap(overlay.$.todayButton);
           waitUntilScrolledTo(new Date(), function() {
             done();
           });

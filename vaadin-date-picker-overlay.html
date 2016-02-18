@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="vaadin-month-calendar.html">
 <link rel="import" href="vaadin-infinite-scroller.html">
@@ -29,20 +30,20 @@
         height: 100%;
       }
 
-      #yearLabl {
+      #yearLabel {
         padding: 0.7em;
       }
 
-      #todayBtn {
+      #todayButton {
         color: var(--primary-color, #00B4F0);
       }
     </style>
 
     <div id="toolbar">
-      <div id="yearLabl">[[_yearAfterXMonths(_visibleMonthIndex)]]</div>
-      <paper-button id="todayBtn" on-tap="_scrollToCurrentMonth">
+      <div id="yearLabel">[[_yearAfterXMonths(_visibleMonthIndex)]]</div>
+      <paper-button id="todayButton" on-tap="_scrollToCurrentMonth">
         <iron-icon icon="event"></iron-icon>
-        TODAY
+        [[__today__]]
       </paper-button>
     </div>
 
@@ -72,14 +73,21 @@
          * for example `en-gb`, `fi`, `es`, etc.
          */
         locale: {
-          type: String
+          type: String,
+          observer: '_onLocaleChanged'
         },
 
         _originDate: {
           value: new Date()
         },
 
-        _visibleMonthIndex: Number
+        _visibleMonthIndex: Number,
+
+        __today__: String
+      },
+
+      _onLocaleChanged: function() {
+        this.__today__ = vaadin.elements.datepicker.today || 'Today';
       },
 
       /**
