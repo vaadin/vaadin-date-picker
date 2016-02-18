@@ -212,6 +212,14 @@
         box-shadow: 0 -3px 4px 0 rgba(0, 0, 0, 0.14);
         color: #03a9f4;
       }
+
+      #yearLabel {
+        padding: 0.7em;
+      }
+
+      #todayButton {
+        color: var(--primary-color, #00B4F0);
+      }
     </style>
 
     <div id="header" on-touchend="_preventDefault">
@@ -254,10 +262,6 @@
   <script>
     Polymer({
       is: 'vaadin-date-picker-overlay',
-
-      behaviors: [
-        vaadin.elements.datepicker.LocaleAwareBehavior
-      ],
 
       properties: {
         /**
@@ -323,6 +327,10 @@
         this.$.scroller.position = this.$.yearScroller.position * 12;
 
         this._visibleMonthIndex = Math.floor(this.$.scroller.position);
+      },
+
+      _scrollToCurrentMonth: function() {
+        this.scrollToDate(new Date());
       },
 
       _scrollToCurrentMonth: function() {
