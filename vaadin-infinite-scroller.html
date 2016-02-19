@@ -32,6 +32,7 @@ This program is available under Apache License Version 2.0, available at https:/
       width: 100%;
       box-sizing: border-box;
       padding-right: 40px;
+      @apply(--vaadin-infinite-scroller-buffer);
     }
   </style>
 
@@ -109,6 +110,27 @@ This program is available under Apache License Version 2.0, available at https:/
       this.async(this._reset, 1);
     },
 
+    /**
+     * Scrolls the scroller with given amount of pixels animated within
+     * the given number of milliseconds.
+     */
+    scroll: function(pixels, duration) {
+      var start;
+      var initialScrollTop = this.$.scroller.scrollTop;
+      var smoothScroll = function(timestamp) {
+        if (!start) {
+          start = timestamp;
+        }
+
+        var progress = Math.min(1, (timestamp - start) / duration);
+        this.$.scroller.scrollTop = initialScrollTop + pixels * progress;
+        if (progress < 1) {
+          window.requestAnimationFrame(smoothScroll);
+        }
+      }.bind(this);
+      window.requestAnimationFrame(smoothScroll);
+    },
+
     _translateBuffer: function(up) {
       var index = up ? 1 : 0;
       this._buffers[index].translateY = this._buffers[(index ? 0 : 1)].translateY + this._bufferHeight * (index ? -1 : 1);
@@ -131,18 +153,13 @@ This program is available under Apache License Version 2.0, available at https:/
 
       if (upperThresholdReached || lowerThresholdReached) {
         this._translateBuffer(lowerThresholdReached);
-
-        // Call recursively to continue translating if necessary to make content visible.
-        this._scroll(null, true);
-      } else {
-        if (doUpdateClones) {
-          this._updateClones();
-        }
-        if (!this._preventScrollEvent) {
-          this.fire('scroll');
-        }
-        this._preventScrollEvent = false;
+        this._updateClones();
       }
+
+      if (!this._preventScrollEvent) {
+        this.fire('scroll');
+      }
+      this._preventScrollEvent = false;
     },
 
     /**
