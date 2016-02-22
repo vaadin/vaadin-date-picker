@@ -32,37 +32,38 @@
         window.vaadin = window.vaadin || {};
         vaadin.elements = vaadin.elements || {};
         vaadin.elements.i18n = vaadin.elements.i18n || {};
-        if (!vaadin.elements.i18n) {
-          vaadin.elements.i18n = addEventListener('vaadin-i18n', this._onI18nEvent);
+        if (!vaadin.elements.i18n.handler) {
+          vaadin.elements.i18n.handler = window.addEventListener('vaadin-i18n', this._onI18nEvent.bind(this));
         }
       },
 
       _localeChanged: function() {
         for (i in this._elementsLoaded) {
-          _internationaliseElement(this._elementsLoaded[i], this.locale);
+          this._i18nElement(this._elementsLoaded[i], this.locale);
         }
       },
 
       _onI18nEvent: function(ev) {
         var elem = ev.detail;
         var locale = this.locale || elem.locale || navigator.language.toLowerCase();
-        _internationaliseElement(elem, locale);
+        this._i18nElement(elem, locale);
       },
 
-      _internationaliseElement(elem, locale) {
+      _i18nElement: function(elem, locale) {
         if (elem._currentLocale != locale) {
           elem._currentLocale = locale;
           for (key in elem.i18n) {
-            this._internationaliseKey(elem, locale, key);
+            this._i18nKey(elem, locale, key);
           }
         }
       },
 
-      _internationaliseKey: function(elem, locale, key) {
-        this._weekDayNames = moment.localeData(locale)._weekdaysShort;
-        this._monthNames = moment.localeData(locale)._months;
-        this._firstDayOfWeek = moment.localeData(locale)._week.dow;
+      _setKey: function(elem, key, value) {
+        elem.i18n[key] = value;
+        elem.notifyPath('i18n.' + key, value);
+      },
 
+      _i18nKey: function(elem, locale, key) {
         if (key == 'moment') {
           this._loadLocaleMoment(locale, function() {
             this._setKey(elem, key, moment.localeData(locale));
@@ -71,7 +72,7 @@
           this._loadLocaleMoment(locale, function() {
             this._setKey(elem, key, moment.localeData(locale)._weekdaysShort);
           }.bind(this));
-        } else if (key == 'monthsShort') {
+        } else if (key == 'monthNames') {
           this._loadLocaleMoment(locale, function() {
             this._setKey(elem, key, moment.localeData(locale)._months);
           }.bind(this));
@@ -81,20 +82,23 @@
           }.bind(this));
         } else if (key == 'today') {
           this._loadLocaleMoment(locale, function() {
-            this._setKey(elem, key, moment.localeData(locale).calendar(Date.now()).replace(/(.+?) .*/,'$1'));
+            this._setKey(elem, key, moment().calendar(Date.now()).replace(/(.+?) .*/,'$1'));
           }.bind(this));
         }
       },
 
       _loadScript: function(src, done) {
-        if (_scriptsLoaded[src]) {
-          done();
+        var onLoad = function() {
+          Polymer.Base.async(done, 100);
+        }.bind(this);
+        if (this._scriptsLoaded[src]) {
+          onLoad();
         } else {
           var scriptElem = document.createElement('script');
           scriptElem.src = src;
-          scriptElem.addEventListener('load', done);
+          scriptElem.onload = onLoad;
           document.head.appendChild(scriptElem);
-          _scriptsLoaded[src] = scriptElem;
+          this._scriptsLoaded[src] = scriptElem;
         }
       },
 
@@ -105,9 +109,8 @@
       _loadLocaleMoment: function(locale, done) {
         this._loadMoment(function() {
           this._loadScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
-        });
+        }.bind(this));
       },
-
 
     });
     </script>
