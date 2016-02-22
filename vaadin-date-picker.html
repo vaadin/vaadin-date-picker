@@ -56,12 +56,12 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(value, _opened)]]" on-touchend="_preventDefault">
       <label id="label" on-tap="_open">[[label]]</label>
-      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, _readyLocale)]]" type="text" on-tap="_open">
+      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, locale)]]" type="text" on-tap="_open">
       <iron-icon id="clear" suffix on-tap="_clear" icon="clear"></iron-icon>
     </paper-input-container>
 
     <iron-dropdown id="dropdown" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
-      <vaadin-date-picker-overlay i18n=[[i18n]] id="overlay" locale="[[_readyLocale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay i18n="[[i18n]]" id="overlay" locale="[[locale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
   </template>
@@ -72,10 +72,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       behaviors: [
         vaadin.elements.datepicker.LocaleAwareBehavior
       ],
-
-      listeners: {
-        'locale-ready': '_localeReady'
-      },
 
       properties: {
 
@@ -93,37 +89,39 @@ When the selected `value` is changed, a `value-changed` event is triggered.
          */
         label: String,
 
-        // Property used for data-binding a locale that is ready to be used.
-        _readyLocale: String,
-
         _opened: Boolean,
 
         _fullscreenThresholdWidth: {
           value: 420
         },
 
+        locale: {
+          type: String
+        },
+
         i18n: {
           type: Object,
           value: function() {return {
             moment: function(){},
-            monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+            monthNames : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
             weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
-            firstDayOfWeek: 1
+            firstDayOfWeek: 1,
+            today: 'today'
           }}
         }
       },
 
       ready: function() {
-        console.log("vaadin-date-picker ready: ", this.i18n);
-      },
-
-      _localeReady: function(e) {
-        this._readyLocale = e.detail.locale;
+        // Notify vaadin-i18n-core that it can internationalise this component.
+        window.dispatchEvent(new CustomEvent('vaadin-i18n', {detail: this}));
       },
 
       _formatValue: function(value, locale) {
-        if (value) {
-          return moment(value).format(moment.localeData(locale).longDateFormat('L'));
+        if (moment && value) {
+          var data = moment.localeData(locale);
+          if (data) {
+            return moment(value).format(moment.localeData(locale).longDateFormat('L'));
+          }
         }
       },
 
@@ -170,6 +168,7 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       _preventDefault: function(e) {
         e.preventDefault();
       }
+
 
     });
   </script>

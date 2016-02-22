@@ -42,11 +42,11 @@
       <div id="yearLabel">[[_yearAfterXMonths(_visibleMonthIndex)]]</div>
       <paper-button id="todayButton" on-tap="_scrollToCurrentMonth">
         <iron-icon icon="event"></iron-icon>
-        today
+        [[i18n.today]]
       </paper-button>
     </div>
 
-    <vaadin-infinite-scroller id="scroller" on-scroll="_onListScroll" item-height="250" buffer-size="20">
+    <vaadin-infinite-scroller i18n="[[i18n]]" id="scroller" on-scroll="_onListScroll" item-height="250" buffer-size="20">
       <template>
         <vaadin-month-calendar i18n="[[i18n]]" locale="[[locale]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}"></vaadin-month-calendar>
       </template>
@@ -79,16 +79,7 @@
           value: new Date()
         },
 
-        _visibleMonthIndex: Number,
-
-
-        i18n: {
-          type: Object
-        }
-      },
-
-      ready: function(){
-        console.log("vaadin-date-picker-overlay ready: ", this.i18n);
+        _visibleMonthIndex: Number
       },
 
       /**

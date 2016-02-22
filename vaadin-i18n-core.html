@@ -7,8 +7,8 @@
       properties: {
         /**
          * Locale of the complete UI.
-         * If undefined, it will use default browser language, or locale
-         * in each component using iternationalisation.
+         * If undefined, it will use the locale defined in each component,
+         * or eventually the use the default browser language.
          * Syntax: `en-gb`, `fi`, `es`, etc.
          */
         locale: {
@@ -47,14 +47,15 @@
         var elem = ev.detail;
         var locale = this.locale || elem.locale || navigator.language.toLowerCase();
         this._i18nElement(elem, locale);
+        this._elementsLoaded.push(elem);
       },
 
       _i18nElement: function(elem, locale) {
-        if (elem._currentLocale != locale) {
-          elem._currentLocale = locale;
+        if (elem.locale != locale) {
           for (key in elem.i18n) {
             this._i18nKey(elem, locale, key);
           }
+          elem.locale = locale;
         }
       },
 
@@ -66,23 +67,23 @@
       _i18nKey: function(elem, locale, key) {
         if (key == 'moment') {
           this._loadLocaleMoment(locale, function() {
-            this._setKey(elem, key, moment.localeData(locale));
+            elem.set('i18n.' + key, moment.localeData(locale));
           }.bind(this));
         } else if (key == 'weekdaysShort') {
           this._loadLocaleMoment(locale, function() {
-            this._setKey(elem, key, moment.localeData(locale)._weekdaysShort);
+            elem.set('i18n.' + key, moment.localeData(locale)._weekdaysShort);
           }.bind(this));
         } else if (key == 'monthNames') {
           this._loadLocaleMoment(locale, function() {
-            this._setKey(elem, key, moment.localeData(locale)._months);
+            elem.set('i18n.' + key, moment.localeData(locale)._months);
           }.bind(this));
         } else if (key == 'firstDayOfWeek') {
           this._loadLocaleMoment(locale, function() {
-            this._setKey(elem, key, moment.localeData(locale)._week.dow);
+            elem.set('i18n.' + key, moment.localeData(locale)._week.dow);
           }.bind(this));
         } else if (key == 'today') {
           this._loadLocaleMoment(locale, function() {
-            this._setKey(elem, key, moment().calendar(Date.now()).replace(/(.+?) .*/,'$1'));
+            elem.set('i18n.' + key, moment().calendar(Date.now()).replace(/(.+?) .*/,'$1'));
           }.bind(this));
         }
       },
