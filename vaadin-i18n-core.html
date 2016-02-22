@@ -90,7 +90,7 @@
 
       _loadScript: function(src, done) {
         var onLoad = function() {
-          Polymer.Base.async(done, 100);
+          Polymer.Base.async(done, 10);
         }.bind(this);
         if (this._scriptsLoaded[src]) {
           onLoad();
