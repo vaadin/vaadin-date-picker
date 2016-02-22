@@ -48,7 +48,7 @@
 
     <vaadin-infinite-scroller id="scroller" on-scroll="_onListScroll" item-height="250" buffer-size="20">
       <template>
-        <vaadin-month-calendar locale="[[locale]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}"></vaadin-month-calendar>
+        <vaadin-month-calendar i18n="[[i18n]]" locale="[[locale]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}"></vaadin-month-calendar>
       </template>
     </vaadin-infinite-scroller>
 
@@ -79,7 +79,16 @@
           value: new Date()
         },
 
-        _visibleMonthIndex: Number
+        _visibleMonthIndex: Number,
+
+
+        i18n: {
+          type: Object
+        }
+      },
+
+      ready: function(){
+        console.log("vaadin-date-picker-overlay ready: ", this.i18n);
       },
 
       /**
