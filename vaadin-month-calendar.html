@@ -110,11 +110,19 @@
           notify: true
         },
 
+        i18n: {
+          type: Object
+        },
+
         _monthNames: Array,
 
         _weekDayNames: Array,
 
         _firstDayOfWeek: Number
+      },
+
+      ready: function() {
+        console.log("vaadin-month-calendar ready: ", this.i18n);
       },
 
       _localeReady: function(e) {

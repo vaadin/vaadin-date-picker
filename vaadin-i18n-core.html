@@ -67,11 +67,11 @@
           this._loadLocaleMoment(locale, function() {
             this._setKey(elem, key, moment.localeData(locale));
           }.bind(this));
-        } else if (key == 'weekDayNames') {
+        } else if (key == 'weekdaysShort') {
           this._loadLocaleMoment(locale, function() {
             this._setKey(elem, key, moment.localeData(locale)._weekdaysShort);
           }.bind(this));
-        } else if (key == 'monthNames') {
+        } else if (key == 'monthsShort') {
           this._loadLocaleMoment(locale, function() {
             this._setKey(elem, key, moment.localeData(locale)._months);
           }.bind(this));

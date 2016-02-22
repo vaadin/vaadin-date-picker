@@ -61,7 +61,7 @@ When the selected `value` is changed, a `value-changed` event is triggered.
     </paper-input-container>
 
     <iron-dropdown id="dropdown" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content" on-cancel="_close"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay id="overlay" i18n=[[i18n]] on-date-tap="_close" selected-date="{{value}}" class="dropdown-content" on-cancel="_close"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
   </template>
@@ -103,9 +103,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
          */
         label: String,
 
-        // Property used for data-binding a locale that is ready to be used.
-        _readyLocale: String,
-
         _opened: Boolean,
 
         _fullscreenThresholdWidth: {
@@ -114,7 +111,21 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 
         _fullscreen: {
           value: false
+        },
+
+        i18n: {
+          type: Object,
+          value: function() {return {
+            moment: function(){},
+            monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+            weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+            firstDayOfWeek: 1
+          }}
         }
+      },
+
+      ready: function() {
+        console.log("vaadin-date-picker ready: ", this.i18n);
       },
 
       _localeReady: function(e) {
