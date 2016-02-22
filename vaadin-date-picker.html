@@ -73,10 +73,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
     Polymer({
       is: 'vaadin-date-picker',
 
-      behaviors: [
-        vaadin.elements.datepicker.LocaleAwareBehavior
-      ],
-
       properties: {
 
         /**
@@ -131,7 +127,7 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       },
 
       _formatValue: function(value, locale) {
-        if (moment && value) {
+        if (window.moment && value) {
           var data = moment.localeData(locale);
           if (data) {
             return moment(value).format(moment.localeData(locale).longDateFormat('L'));
