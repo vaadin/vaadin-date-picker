@@ -69,12 +69,12 @@
       }
     </style>
 
-    <div id="title">[[_getTitle(month, _monthNames)]]</div>
+    <div id="title">[[_getTitle(month, i18n.monthNames)]]</div>
     <div id="monthGrid" on-tap="_handleTap">
-      <template is="dom-repeat" items="[[_getWeekDayNames(_weekDayNames, _firstDayOfWeek)]]">
+      <template is="dom-repeat" items="[[_getWeekDayNames(i18n.weekdaysShort, i18n.firstDayOfWeek)]]">
         <div class="weekday">[[item]]</div>
       </template>
-      <template is="dom-repeat" items="[[_getDays(month, _firstDayOfWeek)]]">
+      <template is="dom-repeat" items="[[_getDays(month, i18n.firstDayOfWeek)]]">
         <div today$="[[_isToday(item)]]" selected$="[[_isSelected(item, selectedDate)]]" date="[[item]]">[[_getDate(item)]]</div>
       </template>
     </div>
@@ -87,12 +87,7 @@
         vaadin.elements.datepicker.LocaleAwareBehavior
       ],
 
-      listeners: {
-        'locale-ready': '_localeReady'
-      },
-
       properties: {
-
         /**
          * A `Date` object defining the month to be displayed. Only year and
          * month properties are actually used.
@@ -108,28 +103,7 @@
         selectedDate: {
           type: Date,
           notify: true
-        },
-
-        i18n: {
-          type: Object
-        },
-
-        _monthNames: Array,
-
-        _weekDayNames: Array,
-
-        _firstDayOfWeek: Number
-      },
-
-      ready: function() {
-        console.log("vaadin-month-calendar ready: ", this.i18n);
-      },
-
-      _localeReady: function(e) {
-        var locale = e.detail.locale;
-        this._weekDayNames = moment.localeData(locale)._weekdaysShort;
-        this._monthNames = moment.localeData(locale)._months;
-        this._firstDayOfWeek = moment.localeData(locale)._week.dow;
+        }
       },
 
       _getTitle: function(month, monthNames) {
@@ -166,18 +140,18 @@
         return this._dateEquals(new Date(), date);
       },
 
-      _getDays: function() {
+      _getDays: function(month, firstDayOfWeek) {
         // First day of the month (at noon).
-        var date = new Date(this.month.getFullYear(), this.month.getMonth(), 1, 12, 0, 0);
+        var date = new Date(month.getFullYear(), month.getMonth(), 1, 12, 0, 0);
 
         // Rewind to first day of the week.
-        while (date.getDay() !== this._firstDayOfWeek) {
+        while (date.getDay() !== firstDayOfWeek) {
           this._dateAdd(date, -1);
         }
 
         var days = [];
         var startMonth = date.getMonth();
-        var targetMonth = this.month.getMonth();
+        var targetMonth = month.getMonth();
         while (date.getMonth() === targetMonth || date.getMonth() === startMonth) {
           days.push(date.getMonth() === targetMonth ? new Date(date) : null);
 

@@ -222,6 +222,7 @@
       }
     </style>
 
+<<<<<<< 5ab01c4990c3377a0bd74fc006ac14ceffed1ae1
     <div id="header" on-touchend="_preventDefault">
       <paper-input-container>
         <label>[[label]]</label>
@@ -248,6 +249,21 @@
         </template>
       </vaadin-infinite-scroller>
     </div>
+=======
+    <div id="toolbar">
+      <div id="yearLabel">[[_yearAfterXMonths(_visibleMonthIndex)]]</div>
+      <paper-button id="todayButton" on-tap="_scrollToCurrentMonth">
+        <iron-icon icon="event"></iron-icon>
+        [[i18n.today]]
+      </paper-button>
+    </div>
+
+    <vaadin-infinite-scroller i18n="[[i18n]]" id="scroller" on-scroll="_onListScroll" item-height="250" buffer-size="20">
+      <template>
+        <vaadin-month-calendar i18n="[[i18n]]" locale="[[locale]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}"></vaadin-month-calendar>
+      </template>
+    </vaadin-infinite-scroller>
+>>>>>>> Binding i18n properties to date-picker
 
     <div id="footer" on-touchend="_preventDefault">
       <paper-button id="todayButton" on-tap="_scrollToCurrentMonth">
