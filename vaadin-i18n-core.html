@@ -124,7 +124,7 @@
         if (this.locales[locale]) {
           done(this.locales[locale]);
         } else {
-          this._fetchJson(elem.resolveUrl('./locales/' + locale + ".json"), function(json) {
+          this._fetchJson(elem.resolveUrl('./locales/' + locale.replace(/-.+$/, '') + ".json"), function(json) {
             this.locales[locale] = json;
             done(json);
           }.bind(this));
@@ -133,7 +133,8 @@
 
       _fetchScript: function(src, done) {
         var onLoad = function() {
-          Polymer.Base.async(done, 100);
+          this._scriptsLoaded[src] = 1;
+          done();
         }.bind(this);
         if (this._scriptsLoaded[src]) {
           onLoad();
@@ -142,7 +143,6 @@
           scriptElem.src = src;
           scriptElem.onload = scriptElem.onError = onLoad;
           document.head.appendChild(scriptElem);
-          this._scriptsLoaded[src] = 1;
         }
       },
 
@@ -152,7 +152,11 @@
 
       _loadLocaleMoment: function(locale, done) {
         this._loadMoment(function() {
-          this._fetchScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
+          if (/^en(-us)?/i.test(locale)) {
+            done();
+          } else {
+            this._fetchScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
+          }
         }.bind(this));
       },
 

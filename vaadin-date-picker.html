@@ -25,7 +25,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
-<script src="../dateformat/dist/dateformat.min.js" charset="utf-8"></script>
 
 <dom-module id="vaadin-date-picker">
   <template>
@@ -104,7 +103,7 @@ When the selected `value` is changed, a `value-changed` event is triggered.
           value: {
             monthNames : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
             weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
-            firstDayOfWeek: 1,
+            firstDayOfWeek: 0,
             today: 'today',
             formatDate: function(d) {
               return [1 + d.getMonth(), d.getDate(), d.getFullYear()]
