@@ -109,21 +109,23 @@ When the selected `value` is changed, a `value-changed` event is triggered.
           value: false
         },
 
+        /**
+         *
+         */
         i18n: {
           type: Object,
-          value: function() {return {
-            moment: function(){},
+          value: {
             monthNames : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
             weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
             firstDayOfWeek: 1,
             today: 'today'
-          }}
+          }
         }
       },
 
       ready: function() {
         // Notify vaadin-i18n-core that it can internationalise this component.
-        window.dispatchEvent(new CustomEvent('vaadin-i18n', {detail: this}));
+        window.dispatchEvent(new CustomEvent('vaadin-i18n-register', {detail: this}));
       },
 
       _formatValue: function(value, locale) {
