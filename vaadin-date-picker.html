@@ -25,7 +25,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
-<link rel="import" href="vaadin-locale-aware-behavior.html">
 
 <dom-module id="vaadin-date-picker">
   <template>
@@ -56,26 +55,18 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(value, _opened)]]" on-touchend="_preventDefault">
       <label id="label" on-tap="_open">[[label]]</label>
-      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, _readyLocale)]]" type="text" on-tap="_open">
+      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, i18n.formatDate)]]" type="text" on-tap="_open">
       <iron-icon id="clear" suffix on-tap="_clear" icon="clear"></iron-icon>
     </paper-input-container>
 
     <iron-dropdown id="dropdown" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" locale="[[_readyLocale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay i18n="[[i18n]]" id="overlay" locale="[[locale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
   </template>
   <script>
     Polymer({
       is: 'vaadin-date-picker',
-
-      behaviors: [
-        vaadin.elements.datepicker.LocaleAwareBehavior
-      ],
-
-      listeners: {
-        'locale-ready': '_localeReady'
-      },
 
       properties: {
 
@@ -93,24 +84,42 @@ When the selected `value` is changed, a `value-changed` event is triggered.
          */
         label: String,
 
-        // Property used for data-binding a locale that is ready to be used.
-        _readyLocale: String,
-
         _opened: Boolean,
 
         _fullscreenThresholdWidth: {
           value: 420
+        },
+
+        locale: {
+          type: String
+        },
+
+        /**
+         * The object used to internationalise this component.
+         * Include <vaadin-i18n-core> for using other locales.
+         */
+        i18n: {
+          type: Object,
+          value: {
+            monthNames : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+            weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+            firstDayOfWeek: 0,
+            today: 'today',
+            formatDate: function(d) {
+              return [1 + d.getMonth(), d.getDate(), d.getFullYear()]
+                .join('/').replace(/(^|\/)(\d)(?=\/)/g,'$10$2')
+            }
+          }
         }
       },
 
-      _localeReady: function(e) {
-        this._readyLocale = e.detail.locale;
+      ready: function() {
+        // Notify vaadin-i18n-core that it can internationalise this component.
+        window.dispatchEvent(new CustomEvent('vaadin-i18n-register', {detail: this}));
       },
 
-      _formatValue: function(value, locale) {
-        if (value) {
-          return moment(value).format(moment.localeData(locale).longDateFormat('L'));
-        }
+      _formatValue: function(value) {
+        return value ? this.i18n.formatDate(value) : '';
       },
 
       _open: function() {

@@ -1,0 +1,165 @@
+  <link rel="import" href="../polymer/polymer.html">
+  <dom-module id="vaadin-i18n-core">
+    <template>
+    </template>
+    <script>
+    Polymer({
+      is: "vaadin-i18n-core",
+      properties: {
+        /**
+         * Locale of the complete UI.
+         * If undefined, it will use the locale defined in each component,
+         * or eventually the use the default browser language.
+         * Syntax: `en-gb`, `fi`, `es`, etc.
+         */
+        locale: {
+          type: String,
+          value: undefined,
+          observer: '_localeChanged'
+        },
+
+        /**
+         * All loaded locales, user could add new locales to the collection.
+         */
+        locales: {
+          type: Object,
+          value: {}
+        },
+
+        _elementsLoaded: {
+          type: Array,
+          value: []
+        },
+
+        _scriptsLoaded: {
+          type: Array,
+          value: []
+        }
+      },
+
+      ready: function() {
+        window.vaadin = window.vaadin || {};
+        vaadin.elements = vaadin.elements || {};
+        vaadin.elements.i18n = vaadin.elements.i18n || {};
+        if (!vaadin.elements.i18n.handler) {
+          vaadin.elements.i18n.handler = window.addEventListener('vaadin-i18n-register', this._onI18nEvent.bind(this));
+        }
+      },
+
+      _localeChanged: function() {
+        for (i in this._elementsLoaded) {
+          this._i18nElement(this._elementsLoaded[i], this.locale);
+        }
+      },
+
+      _onI18nEvent: function(ev) {
+        var elem = ev.detail;
+        var locale = this.locale || elem.locale || navigator.language.toLowerCase();
+        this._i18nElement(elem, locale);
+        this._elementsLoaded.push(elem);
+      },
+
+      _i18nElement: function(elem, locale) {
+        if (elem.locale != locale) {
+          for (key in elem.i18n) {
+            this._i18nKey(elem, locale, key);
+          }
+          elem.locale = locale;
+        }
+      },
+
+      _i18nKey: function(elem, locale, key) {
+        if (key == 'moment') {
+          this._loadLocaleMoment(locale, function() {
+            elem.set('i18n.' + key, moment.localeData(locale));
+          }.bind(this));
+        } else if (key == 'weekdaysShort') {
+          this._loadLocaleMoment(locale, function() {
+            elem.set('i18n.' + key, moment.localeData(locale)._weekdaysShort);
+          }.bind(this));
+        } else if (key == 'monthNames') {
+          this._loadLocaleMoment(locale, function() {
+            elem.set('i18n.' + key, moment.localeData(locale)._months);
+          }.bind(this));
+        } else if (key == 'firstDayOfWeek') {
+          this._loadLocaleMoment(locale, function() {
+            elem.set('i18n.' + key, moment.localeData(locale)._week.dow);
+          }.bind(this));
+        } else if (key == 'formatDate') {
+          this._loadLocaleMoment(locale, function() {
+            elem.set('i18n.' + key, function(d) {
+              return moment(d).format(moment.localeData(locale).longDateFormat('L'));
+            });
+          }.bind(this));
+        } else {
+          this._loadLocale(elem, locale, function(json) {
+            var val = json[key];
+            if (val != null) {
+              elem.set('i18n.' + key, json[key]);
+            }
+          }.bind(this));
+        }
+      },
+
+      _fetchJson: function(src, done) {
+        var data = this._scriptsLoaded[src];
+        if (data) {
+          Polymer.Base.async(function(){done(data)}, 100);
+        } else {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', src);
+          xhr.onload = function(e) {
+            if (e.target.status == 200) {
+              data = JSON.parse(e.target.response);
+              this._scriptsLoaded[src] = data;
+              done(data);
+            }
+          }.bind(this);
+          xhr.send();
+          this._scriptsLoaded[src] = 1;
+        }
+      },
+
+      _loadLocale: function(elem, locale, done) {
+        if (this.locales[locale]) {
+          done(this.locales[locale]);
+        } else {
+          this._fetchJson(elem.resolveUrl('./locales/' + locale.replace(/-.+$/, '') + ".json"), function(json) {
+            this.locales[locale] = json;
+            done(json);
+          }.bind(this));
+        }
+      },
+
+      _fetchScript: function(src, done) {
+        var onLoad = function() {
+          this._scriptsLoaded[src] = 1;
+          done();
+        }.bind(this);
+        if (this._scriptsLoaded[src]) {
+          onLoad();
+        } else {
+          var scriptElem = document.createElement('script');
+          scriptElem.src = src;
+          scriptElem.onload = scriptElem.onError = onLoad;
+          document.head.appendChild(scriptElem);
+        }
+      },
+
+      _loadMoment: function(done) {
+        this._fetchScript(this.resolveUrl('../moment/min/moment.min.js'), done);
+      },
+
+      _loadLocaleMoment: function(locale, done) {
+        this._loadMoment(function() {
+          if (/^en(-us)?/i.test(locale)) {
+            done();
+          } else {
+            this._fetchScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
+          }
+        }.bind(this));
+      },
+
+    });
+    </script>
+  </dom-module>

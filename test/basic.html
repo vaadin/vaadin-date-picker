@@ -131,14 +131,6 @@
         datepicker._open();
       });
 
-      it('should update displayed value format according to locale', function(done) {
-        datepicker.value = new Date(2000, 1, 1);
-        datepicker.locale = 'fi';
-        waitUntilLocaleAvailable('fi', function() {
-          expect(datepicker.$.input.bindValue).to.equal('01.02.2000');
-          done();
-        });
-      });
     });
   </script>
 
