@@ -70,10 +70,10 @@
 
     <div id="title">[[_getTitle(month, i18n.monthNames)]]</div>
     <div id="monthGrid" on-tap="_handleTap">
-      <template is="dom-repeat" items="[[_getWeekDayNames(i18n.weekdaysShort, i18n.firstDayOfWeek)]]">
+      <template is="dom-repeat" items="[[_getWeekDayNames(i18n.weekdaysShort, i18n.firstDayOfWeek, i18n)]]">
         <div class="weekday">[[item]]</div>
       </template>
-      <template is="dom-repeat" items="[[_getDays(month, i18n.firstDayOfWeek)]]">
+      <template is="dom-repeat" items="[[_getDays(month, i18n.firstDayOfWeek, i18n)]]">
         <div today$="[[_isToday(item)]]" selected$="[[_isSelected(item, selectedDate)]]" date="[[item]]">[[_getDate(item)]]</div>
       </template>
     </div>

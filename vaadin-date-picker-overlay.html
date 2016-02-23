@@ -8,7 +8,6 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="vaadin-month-calendar.html">
 <link rel="import" href="vaadin-infinite-scroller.html">
-<link rel="import" href="vaadin-locale-aware-behavior.html">
 
 <dom-module id="vaadin-date-picker-overlay">
   <template>
@@ -222,11 +221,10 @@
       }
     </style>
 
-<<<<<<< 5ab01c4990c3377a0bd74fc006ac14ceffed1ae1
     <div id="header" on-touchend="_preventDefault">
       <paper-input-container>
         <label>[[label]]</label>
-        <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(selectedDate, locale)]]">
+        <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[formatted]]">
         <iron-icon id="clear" suffix on-tap="_clear" icon="clear" showclear$="[[_showClear(selectedDate)]]"></iron-icon>
       </paper-input-container>
     </div>
@@ -249,28 +247,13 @@
         </template>
       </vaadin-infinite-scroller>
     </div>
-=======
-    <div id="toolbar">
-      <div id="yearLabel">[[_yearAfterXMonths(_visibleMonthIndex)]]</div>
-      <paper-button id="todayButton" on-tap="_scrollToCurrentMonth">
-        <iron-icon icon="event"></iron-icon>
-        [[i18n.today]]
-      </paper-button>
-    </div>
-
-    <vaadin-infinite-scroller i18n="[[i18n]]" id="scroller" on-scroll="_onListScroll" item-height="250" buffer-size="20">
-      <template>
-        <vaadin-month-calendar i18n="[[i18n]]" locale="[[locale]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}"></vaadin-month-calendar>
-      </template>
-    </vaadin-infinite-scroller>
->>>>>>> Binding i18n properties to date-picker
 
     <div id="footer" on-touchend="_preventDefault">
       <paper-button id="todayButton" on-tap="_scrollToCurrentMonth">
-        Today
+        [[i18n.today]]
       </paper-button>
       <paper-button id="cancelButton" on-tap="_cancel">
-        Cancel
+        [[i18n.cancel]]
       </paper-button>
     </div>
   </template>
@@ -285,15 +268,6 @@
         selectedDate: {
           type: Date,
           notify: true
-        },
-
-        /**
-         * Locale of this element used for formatting and naming of months and days.
-         * Must be a locale supported by [Moment.js](http://momentjs.com/),
-         * for example `en-gb`, `fi`, `es`, etc.
-         */
-        locale: {
-          type: String
         },
 
         _originDate: {
@@ -345,10 +319,6 @@
         this.$.scroller.position = this.$.yearScroller.position * 12;
 
         this._visibleMonthIndex = Math.floor(this.$.scroller.position);
-      },
-
-      _scrollToCurrentMonth: function() {
-        this.scrollToDate(new Date());
       },
 
       _scrollToCurrentMonth: function() {
@@ -482,6 +452,7 @@
       _preventDefault: function(e) {
         e.preventDefault();
       }
+
     });
   </script>
 </dom-module>

@@ -224,7 +224,6 @@ This program is available under Apache License Version 2.0, available at https:/
       }
     },
 
-
     /**
      * Implements extension point from Templatizer
      * Called as side-effect of a host path change, responsible for
@@ -234,11 +233,11 @@ This program is available under Apache License Version 2.0, available at https:/
       if (prop !== 'index') {
         this._buffers.forEach(function(buffer) {
           [].forEach.call(buffer.children, function(itemWrapper) {
-            itemWrapper.instance.notifyPath(prop, value, true)
+            itemWrapper.instance.notifyPath(prop, value, true);
           });
         });
       }
-    },
+    }
 
   });
 </script>

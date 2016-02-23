@@ -121,6 +121,11 @@
         expect(datepicker.$.input.bindValue).to.equal('12/31/1999');
       });
 
+      it('should reflect value in overlay label', function() {
+        datepicker.value = new Date(2000, 1, 1);
+        expect(datepicker.$.overlay.$.input.value).to.equal('02/01/2000');
+      });
+
       it('should not show clear icon', function(done) {
         expect(datepicker.$.clear.clientHeight).to.equal(0);
         datepicker.value = new Date(2000, 1, 1);
@@ -146,14 +151,6 @@
         datepicker._open();
       });
 
-      it('should update displayed value format according to locale', function(done) {
-        datepicker.value = new Date(2000, 1, 1);
-        datepicker.locale = 'fi';
-        waitUntilLocaleAvailable('fi', function() {
-          expect(datepicker.$.input.bindValue).to.equal('01.02.2000');
-          done();
-        });
-      });
     });
   </script>
 

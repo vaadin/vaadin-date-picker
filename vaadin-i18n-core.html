@@ -4,7 +4,7 @@
     </template>
     <script>
     Polymer({
-      is: "vaadin-i18n-core",
+      is: 'vaadin-i18n-core',
       properties: {
         /**
          * Locale of the complete UI.
@@ -47,21 +47,21 @@
       },
 
       _localeChanged: function() {
-        for (i in this._elementsLoaded) {
+        for (var i in this._elementsLoaded) {
           this._i18nElement(this._elementsLoaded[i], this.locale);
         }
       },
 
       _onI18nEvent: function(ev) {
         var elem = ev.detail;
-        var locale = this.locale || elem.locale || navigator.language.toLowerCase();
+        var locale = elem.locale || this.locale || navigator.language.toLowerCase();
         this._i18nElement(elem, locale);
         this._elementsLoaded.push(elem);
       },
 
       _i18nElement: function(elem, locale) {
         if (elem.locale != locale) {
-          for (key in elem.i18n) {
+          for (var key in elem.i18n) {
             this._i18nKey(elem, locale, key);
           }
           elem.locale = locale;
@@ -94,7 +94,7 @@
         } else {
           this._loadLocale(elem, locale, function(json) {
             var val = json[key];
-            if (val != null) {
+            if (val) {
               elem.set('i18n.' + key, json[key]);
             }
           }.bind(this));
@@ -104,7 +104,7 @@
       _fetchJson: function(src, done) {
         var data = this._scriptsLoaded[src];
         if (data) {
-          Polymer.Base.async(function(){done(data)}, 100);
+          Polymer.Base.async(function() {done(data);}, 100);
         } else {
           var xhr = new XMLHttpRequest();
           xhr.open('GET', src);
@@ -124,7 +124,7 @@
         if (this.locales[locale]) {
           done(this.locales[locale]);
         } else {
-          this._fetchJson(elem.resolveUrl('./locales/' + locale + ".json"), function(json) {
+          this._fetchJson(elem.resolveUrl('./locales/' + locale.replace(/-.+$/, '') + '.json'), function(json) {
             this.locales[locale] = json;
             done(json);
           }.bind(this));
@@ -133,7 +133,8 @@
 
       _fetchScript: function(src, done) {
         var onLoad = function() {
-          Polymer.Base.async(done, 100);
+          this._scriptsLoaded[src] = 1;
+          done();
         }.bind(this);
         if (this._scriptsLoaded[src]) {
           onLoad();
@@ -142,7 +143,6 @@
           scriptElem.src = src;
           scriptElem.onload = scriptElem.onError = onLoad;
           document.head.appendChild(scriptElem);
-          this._scriptsLoaded[src] = 1;
         }
       },
 
@@ -152,7 +152,11 @@
 
       _loadLocaleMoment: function(locale, done) {
         this._loadMoment(function() {
-          this._fetchScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
+          if (/^en(-us)?/i.test(locale)) {
+            done();
+          } else {
+            this._fetchScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
+          }
         }.bind(this));
       },
 
