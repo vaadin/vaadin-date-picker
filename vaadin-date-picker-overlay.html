@@ -192,10 +192,11 @@
       #clear {
         color: #fff;
         cursor: pointer;
+        display: none;
       }
 
-      #clear[hideclear] {
-        display: none;
+      #clear[showclear] {
+        display: flex;
       }
 
       #footer {
@@ -217,8 +218,8 @@
     </style>
 
     <div id="header" on-touchend="_preventDefault">
-      <paper-input readonly="true" value="[[_formatValue(selectedDate, locale)]]" label=[[label]]>
-        <iron-icon id="clear" suffix on-tap="_clear" icon="clear" hideclear$="[[!selectedDate]]"></iron-icon>
+      <paper-input id="input" readonly="true" value="[[_formatValue(selectedDate, locale)]]" label=[[label]]>
+        <iron-icon id="clear" suffix on-tap="_clear" icon="clear" showclear$="[[selectedDate]]"></iron-icon>
       </paper-input>
     </div>
 
