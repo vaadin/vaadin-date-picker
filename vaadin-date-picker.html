@@ -25,7 +25,7 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
-<link rel="import" href="vaadin-locale-aware-behavior.html">
+<script src="../dateformat/dist/dateformat.min.js" charset="utf-8"></script>
 
 <dom-module id="vaadin-date-picker">
   <template>
@@ -56,7 +56,7 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(value, _opened, _fullscreen)]]" on-touchend="_preventDefault">
       <label id="label" on-tap="_open">[[label]]</label>
-      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, locale)]]" type="text" on-tap="_open">
+      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, i18n.formatDate)]]" type="text" on-tap="_open">
       <iron-icon id="clear" suffix on-tap="_clear" icon="clear"></iron-icon>
     </paper-input-container>
 
@@ -110,7 +110,8 @@ When the selected `value` is changed, a `value-changed` event is triggered.
         },
 
         /**
-         *
+         * The object used to internationalise this component.
+         * Include <vaadin-i18n-core> for using other locales.
          */
         i18n: {
           type: Object,
@@ -118,7 +119,11 @@ When the selected `value` is changed, a `value-changed` event is triggered.
             monthNames : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
             weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
             firstDayOfWeek: 1,
-            today: 'today'
+            today: 'today',
+            formatDate: function(d) {
+              return [1 + d.getMonth(), d.getDate(), d.getFullYear()]
+                .join('/').replace(/(^|\/)(\d)(?=\/)/g,'$10$2')
+            }
           }
         }
       },
@@ -128,13 +133,8 @@ When the selected `value` is changed, a `value-changed` event is triggered.
         window.dispatchEvent(new CustomEvent('vaadin-i18n-register', {detail: this}));
       },
 
-      _formatValue: function(value, locale) {
-        if (window.moment && value) {
-          var data = moment.localeData(locale);
-          if (data) {
-            return moment(value).format(moment.localeData(locale).longDateFormat('L'));
-          }
-        }
+      _formatValue: function(value) {
+        return value ? this.i18n.formatDate(value) : '';
       },
 
       _open: function() {
@@ -180,7 +180,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       _preventDefault: function(e) {
         e.preventDefault();
       }
-
 
     });
   </script>

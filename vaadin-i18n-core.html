@@ -1,3 +1,4 @@
+  <link rel="import" href="../polymer/polymer.html">
   <dom-module id="vaadin-i18n-core">
     <template>
     </template>
@@ -67,11 +68,6 @@
         }
       },
 
-      _setKey: function(elem, key, value) {
-        elem.i18n[key] = value;
-        elem.notifyPath('i18n.' + key, value);
-      },
-
       _i18nKey: function(elem, locale, key) {
         if (key == 'moment') {
           this._loadLocaleMoment(locale, function() {
@@ -88,6 +84,12 @@
         } else if (key == 'firstDayOfWeek') {
           this._loadLocaleMoment(locale, function() {
             elem.set('i18n.' + key, moment.localeData(locale)._week.dow);
+          }.bind(this));
+        } else if (key == 'formatDate') {
+          this._loadLocaleMoment(locale, function() {
+            elem.set('i18n.' + key, function(d) {
+              return moment(d).format(moment.localeData(locale).longDateFormat('L'));
+            });
           }.bind(this));
         } else {
           this._loadLocale(elem, locale, function(json) {
@@ -138,7 +140,7 @@
         } else {
           var scriptElem = document.createElement('script');
           scriptElem.src = src;
-          scriptElem.onload = onLoad;
+          scriptElem.onload = scriptElem.onError = onLoad;
           document.head.appendChild(scriptElem);
           this._scriptsLoaded[src] = 1;
         }
