@@ -17,6 +17,14 @@
           observer: '_localeChanged'
         },
 
+        /**
+         * All loaded locales, user could add new locales to the collection.
+         */
+        locales: {
+          type: Object,
+          value: {}
+        },
+
         _elementsLoaded: {
           type: Array,
           value: []
@@ -33,7 +41,7 @@
         vaadin.elements = vaadin.elements || {};
         vaadin.elements.i18n = vaadin.elements.i18n || {};
         if (!vaadin.elements.i18n.handler) {
-          vaadin.elements.i18n.handler = window.addEventListener('vaadin-i18n', this._onI18nEvent.bind(this));
+          vaadin.elements.i18n.handler = window.addEventListener('vaadin-i18n-register', this._onI18nEvent.bind(this));
         }
       },
 
@@ -81,16 +89,49 @@
           this._loadLocaleMoment(locale, function() {
             elem.set('i18n.' + key, moment.localeData(locale)._week.dow);
           }.bind(this));
-        } else if (key == 'today') {
-          this._loadLocaleMoment(locale, function() {
-            elem.set('i18n.' + key, moment().calendar(Date.now()).replace(/(.+?) .*/,'$1'));
+        } else {
+          this._loadLocale(elem, locale, function(json) {
+            var val = json[key];
+            if (val != null) {
+              elem.set('i18n.' + key, json[key]);
+            }
           }.bind(this));
         }
       },
 
-      _loadScript: function(src, done) {
+      _fetchJson: function(src, done) {
+        var data = this._scriptsLoaded[src];
+        if (data) {
+          Polymer.Base.async(function(){done(data)}, 100);
+        } else {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', src);
+          xhr.onload = function(e) {
+            if (e.target.status == 200) {
+              data = JSON.parse(e.target.response);
+              this._scriptsLoaded[src] = data;
+              done(data);
+            }
+          }.bind(this);
+          xhr.send();
+          this._scriptsLoaded[src] = 1;
+        }
+      },
+
+      _loadLocale: function(elem, locale, done) {
+        if (this.locales[locale]) {
+          done(this.locales[locale]);
+        } else {
+          this._fetchJson(elem.resolveUrl('./locales/' + locale + ".json"), function(json) {
+            this.locales[locale] = json;
+            done(json);
+          }.bind(this));
+        }
+      },
+
+      _fetchScript: function(src, done) {
         var onLoad = function() {
-          Polymer.Base.async(done, 10);
+          Polymer.Base.async(done, 100);
         }.bind(this);
         if (this._scriptsLoaded[src]) {
           onLoad();
@@ -99,17 +140,17 @@
           scriptElem.src = src;
           scriptElem.onload = onLoad;
           document.head.appendChild(scriptElem);
-          this._scriptsLoaded[src] = scriptElem;
+          this._scriptsLoaded[src] = 1;
         }
       },
 
       _loadMoment: function(done) {
-        this._loadScript(this.resolveUrl('../moment/min/moment.min.js'), done);
+        this._fetchScript(this.resolveUrl('../moment/min/moment.min.js'), done);
       },
 
       _loadLocaleMoment: function(locale, done) {
         this._loadMoment(function() {
-          this._loadScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
+          this._fetchScript(this.resolveUrl('../moment/locale/' + locale + '.js'), done);
         }.bind(this));
       },
 
