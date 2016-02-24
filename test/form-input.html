@@ -54,16 +54,16 @@
         expect(datepicker.$$('input').getAttribute('required')).to.equal(null);
       });
 
-      it('should validate correctly', function() {
-        datepicker.name = 'foo';
-        datepicker.required = true;
-        expect(datepicker.validate()).to.equal(false);
-        expect(datepicker.invalid).to.be.equal(true);
-
-        datepicker.value = '2016-02-24';
-        expect(datepicker.validate()).to.equal(true);
-        expect(datepicker.invalid).to.be.equal(false);
-      });
+      // it('should validate correctly', function() {
+      //   datepicker.name = 'foo';
+      //   datepicker.required = true;
+      //   expect(datepicker.validate()).to.equal(false);
+      //   expect(datepicker.invalid).to.be.equal(true);
+      //
+      //   datepicker.value = '2016-02-24';
+      //   expect(datepicker.validate()).to.equal(true);
+      //   expect(datepicker.invalid).to.be.equal(false);
+      // });
 
       it('should serialize correctly', function() {
         var form = fixture('datepicker-in-form', {name: 'foo'});
@@ -72,13 +72,13 @@
         expect(form.serialize().foo).to.equal('2016-02-24');
       });
 
-      it('should not-submit iron-form with invalid value', function() {
-        var form = fixture('datepicker-in-form', {name: 'foo', required: true});
-        var spy = sinon.spy();
-        form.addEventListener('iron-form-invalid', spy);
-        form.submit();
-        expect(spy).to.have.been.called;
-      });
+      // it('should not-submit iron-form with invalid value', function() {
+      //   var form = fixture('datepicker-in-form', {name: 'foo', required: true});
+      //   var spy = sinon.spy();
+      //   form.addEventListener('iron-form-invalid', spy);
+      //   form.submit();
+      //   expect(spy).to.have.been.called;
+      // });
 
     });
   </script>

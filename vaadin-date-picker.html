@@ -18,6 +18,22 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 This element is also extended with the `IronFormElementBehavior` to
 enable usage within an `iron-form`.
 
+The user can internationalise this element just changing the i18n object:
+```html
+<vaadin-date-picker id='my-picker' label="Birthday"></vaadin-date-picker>
+```
+```js
+document.getElementById('my-picker').i18n = {
+  today: 'tänään',
+  cancel: 'peruuta',
+  firstDayOfWeek: 1,
+  monthNames: ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu',
+               'heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'],
+  weekdaysShort: ['su','ma','ti','ke','to','pe','la'],
+  formatDate: 'DD.MM.YYYY'
+}
+```
+
 ### Styling
 The following custom properties and mixins are available for styling:
 
@@ -66,7 +82,6 @@ See paper-input-container documentation for styling the included input fields
 <link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
-<link rel="import" href="vaadin-locale-aware-behavior.html">
 
 <dom-module id="vaadin-date-picker">
   <template>
@@ -129,7 +144,9 @@ See paper-input-container documentation for styling the included input fields
 
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" tabindex="1" on-touchend="_preventDefault" on-tap="open">
       <label id="label">[[label]]</label>
-      <input id="input" is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(_selectedDate, _readyLocale)]]" type="text" invalid="[[invalid]]" name$="[[name]]" required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer">
+      <input id="input" is="iron-input" autocomplete="off"
+        bind-value="[[_formatValue(value)]]" type="text" invalid="[[invalid]]" name$="[[name]]"
+        required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer">
 
       <div suffix id="clear" on-tap="_clear" hidden$="[[_hideClearIcon(value, opened)]]">
         <iron-icon icon="clear"></iron-icon>
@@ -143,7 +160,7 @@ See paper-input-container documentation for styling the included input fields
     </paper-input-container>
 
     <iron-dropdown id="dropdown" fullscreen$=[[_fullscreen]] allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" on-iron-overlay-closed="_onOverlayClosed" on-iron-overlay-canceled="_preventCancelOnInputContainerTap" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="close" selected-date="{{_selectedDate}}" class="dropdown-content" on-cancel="close"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay id="overlay" i18n="[[i18n]]" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="close" selected-date="{{_selectedDate}}" class="dropdown-content" on-cancel="close"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
     <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"></iron-media-query>
@@ -151,16 +168,6 @@ See paper-input-container documentation for styling the included input fields
   <script>
     Polymer({
       is: 'vaadin-date-picker',
-
-      behaviors: [
-        Polymer.IronFormElementBehavior,
-        Polymer.IronValidatableBehavior,
-        vaadin.elements.datepicker.LocaleAwareBehavior
-      ],
-
-      listeners: {
-        'locale-ready': '_localeReady'
-      },
 
       properties: {
 
@@ -200,9 +207,6 @@ See paper-input-container documentation for styling the included input fields
          */
         label: String,
 
-        // Property used for data-binding a locale that is ready to be used.
-        _readyLocale: String,
-
         _opened: Boolean,
 
         _fullscreen: {
@@ -216,7 +220,23 @@ See paper-input-container documentation for styling the included input fields
 
         // An array of ancestor elements whose -webkit-overflow-scrolling is forced from value
         // 'touch' to value 'auto' in order to prevent them from clipping the dropdown. iOS only.
-        _touchPrevented: Array
+        _touchPrevented: Array,
+
+        i18n: {
+          type: Object,
+          value:  function() {
+            return {
+              monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+              weekdaysShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+              firstDayOfWeek: 0,
+              today: 'today',
+              cancel: 'cancel',
+              formatDate: function(d) {
+                return this._formatISO(d);
+              }
+            }
+         }
+       }
       },
 
       /**
@@ -254,6 +274,11 @@ See paper-input-container documentation for styling the included input fields
           '';
       },
 
+      _formatValue: function(value) {
+        var fnc = this.i18n && typeof this.i18n.formatDate == 'function' ? this.i18n.formatDate.bind(this) : this._formatISO;
+        return fnc(typeof value == 'string' ? this._parseDate(value) : value);
+      },
+
       _selectedDateChanged: function(selectedDate) {
         this.value = this._formatISO(selectedDate);
       },
@@ -269,7 +294,6 @@ See paper-input-container documentation for styling the included input fields
           this.value = oldValue;
           return;
         }
-
         if (!(this._selectedDate instanceof Date) ||
           date.getFullYear() !== this._selectedDate.getFullYear() ||
           date.getMonth() !== this._selectedDate.getMonth() ||
