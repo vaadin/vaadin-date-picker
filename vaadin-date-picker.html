@@ -14,6 +14,23 @@ month calendar view.
 datePicker.value = new Date();
 ```
 When the selected `value` is changed, a `value-changed` event is triggered.
+
+The user can internationalise this element just changing the i18n object:
+```html
+<vaadin-date-picker id='my-picker' label="Birthday"></vaadin-date-picker>
+```
+```js
+document.getElementById('my-picker').i18n = {
+  today: 'tänään',
+  cancel: 'peruuta',
+  firstDayOfWeek: 1,
+  monthNames: ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu',
+               'heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'],
+  weekdaysShort: ['su','ma','ti','ke','to','pe','la'],
+  formatDate: 'DD.MM.YYYY'
+}
+```
+
 @element vaadin-date-picker
 @demo demo/
 -->
@@ -26,7 +43,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
-<link rel="import" href="vaadin-locale-aware-behavior.html">
 
 <dom-module id="vaadin-date-picker">
   <template>
@@ -68,13 +84,15 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(value, _opened, _fullscreen)]]" on-touchend="_preventDefault">
       <label id="label" on-tap="_open">[[label]]</label>
-      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, _readyLocale)]]" type="text" on-tap="_open">
+      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, i18n.formatDate)]]" type="text" on-tap="_open">
+
       <iron-icon id="clear" suffix on-tap="_clear" icon="clear"></iron-icon>
       <iron-icon id="calendar" suffix on-tap="_open" icon="event" open$="{{_opened}}"></iron-icon>
     </paper-input-container>
 
     <iron-dropdown id="dropdown" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content" on-cancel="_close"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay id="overlay" i18n="[[i18n]]" fullscreen$=[[_fullscreen]] label=[[label]] formatted="[[formatted]]"
+         on-date-tap="_close" selected-date="{{value}}" class="dropdown-content" on-cancel="_close"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
     <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"></iron-media-query>
@@ -82,14 +100,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
   <script>
     Polymer({
       is: 'vaadin-date-picker',
-
-      behaviors: [
-        vaadin.elements.datepicker.LocaleAwareBehavior
-      ],
-
-      listeners: {
-        'locale-ready': '_localeReady'
-      },
 
       properties: {
 
@@ -117,9 +127,6 @@ When the selected `value` is changed, a `value-changed` event is triggered.
          */
         label: String,
 
-        // Property used for data-binding a locale that is ready to be used.
-        _readyLocale: String,
-
         _opened: Boolean,
 
         _fullscreen: {
@@ -129,11 +136,61 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 
         _fullscreenMediaQuery: {
           value: '(max-width: 420px), (orientation: landscape) and (max-width: 800px)'
+        },
+
+        /**
+         * Locale for the element.
+         * When it changes it does nothing but send a `vaadin-i18n-register`
+         * event so as `<vaadin-i18n-core>` is notified.
+         * Syntax: `en-gb`, `fi`, `es`, etc.
+         */
+        locale: {
+          type: String,
+          value: undefined,
+          observer: '_localeChanged'
+        },
+
+        /**
+         * The object used to localise this component.
+         *
+         * For internationalising this component, you can either:
+         * include `<vaadin-i18n-core>` in your UI, or provide your customised
+         * `i18n` object.
+         */
+        i18n: {
+          type: Object,
+          value: {
+            monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+            weekdaysShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+            firstDayOfWeek: 0,
+            today: 'today',
+            cancel: 'cancel',
+            formatDate: 'MM/DD/YYYY'
+          }
         }
       },
 
-      _localeReady: function(e) {
-        this._readyLocale = e.detail.locale;
+      ready: function() {
+        this._localeChanged();
+      },
+
+      _localeChanged: function() {
+        // Notify vaadin-i18n-core (if it has been loaded), that this element
+        // can be internationalised.
+        window.dispatchEvent(new CustomEvent('vaadin-i18n-register', {detail: this}));
+      },
+
+      _formatValue: function(value) {
+        var fnc = typeof this.i18n.formatDate == 'function' ? this.i18n.formatDate :
+          // A very basic date format implementation, you can provide a better implementation
+          // using the `i18n.formatDate` property.
+          function(d, format) {
+            function pad(n) {return ('0' + n).replace(/.*(..)/,'$1');}
+            return format.replace(/DD/ig, pad(d.getDate()))
+                         .replace(/MM/, pad(d.getMonth() + 1))
+                         .replace(/Y+/ig, d.getFullYear());
+          }.bind(this);
+        return (this.formatted = value ? fnc(value, this.i18n.formatDate) : '');
       },
 
       _open: function() {

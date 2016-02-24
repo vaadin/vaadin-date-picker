@@ -21,7 +21,28 @@
 
 <body>
   <vaadin-date-picker label="Pick a date"></vaadin-date-picker>
-  <vaadin-date-picker label="Birthday" value="2000-01-01T00:00:00"></vaadin-date-picker>
+  <vaadin-date-picker label="Birthday" value="2000-03-01T00:00:00"></vaadin-date-picker>
+  <vaadin-date-picker id="spanish" label="Seleccione un día"></vaadin-date-picker>
+  <vaadin-date-picker id="finnish" label="Valitse päivämäärä"></vaadin-date-picker>
+  <script>
+    HTMLImports.whenReady(function() {
+      document.getElementById('spanish').i18n = {
+        today: 'hoy',
+        cancel: 'cancelar',
+        weekdaysShort: ['dom','lun','mar','mié','jue','vie','sáb.'],
+        firstDayOfWeek: 1,
+        monthNames: ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],
+        formatDate: 'DD-MM-YYYY'
+      };
+      document.getElementById('finnish').i18n = {
+        today: 'tänään',
+        cancel: 'peruuta',
+        firstDayOfWeek: 1,
+        monthNames: 'tammikuu_helmikuu_maaliskuu_huhtikuu_toukokuu_kesäkuu_heinäkuu_elokuu_syyskuu_lokakuu_marraskuu_joulukuu'.split('_'),
+        weekdaysShort: 'su_ma_ti_ke_to_pe_la'.split('_'),
+        formatDate: 'DD.MM.YYYY'
+      };
+    });
+  </script>
 </body>
-
 </html>

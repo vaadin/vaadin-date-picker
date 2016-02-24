@@ -29,3 +29,22 @@ datePicker.addEventListener('value-changed', function() {
   console.log('Selected: ' + datePicker.value);
 });
 ----
+
+To change the locale of the component, provide a customized `i18n` property object.
+
+[source,html]
+----
+<vaadin-date-picker id='my-picker' label="Birthday"></vaadin-date-picker>
+----
+[source,javascript]
+----
+document.getElementById('my-picker').i18n = {
+  today: 'tänään',
+  cancel: 'peruuta',
+  firstDayOfWeek: 1,
+  monthNames: ['tammikuu','helmikuu','maaliskuu','huhtikuu','toukokuu','kesäkuu',
+               'heinäkuu','elokuu','syyskuu','lokakuu','marraskuu','joulukuu'],
+  weekdaysShort: ['su','ma','ti','ke','to','pe','la'],
+  formatDate: 'DD.MM.YYYY'
+}
+----
