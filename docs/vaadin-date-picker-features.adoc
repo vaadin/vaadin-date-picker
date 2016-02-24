@@ -1,0 +1,36 @@
+---
+title: Other features
+order: 3
+layout: page
+---
+
+[[vaadin-date-picker.features]]
+= Other Features
+
+== Localization
+
+The [vaadinelement]#vaadin-date-picker# has built-in support for multiple locales.
+
+You can adjust the element to a specific locale with the [propertyname]#locale# property.
+The value should be a locale identifier given in the BCP 47 format, such as `en-gb`, `fi`, or `es`.
+The date picker supports all the locales supported by the link:http://momentjs.com/[moment.js] library. Please refer to its website for the complete list of supported locales.
+
+Once set, the locale affects how months and dates are displayed in the [vaadinelement]#vaadin-date-picker# dropdown.
+
+
+[source,html]
+----
+<vaadin-date-picker locale="fi"></vaadin-date-picker>
+----
+
+== Initial Position
+
+After opening the [vaadinelement]#vaadin-date-picker# dropdown, it automatically scrolls to the month with the current date.
+Use [propertyname]#initialPosition# property to change the default from the current date to something else.
+
+Note: If a value is selected, [vaadinelement]#vaadin-date-picker# always scrolls to the month with the selected date.
+
+[source,html]
+----
+<vaadin-date-picker initial-position="2020-05-01"></vaadin-date-picker>
+----
