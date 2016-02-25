@@ -10,13 +10,15 @@ layout: page
 The user can select a date by clicking or tapping on it.
 Use of keyboard for navigation or for entering the date is not yet supported in the alpha version of the element.
 
-The type of the value is a JavaScript [classname]#Date# object or an empty [classname]#String# when no selection is made.
+The type of the value is a ISO 8601 formatted [classname]#String# or an empty [classname]#String# when no selection is made.
+When representing years below 0 or above 9999, the ISO 8601 extended 6-digit year format is used (e.g.: `"-000001-01-01"` for year -1, `"+010000-01-01"` for year 10000).
+
 You can set the value programmatically by assigning the [propertyname]#value# property or by using the [propertyname]#value# attribute.
-The attribute value should be a Date-parsable [classname]#String# representation.
+The attribute value should be a ISO 8601 formatted [classname]#String#.
 
 [source,html]
 ----
-<vaadin-date-picker value="1999-12-31T00:00:00"></vaadin-date-picker>
+<vaadin-date-picker value="1999-12-31"></vaadin-date-picker>
 ----
 
 In order to listen to changes in this value, you can add a `value-changed` listener to the [elementname]#vaadin-date-picker#.
@@ -24,7 +26,7 @@ In order to listen to changes in this value, you can add a `value-changed` liste
 [source,javascript]
 ----
 // Log the selected dates to console.
-// Example output: "Selected: Sun Feb 14 2016 12:00:00 GMT+0200 (EET)"
+// Example output: "Selected: 2016-02-14"
 datePicker.addEventListener('value-changed', function() {
   console.log('Selected: ' + datePicker.value);
 });

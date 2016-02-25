@@ -14,6 +14,10 @@ month calendar view.
 datePicker.value = new Date();
 ```
 When the selected `value` is changed, a `value-changed` event is triggered.
+
+This element is also extended with the `IronFormElementBehavior` to
+enable usage within an `iron-form`.
+
 @element vaadin-date-picker
 @demo demo/
 -->
@@ -25,6 +29,8 @@ When the selected `value` is changed, a `value-changed` event is triggered.
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
 <link rel="import" href="vaadin-locale-aware-behavior.html">
 
@@ -66,15 +72,15 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       }
     </style>
 
-    <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(value, _opened, _fullscreen)]]" on-touchend="_preventDefault">
+    <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" on-touchend="_preventDefault">
       <label id="label" on-tap="_open">[[label]]</label>
-      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatValue(value, _readyLocale)]]" type="text" on-tap="_open">
+      <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(_selectedDate, _readyLocale)]]" name$="[[name]]" type="text" required$="[[required]]" on-tap="_open">
       <iron-icon id="clear" suffix on-tap="_clear" icon="clear"></iron-icon>
       <iron-icon id="calendar" suffix on-tap="_open" icon="event" open$="{{_opened}}"></iron-icon>
     </paper-input-container>
 
     <iron-dropdown id="dropdown" allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="_close" selected-date="{{value}}" class="dropdown-content" on-cancel="_close"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay id="overlay" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="_close" selected-date="{{_selectedDate}}" class="dropdown-content" on-cancel="_close"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
     <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"></iron-media-query>
@@ -84,6 +90,8 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       is: 'vaadin-date-picker',
 
       behaviors: [
+        Polymer.IronFormElementBehavior,
+        Polymer.IronValidatableBehavior,
         vaadin.elements.datepicker.LocaleAwareBehavior
       ],
 
@@ -94,23 +102,27 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       properties: {
 
         /**
+         * The current selected date.
+         */
+        _selectedDate: {
+          type: Date,
+          notify: true,
+          observer: '_selectedDateChanged'
+        },
+
+        /**
          * The value for this element.
          */
         value: {
-          type: Date,
-          notify: true,
-          value: ''
+          type: String,
+          value: '',
+          observer: '_valueChanged'
         },
 
         /**
          * Date which should be visible when there is no value selected.
          */
-        initialPosition: {
-          type: Date,
-          value: function() {
-            return new Date();
-          }
-        },
+        initialPosition: String,
 
         /**
          * The label for this element.
@@ -132,8 +144,64 @@ When the selected `value` is changed, a `value-changed` event is triggered.
         }
       },
 
+      _parseDate: function(str) {
+        // Parsing with RegExp to ensure correct format
+        var parts = /^(\d{4}|[-+]\d{6})-(\d{2})-(\d{2})$/.exec(str);
+        if (!parts) {
+          return;
+        }
+
+        var date = new Date(0, 0); // Wrong date (1900-01-01), but with midnight in local time
+        date.setFullYear(parseInt(parts[1], 10));
+        date.setMonth(parseInt(parts[2], 10) - 1);
+        date.setDate(parseInt(parts[3], 10));
+        return date;
+      },
+
+      _formatISO: function(date) {
+        return date instanceof Date
+          ? (new Date(date.getTime() - date.getTimezoneOffset() * 60000)).toISOString().split('T')[0]
+          : '';
+      },
+
+      _selectedDateChanged: function(selectedDate) {
+        var value = this._formatISO(selectedDate);
+
+        if (this.value !== value) {
+          this.value = value;
+        }
+      },
+
+      _valueChanged: function(value, oldValue) {
+        if (!value) {
+          if (this._selectedDate !== null) {
+            this._selectedDate = null;
+          }
+          return;
+        }
+
+        var date = this._parseDate(value);
+        if (!date) {
+          this.value = oldValue;
+          return;
+        }
+
+        if (!(this._selectedDate instanceof Date)
+            || date.getFullYear() !== this._selectedDate.getFullYear()
+            || date.getMonth() !== this._selectedDate.getMonth()
+            || date.getDate() !== this._selectedDate.getDate()) {
+          this._selectedDate = date;
+        }
+      },
+
       _localeReady: function(e) {
         this._readyLocale = e.detail.locale;
+      },
+
+      _formatDisplayed: function(date, locale) {
+        if (date) {
+          return moment(date).format(moment.localeData(locale).longDateFormat('L'));
+        }
       },
 
       _open: function() {
@@ -162,10 +230,11 @@ When the selected `value` is changed, a `value-changed` event is triggered.
       },
 
       _onOverlayOpened: function() {
-        if (this.value) {
-          this.$.overlay.scrollToDate(this.value);
+        if (this._selectedDate) {
+          this.$.overlay.scrollToDate(this._selectedDate);
         } else {
-          this.$.overlay.scrollToDate(this.initialPosition);
+          var initialPositionDate = this._parseDate(this.initialPosition) || new Date();
+          this.$.overlay.scrollToDate(initialPositionDate);
         }
       },
 
@@ -173,12 +242,21 @@ When the selected `value` is changed, a `value-changed` event is triggered.
         this.$.dropdown.close();
       },
 
-      _hideClearIcon: function(value, opened, fullscreen) {
-        return !value || !opened || fullscreen;
+      _hideClearIcon: function(selectedDate, opened, fullscreen) {
+        return !selectedDate || !opened || fullscreen;
       },
 
       _clear: function() {
         this.value = '';
+      },
+
+      /**
+       * Validates the input element and sets an error style if needed.
+       *
+       * @return {boolean}
+       */
+      _getValidity: function() {
+        return Boolean(this.value);
       },
 
       _preventDefault: function(e) {
