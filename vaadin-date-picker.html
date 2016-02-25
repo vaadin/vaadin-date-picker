@@ -159,13 +159,15 @@ document.getElementById('my-picker').i18n = {
          */
         i18n: {
           type: Object,
-          value: {
-            monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-            weekdaysShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-            firstDayOfWeek: 0,
-            today: 'today',
-            cancel: 'cancel',
-            formatDate: 'MM/DD/YYYY'
+          value: function() {
+            return {
+              monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+              weekdaysShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+              firstDayOfWeek: 0,
+              today: 'today',
+              cancel: 'cancel',
+              formatDate: 'MM/DD/YYYY'
+            }
           }
         }
       },

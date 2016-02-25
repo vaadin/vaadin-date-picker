@@ -121,11 +121,6 @@
         expect(datepicker.$.input.bindValue).to.equal('12/31/1999');
       });
 
-      it('should reflect value in overlay label', function() {
-        datepicker.value = new Date(2000, 1, 1);
-        expect(datepicker.$.overlay.$.input.value).to.equal('02/01/2000');
-      });
-
       it('should not show clear icon', function(done) {
         expect(datepicker.$.clear.clientHeight).to.equal(0);
         datepicker.value = new Date(2000, 1, 1);
@@ -157,6 +152,30 @@
           done();
         });
       });
+
+      describe('i18n', function() {
+        beforeEach(function(done) {
+          datepicker.set("i18n.weekdaysShort", 'su_ma_ti_ke_to_pe_la'.split('_'));
+          datepicker.set("i18n.firstDayOfWeek", 1);
+          datepicker.set("i18n.formatDate", 'DD.MM.YYYY');
+          datepicker.async(done);
+        });
+
+        it('should notify i18n mutation to children', function() {
+          var monthCalendar = datepicker.$.overlay.$.scroller.$.scroller.querySelector('vaadin-month-calendar');
+          var weekdays = monthCalendar.$.monthGrid.querySelectorAll('div.weekday');
+          var weekdayTitles = Array.prototype.map.call(weekdays, function(weekday) {
+            return weekday.textContent;
+          });
+          expect(weekdayTitles).to.eql(['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']);
+        });
+
+        it('should reflect value in overlay label', function() {
+          datepicker.value = new Date(2000, 1, 1);
+          expect(datepicker.$.overlay.$.input.value).to.equal('01.02.2000');
+        });
+      });
+
     });
   </script>
 
