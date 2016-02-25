@@ -222,9 +222,16 @@ See paper-input-container documentation for styling the included input fields
         // 'touch' to value 'auto' in order to prevent them from clipping the dropdown. iOS only.
         _touchPrevented: Array,
 
+        /**
+         * The object used to localize this component.
+         *
+         * For internationalising this component, you can either:
+         * include `<vaadin-i18n-core>` in your UI, or provide your customised
+         * `i18n` object.
+         */
         i18n: {
           type: Object,
-          value:  function() {
+          value: function() {
             return {
               monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
               weekdaysShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
