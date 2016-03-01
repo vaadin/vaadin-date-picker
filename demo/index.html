@@ -12,16 +12,27 @@
     body {
       background: #f9f9f9;
     }
-
-    :root {
-      --primary-color: #2899f2;
-    }
   </style>
 </head>
 
 <body>
   <vaadin-date-picker label="Pick a date"></vaadin-date-picker>
   <vaadin-date-picker label="Birthday" value="2000-01-01"></vaadin-date-picker>
+
+  <style is="custom-style">
+    .custom-theme {
+      --vaadin-date-picker-toolbar-color: var(--dark-primary-color);
+      --vaadin-date-picker-yearscroller-background: var(--primary-background-color);
+      --vaadin-date-picker-yearscroller-color: var(--secondary-text-color);
+      --vaadin-date-picker-calendar-title-color: var(--dark-theme-text-color);
+      --vaadin-date-picker-calendar-date-cell-color: var(--dark-theme-text-color);
+      --vaadin-date-picker-weekday-cell-color: var(--dark-theme-secondary-color);
+      --vaadin-date-picker-selected-color: var(--dark-theme-text-color);
+      --vaadin-date-picker-selected-background: var(--dark-primary-color);
+      --vaadin-date-picker-background: var(--dark-theme-background-color);
+    }
+  </style>
+  <vaadin-date-picker class="custom-theme" label="Custom theme" value="2016-03-02"></vaadin-date-picker>
 </body>
 
 </html>
