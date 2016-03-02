@@ -100,6 +100,8 @@ This program is available under Apache License Version 2.0, available at https:/
 
       _bufferHeight: Number,
 
+      _bufferOffset: Number,
+
       _mayHaveMomentum: Boolean
     },
 
@@ -136,8 +138,11 @@ This program is available under Apache License Version 2.0, available at https:/
       }
 
       // Check if we scrolled enough to translate the buffer positions.
-      var upperThresholdReached = scrollTop > this._buffers[1].translateY + this._bufferHeight / 2;
-      var lowerThresholdReached = scrollTop < this._buffers[0].translateY + this._bufferHeight / 2;
+      if (this._bufferOffset === undefined) {
+        this._bufferOffset = this.$$('.buffer').offsetTop;
+      }
+      var upperThresholdReached = scrollTop > this._buffers[1].translateY + this.itemHeight + this._bufferOffset;
+      var lowerThresholdReached = scrollTop < this._buffers[0].translateY + this.itemHeight + this._bufferOffset;
 
       if (upperThresholdReached || lowerThresholdReached) {
         this._translateBuffer(lowerThresholdReached);
