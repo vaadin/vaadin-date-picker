@@ -134,7 +134,7 @@
 
       it('should format display correctly', function() {
         datepicker.value = '2000-02-01';
-        expect(datepicker.$.input.bindValue).to.equal('02/01/2000');
+        expect(datepicker.$.input.bindValue).to.equal('2/1/2000');
         datepicker.value = '1999-12-31';
         expect(datepicker.$.input.bindValue).to.equal('12/31/1999');
       });
@@ -164,13 +164,10 @@
         datepicker.open();
       });
 
-      it('should update displayed value format according to locale', function(done) {
+      it('should update displayed value format according to locale', function() {
+        datepicker.i18n = finnishI18n;
         datepicker.value = '2000-02-01';
-        datepicker.locale = 'fi';
-        waitUntilLocaleAvailable('fi', function() {
-          expect(datepicker.$.input.bindValue).to.equal('01.02.2000');
-          done();
-        });
+        expect(datepicker.$.input.bindValue).to.equal('1.2.2000');
       });
 
       it('should open by tapping the calendar icon', function(done) {

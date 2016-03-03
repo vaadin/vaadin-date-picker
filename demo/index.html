@@ -50,8 +50,24 @@
     <h4>Changing the locale</h4>
     <demo-snippet>
       <template>
-        <vaadin-date-picker label="Syntymäpäivä" locale="fi" value="1980-08-14">
+        <vaadin-date-picker id="finnish" label="Syntymäpäivä" value="1980-08-14">
         </vaadin-date-picker>
+        <script>
+          document.querySelector('#finnish').i18n = {
+            monthNames: [
+              'tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu',
+              'toukokuu', 'kesäkuu', 'heinäkuu', 'elokuu',
+              'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu'
+            ],
+            weekdays: ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'],
+            firstDayOfWeek: 1,
+            today: 'Tänään',
+            cancel: 'Peruuta',
+            formatDate: function(date) {
+              return date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
+            }
+          };
+        </script>
       </template>
     </demo-snippet>
 

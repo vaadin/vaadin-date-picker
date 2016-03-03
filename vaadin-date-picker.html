@@ -69,7 +69,6 @@ See paper-input-container documentation for styling the included input fields
 <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="vaadin-date-picker-overlay.html">
-<link rel="import" href="vaadin-locale-aware-behavior.html">
 
 <dom-module id="vaadin-date-picker">
   <template>
@@ -132,7 +131,7 @@ See paper-input-container documentation for styling the included input fields
 
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" tabindex="1" on-touchend="_preventDefault" on-tap="open" on-keydown="_onKeydown">
       <label id="label">[[label]]</label>
-      <input id="input" is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(_selectedDate, _readyLocale)]]" type="text" invalid="[[invalid]]" name$="[[name]]" required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer">
+      <input id="input" is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(_selectedDate, i18n.formatDate)]]" type="text" invalid="[[invalid]]" name$="[[name]]" required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer">
 
       <div suffix id="clear" on-tap="_clear" hidden$="[[_hideClearIcon(value, opened)]]">
         <iron-icon icon="clear"></iron-icon>
@@ -146,7 +145,7 @@ See paper-input-container documentation for styling the included input fields
     </paper-input-container>
 
     <iron-dropdown id="dropdown" fullscreen$=[[_fullscreen]] allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" on-iron-overlay-closed="_onOverlayClosed" on-iron-overlay-canceled="_preventCancelOnInputContainerTap" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="close" selected-date="{{_selectedDate}}" class="dropdown-content" on-close="close" focused-date="[[_focusedDate]]" tabindex="-1"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay id="overlay" i18n="[[i18n]]" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="close" selected-date="{{_selectedDate}}" class="dropdown-content" on-close="close" focused-date="[[_focusedDate]]" tabindex="-1"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
     <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"></iron-media-query>
@@ -157,13 +156,8 @@ See paper-input-container documentation for styling the included input fields
 
       behaviors: [
         Polymer.IronFormElementBehavior,
-        Polymer.IronValidatableBehavior,
-        vaadin.elements.datepicker.LocaleAwareBehavior
+        Polymer.IronValidatableBehavior
       ],
-
-      listeners: {
-        'locale-ready': '_localeReady'
-      },
 
       properties: {
 
@@ -203,8 +197,51 @@ See paper-input-container documentation for styling the included input fields
          */
         label: String,
 
-        // Property used for data-binding a locale that is ready to be used.
-        _readyLocale: String,
+        /**
+         * An `Object` containing following sub-properties for localization.
+         *
+         * `i18n.monthNames`
+         *
+         *  An array of month names starting from January.
+         *
+         * `i18n.weekdays`
+         *
+         *  An array of short weekday names starting from Sunday.
+         *
+         * `i18n.firstDayOfWeek`
+         *
+         *  An integer for the first day of the week (0 = Sunday, 1 = Monday, etc.).
+         *
+         * `i18n.today`
+         *
+         *  Translation of the Today shortcut button text.
+         *
+         * `i18n.cancel`
+         *
+         *  Translation of the Cancel button text.
+         *
+         * `i18n.formatDate`
+         *
+         *  A function to format given `Date` object as `String`.
+         */
+        i18n: {
+          type: Object,
+          value: function() {
+            return {
+              monthNames: [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November','December'
+              ],
+              weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+              firstDayOfWeek: 0,
+              today: 'Today',
+              cancel: 'Cancel',
+              formatDate: function(date) {
+                return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+              }
+            };
+          }
+        },
 
         _opened: Boolean,
 
@@ -257,6 +294,12 @@ See paper-input-container documentation for styling the included input fields
           '';
       },
 
+      _formatDisplayed: function(date, formatDate) {
+        if (date) {
+          return formatDate(date);
+        }
+      },
+
       _selectedDateChanged: function(selectedDate) {
         this.value = this._formatISO(selectedDate);
       },
@@ -279,10 +322,6 @@ See paper-input-container documentation for styling the included input fields
           date.getDate() !== this._selectedDate.getDate()) {
           this._selectedDate = date;
         }
-      },
-
-      _localeReady: function(e) {
-        this._readyLocale = e.detail.locale;
       },
 
       _updateAlignmentAndPosition: function() {
@@ -413,7 +452,7 @@ See paper-input-container documentation for styling the included input fields
 
       _onKeydown: function(e) {
         switch (this._eventKey(e)) {
-          case 'down':    
+          case 'down':
           case 'up':
             // prevent scrolling the page with arrows
             e.preventDefault();
