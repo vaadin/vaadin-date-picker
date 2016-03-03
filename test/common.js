@@ -1,5 +1,20 @@
 var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+var finnishI18n = {
+  monthNames: [
+    'tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu',
+    'toukokuu', 'kesäkuu', 'heinäkuu', 'elokuu',
+    'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu'
+  ],
+  weekdays: ['su', 'ma', 'ti', 'ke', 'to', 'pe', 'la'],
+  firstDayOfWeek: 1,
+  today: 'Tänään',
+  cancel: 'Peruuta',
+  formatDate: function(date) {
+    return date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear();
+  }
+};
+
 function tap(element) {
   Polymer.Base.fire('tap', {}, {
     bubbles: true,
