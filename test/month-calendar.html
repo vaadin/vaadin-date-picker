@@ -25,6 +25,16 @@
 
       beforeEach(function(done) {
         monthCalendar = fixture('vaadin-month-calendar');
+        monthCalendar.i18n = {
+          monthNames: ['January','February','March','April','May', 'June','July','August','September','October','November','December'],
+          weekdays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+          firstDayOfWeek: 0,
+          today: 'Today',
+          cancel: 'Cancel',
+          formatDate: function(date) {
+            return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+          }
+        };
         monthCalendar.month = new Date(2016, 1, 1); // Feb 2016
 
         valueChangedSpy = sinon.spy();
@@ -62,8 +72,7 @@
       });
 
       it('should render days in correct order by first day of week', function(done) {
-        monthCalendar._firstDayOfWeek = 1; // Start from Monday.
-
+        monthCalendar.set('i18n.firstDayOfWeek', 1); // Start from Monday.
         Polymer.Base.async(function() {
           var weekdays = monthCalendar.$.monthGrid.querySelectorAll('div.weekday');
           var weekdayTitles = Array.prototype.map.call(weekdays, function(weekday) {
@@ -75,8 +84,8 @@
       });
 
       it('should render days in correct locale', function(done) {
-        monthCalendar.locale = 'fi'; // Start from Monday with Finnish day names.
-        waitUntilLocaleAvailable('fi', function() {
+        monthCalendar.i18n = finnishI18n; // Start from Monday with Finnish day names.
+        Polymer.Base.async(function() {
           var weekdays = monthCalendar.$.monthGrid.querySelectorAll('div.weekday');
           var weekdayTitles = Array.prototype.map.call(weekdays, function(weekday) {
             return weekday.textContent;
@@ -86,12 +95,9 @@
         });
       });
 
-      it('should render month name in correct locale', function(done) {
-        monthCalendar.locale = 'fi';
-        waitUntilLocaleAvailable('fi', function() {
-          expect(monthCalendar.$.title.textContent).to.equal('helmikuu 2016');
-          done();
-        });
+      it('should render month name in correct locale', function() {
+        monthCalendar.i18n = finnishI18n;
+        expect(monthCalendar.$.title.textContent).to.equal('helmikuu 2016');
       });
 
       it('should re-render after changing the month', function(done) {
