@@ -9,19 +9,37 @@ layout: page
 
 == Localization
 
-The [vaadinelement]#vaadin-date-picker# element has built-in support for multiple locales.
+The [vaadinelement]#vaadin-date-picker# element supports localization through its [propertyname]#i18n# property.
 
-You can adjust the element to a specific locale with the [propertyname]#locale# property.
-The value should be a locale identifier given in the BCP 47 format, such as `en-gb`, `fi`, or `es`.
-The date picker supports all the locales supported by the link:http://momentjs.com/[moment.js] library. Please refer to its website for the complete list of supported locales.
+You can adjust the element to a specific language and date format by assigning the [propertyname]#i18n# property.
+See the example below for the default values used when the property is not defined.
 
-Once set, the locale affects how months and dates are displayed in the [vaadinelement]#vaadin-date-picker# dropdown.
-
-
-[source,html]
+[source,javascript]
 ----
-<vaadin-date-picker locale="fi"></vaadin-date-picker>
+datePicker.i18n = {
+  monthNames: [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November','December'
+  ],
+  weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  firstDayOfWeek: 0,
+  today: 'Today',
+  cancel: 'Cancel',
+  formatDate: function(date) {
+    return (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+  }
+}
 ----
+
+* [propertyname]#i18n.monthNames# – An array of month names starting from January.
+* [propertyname]#i18n.weekdays# – An array of short weekday names starting from Sunday.
+* [propertyname]#i18n.firstDayOfWeek# – An integer for the first day of the week (0 = Sunday, 1 = Monday, etc.).
+* [propertyname]#i18n.today# – Translation of the Today shortcut button text.
+* [propertyname]#i18n.cancel# – Translation of the Cancel button text.
+* [propertyname]#i18n.formatDate# – A function to format given [classname]#Date# object as [classname]#String#.
+
+Once set, the [propertyname]#i18n# property affects how months and dates are displayed in the [vaadinelement]#vaadin-date-picker# dropdown as well as the language of the buttons in the element.
+
 
 == Initial Position
 
