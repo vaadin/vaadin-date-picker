@@ -35,12 +35,12 @@
         expect(datepicker.value).to.equal('');
       });
 
-      // it('should notify value change', function() {
-      //   var spy = sinon.spy();
-      //   datepicker.addEventListener('value-changed', spy);
-      //   datepicker.value = '2000-02-01';
-      //   expect(spy.calledOnce).to.be.true;
-      // });
+      it('should notify value change', function() {
+        var spy = sinon.spy();
+        datepicker.addEventListener('value-changed', spy);
+        datepicker.value = '2000-02-01';
+        expect(spy.calledOnce).to.be.true;
+      });
 
       it('should open with open call', function(done) {
         datepicker.addEventListener('iron-overlay-opened', function() {
@@ -138,11 +138,6 @@
         datepicker.value = '1999-12-31';
         expect(datepicker.$.input.bindValue).to.equal('1999-12-31');
       });
-
-      // it('should reflect value in overlay label', function() {
-      //   datepicker.value = new Date(2000, 1, 1);
-      //   expect(datepicker.$.overlay.$.input.value).to.equal('2000-02-01');
-      // });
 
       it('should not show clear icon', function(done) {
         expect(datepicker.$.clear.clientHeight).to.equal(0);
@@ -279,8 +274,8 @@
         });
 
         it('should reflect value in overlay label', function() {
-          datepicker.value = new Date(2000, 1, 1);
-          expect(datepicker.$.overlay.$.input.value).to.equal('01.02.2000');
+          datepicker.value = '2000-02-01';
+          expect(datepicker.$.overlay.$.input.value).to.equal('2000-02-01');
         });
       });
 

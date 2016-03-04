@@ -145,7 +145,7 @@ See paper-input-container documentation for styling the included input fields
     <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" tabindex="1" on-touchend="_preventDefault" on-tap="open">
       <label id="label">[[label]]</label>
       <input id="input" is="iron-input" autocomplete="off"
-        bind-value="[[_formatValue(value)]]" type="text" invalid="[[invalid]]" name$="[[name]]"
+        bind-value="[[_formatDisplayed(_selectedDate, i18n.formatDate)]]" type="text" invalid="[[invalid]]" name$="[[name]]"
         required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer">
 
       <div suffix id="clear" on-tap="_clear" hidden$="[[_hideClearIcon(value, opened)]]">
@@ -160,7 +160,7 @@ See paper-input-container documentation for styling the included input fields
     </paper-input-container>
 
     <iron-dropdown id="dropdown" fullscreen$=[[_fullscreen]] allow-outside-scroll on-iron-overlay-opened="_onOverlayOpened" on-iron-overlay-closed="_onOverlayClosed" on-iron-overlay-canceled="_preventCancelOnInputContainerTap" opened="{{_opened}}">
-      <vaadin-date-picker-overlay id="overlay" i18n="[[i18n]]" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="close" selected-date="{{_selectedDate}}" class="dropdown-content" on-cancel="close"></vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay id="overlay" i18n="[[i18n]]" fullscreen$=[[_fullscreen]] label=[[label]] locale="[[_readyLocale]]" on-date-tap="close" selected-date="{{_selectedDate}}" class="dropdown-content" on-cancel="close" formatted="[[formatted]]"></vaadin-date-picker-overlay>
     </iron-dropdown>
 
     <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"></iron-media-query>
@@ -168,6 +168,11 @@ See paper-input-container documentation for styling the included input fields
   <script>
     Polymer({
       is: 'vaadin-date-picker',
+
+      behaviors: [
+        Polymer.IronFormElementBehavior,
+        Polymer.IronValidatableBehavior,
+      ],
 
       properties: {
 
@@ -281,9 +286,9 @@ See paper-input-container documentation for styling the included input fields
           '';
       },
 
-      _formatValue: function(value) {
+      _formatDisplayed: function(value) {
         var fnc = this.i18n && typeof this.i18n.formatDate == 'function' ? this.i18n.formatDate.bind(this) : this._formatISO;
-        return fnc(typeof value == 'string' ? this._parseDate(value) : value);
+        return this.formatted = fnc(typeof value == 'string' ? this._parseDate(value) : value);
       },
 
       _selectedDateChanged: function(selectedDate) {
