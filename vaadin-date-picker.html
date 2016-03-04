@@ -246,7 +246,7 @@ See paper-input-container documentation for styling the included input fields
               formatDate: function(d) {
                 return this._formatUS(d);
               }
-            }
+            };
          }
        }
       },
@@ -294,7 +294,7 @@ See paper-input-container documentation for styling the included input fields
       _formatDisplayed: function(value) {
         var fnc = this.i18n && typeof this.i18n.formatDate == 'function' ?
           this.i18n.formatDate.bind(this) : this._formatISO;
-        return this.formatted = fnc(typeof value == 'string' ? this._parseDate(value) : value);
+        return (this.formatted = fnc(typeof value == 'string' ? this._parseDate(value) : value));
       },
 
       _selectedDateChanged: function(selectedDate) {
