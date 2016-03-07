@@ -273,17 +273,11 @@ See paper-input-container documentation for styling the included input fields
       },
 
       _parseDate: function(str) {
-        // Parsing with RegExp to ensure correct format
-        var parts = /^(\d{4}|[-+]\d{6})-(\d{2})-(\d{2})$/.exec(str);
-        if (!parts) {
-          return;
+        // We only accept ISO format without time info: (+-YY)YYYY-MM-DD
+        if (/^([-+]\d\d)?\d{4}(-\d\d){2}$/.test(str)) {
+          // Date.parse returns time in UTC, so we add the local offset
+          return new Date(Date.parse(str) + new Date().getTimezoneOffset() * 60000);
         }
-
-        var date = new Date(0, 0); // Wrong date (1900-01-01), but with midnight in local time
-        date.setFullYear(parseInt(parts[1], 10));
-        date.setMonth(parseInt(parts[2], 10) - 1);
-        date.setDate(parseInt(parts[3], 10));
-        return date;
       },
 
       _formatISO: function(date) {
