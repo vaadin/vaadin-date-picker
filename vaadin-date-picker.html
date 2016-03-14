@@ -128,7 +128,7 @@ See paper-input-container documentation for styling the included input fields
       }
     </style>
 
-    <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" tabindex="0" on-touchend="_preventDefault" on-tap="open" on-keydown="_onKeydown">
+    <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" tabindex="0" on-touchend="_preventDefault" on-tap="open" on-keydown="_onKeydown" disabled$="[[disabled]]" readonly$="[[readonly]]">
       <label id="label">[[label]]</label>
       <input id="input" is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(_selectedDate, i18n.formatDate)]]" type="text" invalid="[[invalid]]" name$="[[name]]" required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer">
 
@@ -255,6 +255,22 @@ See paper-input-container documentation for styling the included input fields
               }
             };
           }
+        },
+
+        /**
+         * Set to true to disable this element.
+         */
+        disabled: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * When present, it specifies that the element field is read-only.
+         */
+        readonly: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -263,7 +279,10 @@ See paper-input-container documentation for styling the included input fields
        */
       open: function(e) {
         this._updateAlignmentAndPosition();
-        this.$.dropdown.open();
+        // Prevent dropdown.open() being called when input is disabled or read-only
+        if (!this.disabled && !this.readonly) {
+          this.$.dropdown.open();
+        }
       },
 
       /**

@@ -107,6 +107,30 @@
         });
 
       });
+
+      describe('Disabled', function() {
+
+        beforeEach(function() {
+          datepicker.disabled = true;
+        });
+
+        it('should not open', function() {
+          datepicker.open();
+          expect(datepicker.$.dropdown.opened).to.be.equal(false);
+        });
+      });
+
+      describe('Readonly', function() {
+
+        beforeEach(function() {
+          datepicker.readonly = true;
+        });
+
+        it('should not open', function() {
+          datepicker.open();
+          expect(datepicker.$.dropdown.opened).to.be.equal(false);
+        });
+      });
     });
   </script>
 
