@@ -13,6 +13,14 @@
 </head>
 
 <body>
+  <iron-meta type="validator" key="year-2016-validator"></iron-meta>
+  <script>
+    document.querySelector('iron-meta[key=year-2016-validator]').value = {
+      validate: function(value) {
+        return new Date(value).getFullYear() === 2016;
+      }
+    };
+  </script>
 
   <test-fixture id="datepicker">
     <template>
@@ -63,6 +71,21 @@
         datepicker.value = '2016-02-24';
         expect(datepicker.validate()).to.equal(true);
         expect(datepicker.invalid).to.be.equal(false);
+      });
+
+      it('should validate correctly with custom validator', function() {
+        // Use a custom validator registered with <iron-meta>.
+        datepicker.validator = 'year-2016-validator';
+
+        // Try invalid value.
+        datepicker.value = '2014-01-01';
+        expect(datepicker.validate()).to.equal(false);
+        expect(datepicker.invalid).to.equal(true);
+
+        // Try valid value.
+        datepicker.value = '2016-01-01';
+        expect(datepicker.validate()).to.equal(true);
+        expect(datepicker.invalid).to.equal(false);
       });
 
       it('should serialize correctly', function() {
