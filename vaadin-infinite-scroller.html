@@ -38,6 +38,16 @@ This program is available under Apache License Version 2.0, available at https:/
       padding-right: 40px;
       @apply(--vaadin-infinite-scroller-buffer);
     }
+
+    /*
+    Firefox reserves space for the scrollbar. Padding-right adjusted for that.
+    */
+    @-moz-document url-prefix() {
+      .buffer {
+        padding-right: 25px;
+        @apply(--vaadin-infinite-scroller-buffer);
+      }
+    }
   </style>
 
   <template>
