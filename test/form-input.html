@@ -92,6 +92,23 @@
         expect(datepicker.invalid).to.equal(false);
       });
 
+
+      it('should fire invalid-changed event with auto-validate', function() {
+        // Use a custom validator registered with <iron-meta>.
+        datepicker.validator = 'year-2016-validator';
+        datepicker.autoValidate = true;
+
+        // Set invalid value.
+        var spy = sinon.spy();
+        datepicker.addEventListener('invalid-changed', spy);
+        datepicker.value = '2014-01-01';
+        expect(spy.calledOnce).to.be.true;
+
+        // Change it to a valid value.
+        datepicker.value = '2016-01-01';
+        expect(spy.calledTwice).to.be.true;
+      });
+
       it('should serialize correctly', function() {
         var form = fixture('datepicker-in-form', {name: 'foo'});
         datepicker = form.querySelector('vaadin-date-picker');
