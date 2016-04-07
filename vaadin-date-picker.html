@@ -69,7 +69,7 @@ See paper-input-container documentation for styling the included input fields
       }
 
       #dropdown:not([fullscreen]) {
-        margin: 12px 0 10px 0;
+        padding: 12px 0 10px 0;
       }
 
       #overlay {
@@ -143,6 +143,10 @@ See paper-input-container documentation for styling the included input fields
         @apply(--vaadin-date-picker-clear-icon);
       }
 
+      [hasvalue] #clear:hover {
+        display: block;
+      }
+
       #calendar iron-icon {
         @apply(--vaadin-date-picker-calendar-icon);
       }
@@ -152,7 +156,7 @@ See paper-input-container documentation for styling the included input fields
       }
     </style>
 
-    <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" invalid="[[invalid]]" tabindex$="[[_getTabIndex(disabled, readonly)]]" on-touchend="_preventDefault" on-tap="open" on-keydown="_onKeydown" disabled$="[[disabled]]" opened$="[[_opened]]" auto-validate$="[[autoValidate]]">
+    <paper-input-container id="inputcontainer" hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]" invalid="[[invalid]]" tabindex$="[[_getTabIndex(disabled, readonly)]]" on-touchend="_preventDefault" on-tap="open" on-keydown="_onKeydown" disabled$="[[disabled]]" opened$="[[_opened]]" auto-validate$="[[autoValidate]]" hasvalue$="[[_hasValue(value)]]">
       <label id="label">[[label]]</label>
       <input id="input" is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(_selectedDate, i18n.formatDate)]]" type="text" invalid="{{invalid}}" name$="[[name]]" required$="[[required]]" tabindex="-1" on-focus="_focusInputContainer" validator="[[validator]]" readonly$="[[readonly]]" disabled$="[[disabled]]">
 
@@ -334,6 +338,10 @@ See paper-input-container documentation for styling the included input fields
        */
       close: function() {
         this.$.dropdown.close();
+      },
+
+      _hasValue: function() {
+        return !!this.value;
       },
 
       _parseDate: function(str) {
