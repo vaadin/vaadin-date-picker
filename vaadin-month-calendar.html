@@ -129,6 +129,10 @@
       },
 
       _getTitle: function(month, monthNames) {
+        if (this.i18n && typeof this.i18n.formatTitle === 'function') {
+          return this.i18n.formatTitle(month.getMonth(), month.getFullYear(), monthNames);
+        }
+        // fallback
         return monthNames[month.getMonth()] + ' ' + month.getFullYear();
       },
 

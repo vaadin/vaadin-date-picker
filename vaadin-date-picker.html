@@ -268,10 +268,17 @@ See paper-input-container documentation for styling the included input fields
         cancel: 'Cancel',
 
         // A function to format given `Date` object as
-        // string.
+        // date string.
         formatDate: function(d) {
           // returns a string representation of the given
           // Date object in 'MM/DD/YYYY' -format
+        },
+
+        // A optional function to format given `month` and
+        // `fullYear` integers, `monthNames` object as
+        // calendar title string.
+        formatTitle: function(month, year) {
+          return monthNames[month] + ' ' + fullYear;
         }
       }
 
@@ -292,6 +299,9 @@ See paper-input-container documentation for styling the included input fields
               cancel: 'Cancel',
               formatDate: function(d) {
                 return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+              },
+              formatTitle: function(month, fullYear, monthNames) {
+                return monthNames[month] + ' ' + fullYear;
               }
             };
           }
