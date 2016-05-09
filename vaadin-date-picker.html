@@ -497,7 +497,9 @@ See paper-input-container documentation for styling the included input fields
       },
 
       _preventCancelOnComponentAccess: function(e) {
-        if (/tap|mousedown|touchstart/.test(e.detail.type) && this.contains(e.detail.target)) {
+        var isInPath = e.detail.path && e.detail.path.indexOf && e.detail.path.indexOf(this) !== -1;
+        var isLocal = isInPath || this.contains(e.detail.target);
+        if (/tap|mousedown|touchstart/.test(e.detail.type) && isLocal) {
           e.preventDefault();
         }
       },
