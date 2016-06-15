@@ -60,7 +60,7 @@ need to define the name of value property using the `attrForValue` property.
         on-iron-overlay-opened="_onOverlayOpened"
         on-iron-overlay-closed="_onOverlayClosed"
         on-iron-overlay-canceled="_preventCancelOnComponentAccess"
-        opened="{{_opened}}">
+        opened="{{opened}}">
       <vaadin-date-picker-overlay
         id="overlay" i18n="[[i18n]]"
         fullscreen$=[[_fullscreen]]
@@ -98,7 +98,7 @@ need to define the name of value property using the `attrForValue` property.
         }
       },
 
-      get _input() {
+      _input: function() {
         return Polymer.dom(this).querySelector('[is="iron-input"]');
       },
 

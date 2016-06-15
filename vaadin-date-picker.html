@@ -159,15 +159,17 @@ If you want to replace the default input field with a custom implementation, you
     </style>
 
     <paper-input-container id="inputcontainer"
-        hideclear$="[[_hideClearIcon(_selectedDate, _opened, _fullscreen)]]"
-        auto-validate$="[[autoValidate]]">
+        hideclear$="[[_hideClearIcon(_selectedDate, opened, _fullscreen)]]"
+        auto-validate$="[[autoValidate]]"
+        invalid$="[[invalid]]"
+        tabindex="0"
+        disabled$="[[disabled]]" >
       <label id="label">[[label]]</label>
       <input id="input"
           is="iron-input"
           autocomplete="off"
           tabindex="-1"
           type="text"
-          on-focus="_focusInputContainer"
           invalid="{{invalid}}"
           required$="[[required]]"
           validator="[[validator]]"
@@ -191,7 +193,7 @@ If you want to replace the default input field with a custom implementation, you
         on-iron-overlay-opened="_onOverlayOpened"
         on-iron-overlay-closed="_onOverlayClosed"
         on-iron-overlay-canceled="_preventCancelOnComponentAccess"
-        opened="{{_opened}}">
+        opened="{{opened}}">
       <vaadin-date-picker-overlay
           id="overlay" i18n="[[i18n]]"
           fullscreen$=[[_fullscreen]]
@@ -219,6 +221,24 @@ If you want to replace the default input field with a custom implementation, you
         vaadin.elements.datepicker.DatePickerBehavior
       ],
 
+      properties: {
+        /**
+         * Set to true to disable this element.
+         */
+        disabled: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Set to true to make this element read-only.
+         */
+        readonly: {
+          type: Boolean,
+          value: false
+        }
+      },
+
       _hideClearIcon: function(selectedDate, opened, fullscreen) {
         return !selectedDate || !opened || fullscreen;
       },
@@ -238,20 +258,22 @@ If you want to replace the default input field with a custom implementation, you
         this[this.$.dropdown.opened ? 'close' : 'open']();
       },
 
-      get _input() {
+      _input: function() {
         return this.$.input;
       },
 
-      get _inputcontainer() {
-        return this.$.inputcontainer;
+      _tabIndex: function(disabled){
+        var r =  disabled ? -1 : 0;
+        console.log("RRR", r);
+        return r;
       },
 
       set _inputValue(value) {
-        this._input.bindValue = value;
+        this.inputElement.bindValue = value;
       },
 
       get _inputValue() {
-        return this._input.bindValue;
+        return this.inputElement.bindValue;
       }
     });
   </script>

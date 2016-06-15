@@ -9,11 +9,11 @@
   vaadin.elements.datepicker.DatePickerBehaviorImpl = {
     observers: [
       '_selectedDateChanged(_selectedDate, i18n.formatDate)',
-      '_setDisabled(disabled)',
-      '_setInvalid(invalid)',
-      '_setOpened(_opened)',
       '_setName(name)'
     ],
+    listeners: {
+      'tap': '_onTap'
+    },
 
     properties: {
       /**
@@ -49,7 +49,10 @@
        */
       label: String,
 
-      _opened: Boolean,
+      opened: {
+        type: Boolean,
+        reflectToAttribute: true
+      },
 
       _fullscreen: {
         value: false,
@@ -133,22 +136,6 @@
             }
           };
         }
-      },
-
-      /**
-       * Set to true to disable this element.
-       */
-      disabled: {
-        type: Boolean,
-        value: false
-      },
-
-      /**
-       * Set to true to make this element read-only.
-       */
-      readonly: {
-        type: Boolean,
-        value: false
       }
     },
 
@@ -157,20 +144,33 @@
     },
 
     ready: function() {
+      console.log("READY >>>>", this.inputElement);
+      window.d = this;
       // The value property is also defined in IronFormElementBehavior, which
       // will mix up the default value if set in the property.
       if (this.value === undefined) {
         this.value = '';
       }
-      this.listen(this._inputcontainer, 'tap', 'open');
-      this.listen(this._inputcontainer, 'touchend', '_preventDefault');
-      this.listen(this._inputcontainer, 'keydown', '_onKeydown');
+      this.listen(this.inputElement, 'tap', '_ttt');
+      // this.listen(this.inputElement, 'touchend', '_preventDefault');
+      this.listen(this.inputElement, 'keydown', '_onKeydown');
+    },
+
+    _onTap: function(e) {
+      console.log('tap');
+      this.open();
+      this.inputElement.focus();
+    },
+    _ttt: function(e) {
+      console.log('_ttt');
+
     },
 
     /**
      * Opens the dropdown.
      */
     open: function(e) {
+      console.log("OPEN");
       this._updateAlignmentAndPosition();
       // Prevent dropdown.open() being called when input is disabled or read-only
       if (!this.disabled && !this.readonly) {
@@ -263,7 +263,7 @@
 
     _onOverlayOpened: function() {
       this.$.overlay.initialPosition = this._selectedDate ||
-        this.$.overlay.initialPosition || this._parseDate(this.initialPosition) || new Date();
+      this.$.overlay.initialPosition || this._parseDate(this.initialPosition) || new Date();
       this.$.overlay.scrollToDate(this.$.overlay.focusedDate || this.$.overlay.initialPosition);
 
       window.addEventListener('scroll', this._boundOnScroll, true);
@@ -304,7 +304,7 @@
       window.removeEventListener('scroll', this._boundOnScroll, true);
       window.removeEventListener('resize', this._boundOnScroll, true);
 
-      this._focusInputContainer();
+      this.inputElement.focus();
 
       if (this._touchPrevented) {
         this._touchPrevented.forEach(function(prevented) {
@@ -345,10 +345,6 @@
       return this._input.validate();
     },
 
-    _focusInputContainer: function() {
-      this._inputcontainer.focus();
-    },
-
     _preventDefault: function(e) {
       e.preventDefault();
     },
@@ -374,32 +370,27 @@
           // prevent scrolling the page with arrows
           e.preventDefault();
 
-          if (!this._opened) {
+          if (!this.opened) {
             this.open();
           }
           break;
       }
     },
 
-    _attrBool: function(elm, name, value) {
-      Polymer.dom(elm)[value ? 'setAttribute' : 'removeAttribute'](name, '');
-    },
-
-    _setDisabled: function(disabled) {
-      this._inputcontainer.setAttribute('tabindex', disabled ? -1 : 0);
-      this._attrBool(this._inputcontainer, 'disabled', disabled);
-    },
-
-    _setInvalid: function(invalid) {
-      this._inputcontainer.invalid = invalid;
-    },
-
-    _setOpened: function(_opened) {
-      this._attrBool(this._inputcontainer, 'opened', _opened);
+   /**
+    * The reference to the UI element which handles the value and opens the selector.
+    * Despite the name, it could be any Element, not only input based ones.
+    *
+    * @property inputElement
+    * @type HTMLElement
+    * @read-only
+    */
+    get inputElement() {
+      return this._input();
     },
 
     _setName: function(name) {
-      this._input.setAttribute('name', name);
+      this.inputElement.setAttribute('name', name);
     }
   };
 
