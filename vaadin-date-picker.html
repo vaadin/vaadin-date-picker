@@ -142,7 +142,9 @@ If you want to replace the default input field with a custom implementation, you
         @apply(--vaadin-date-picker-calendar-icon);
       }
 
-      :host(:not([has-value])) #clear {
+      :host(:not([has-value])) #clear,
+      :host([readonly]) #clear,
+      :host([disabled]) #clear {
         display: none;
       }
 
@@ -247,10 +249,6 @@ If you want to replace the default input field with a custom implementation, you
        */
       _getValidity: function() {
         return this.inputElement.validate();
-      },
-
-      _hideClearIcon: function(selectedDate, opened, fullscreen) {
-        return !selectedDate || !opened || fullscreen;
       },
 
       _hideCalendarIcon: function(disabled, readonly) {

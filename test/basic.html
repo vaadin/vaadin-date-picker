@@ -408,6 +408,10 @@
           expect(datepicker.$.calendar.hidden).to.be.equal(true);
         });
 
+        it('clear icon should be hidden', function() {
+          expect(getComputedStyle(datepicker.$.clear).display).to.be.equal('none');
+        });
+
         it('should not be focusable', function() {
           expect(datepicker.$.inputcontainer.tabIndex).to.equal(-1);
         });
@@ -426,6 +430,10 @@
 
         it('calendar icon should be hidden', function() {
           expect(datepicker.$.calendar.hidden).to.be.equal(true);
+        });
+
+        it('clear icon should be hidden', function() {
+          expect(getComputedStyle(datepicker.$.clear).display).to.be.equal('none');
         });
 
         it('should be focusable', function() {
