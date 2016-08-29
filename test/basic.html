@@ -463,6 +463,15 @@
         it('should be focusable', function() {
           expect(datepicker.$.inputcontainer.tabIndex).to.equal(0);
         });
+
+        it('input should always be readonly', function() {
+          expect(datepicker.$.input.readOnly).to.be.true;
+
+          // Changing the readonly property should still keep the
+          // input field in read-only mode.
+          datepicker.readonly = false;
+          expect(datepicker.$.input.readOnly).to.be.true;
+        });
       });
 
     });
