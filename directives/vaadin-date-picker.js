@@ -1,4 +1,4 @@
-System.register(['@angular/core', '@angular/common'], function(exports_1, context_1) {
+System.register(['@angular/core', '@angular/forms'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,25 +10,26 @@ System.register(['@angular/core', '@angular/common'], function(exports_1, contex
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var core_1, common_1;
+    var core_1, forms_1;
     var Polymer, VAADIN_DATE_PICKER_CONTROL_VALUE_ACCESSOR, VaadinDatePicker;
     return {
         setters:[
             function (core_1_1) {
                 core_1 = core_1_1;
             },
-            function (common_1_1) {
-                common_1 = common_1_1;
+            function (forms_1_1) {
+                forms_1 = forms_1_1;
             }],
         execute: function() {
             console.warn('The `VaadinDatePicker` directive is deprecated. Please use ' +
                 '`PolymerElement(\'vaadin-date-picker\')` from the ' +
                 '`@vaadin/angular2-polymer` npm package instead.');
             Polymer = window.Polymer;
-            VAADIN_DATE_PICKER_CONTROL_VALUE_ACCESSOR = new core_1.Provider(common_1.NG_VALUE_ACCESSOR, {
+            VAADIN_DATE_PICKER_CONTROL_VALUE_ACCESSOR = {
+                provide: forms_1.NG_VALUE_ACCESSOR,
                 useExisting: core_1.forwardRef(function () { return VaadinDatePicker; }),
                 multi: true
-            });
+            };
             VaadinDatePicker = (function () {
                 function VaadinDatePicker(renderer, el, _injector) {
                     var _this = this;
@@ -55,7 +56,7 @@ System.register(['@angular/core', '@angular/common'], function(exports_1, contex
                 VaadinDatePicker.prototype.registerOnChange = function (fn) { this.onChange = fn; };
                 VaadinDatePicker.prototype.registerOnTouched = function (fn) { this.onTouched = fn; };
                 VaadinDatePicker.prototype.ngOnInit = function () {
-                    this._control = this._injector.get(common_1.NgControl, null);
+                    this._control = this._injector.get(forms_1.NgControl, null);
                 };
                 VaadinDatePicker.prototype.valuechanged = function (value) {
                     var _this = this;
@@ -99,5 +100,4 @@ System.register(['@angular/core', '@angular/common'], function(exports_1, contex
         }
     }
 });
-
 //# sourceMappingURL=vaadin-date-picker.js.map
