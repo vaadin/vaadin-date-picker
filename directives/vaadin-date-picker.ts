@@ -10,7 +10,7 @@ Provider,
 forwardRef,
 Renderer
 } from '@angular/core';
-import { NgControl, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/common';
+import { NgControl, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
 console.warn(
   'The `VaadinDatePicker` directive is deprecated. Please use ' +
@@ -20,11 +20,11 @@ console.warn(
 
 const Polymer = (<any>window).Polymer;
 
-const VAADIN_DATE_PICKER_CONTROL_VALUE_ACCESSOR = new Provider(
-  NG_VALUE_ACCESSOR, {
-    useExisting: forwardRef(() => VaadinDatePicker),
-    multi: true
-  });
+const VAADIN_DATE_PICKER_CONTROL_VALUE_ACCESSOR = {
+  provide: NG_VALUE_ACCESSOR,
+  useExisting: forwardRef(() => VaadinDatePicker),
+  multi: true
+  }
 
 @Directive({
   selector: 'vaadin-date-picker',
