@@ -328,6 +328,71 @@
             expect(overlay.focusedDate.getMonth()).to.eql(new Date().getMonth());
             expect(overlay.focusedDate.getDate()).to.eql(new Date().getDate());
           });
+
+          it('should not move focus to a disabled date with arrow down', function() {
+            overlay.maxDate = new Date(2000, 0, 7);
+
+            arrowDown(overlay);
+
+            expect(overlay.focusedDate).to.eql(new Date(2000, 0, 1));
+          });
+
+          it('should not move focus to a disabled date with arrow up', function() {
+            overlay.minDate = new Date(1999, 11, 26);
+
+            arrowUp(overlay);
+
+            expect(overlay.focusedDate).to.eql(new Date(2000, 0, 1));
+          });
+
+          it('should focus min date with home', function() {
+            overlay.minDate = new Date(1999, 11, 3);
+
+            arrowLeft();
+            home();
+
+            expect(overlay.focusedDate).to.eql(new Date(1999, 11, 3));
+          });
+
+          it('should focus max date with end', function() {
+            overlay.maxDate = new Date(2000, 0, 26);
+
+            end();
+
+            expect(overlay.focusedDate).to.eql(new Date(2000, 0, 26));
+          });
+
+          it('should focus max date with pagedown', function() {
+            overlay.maxDate = new Date(2000, 0, 28);
+
+            pageDown();
+
+            expect(overlay.focusedDate).to.eql(new Date(2000, 0, 28));
+          });
+
+          it('should focus min date with pageup', function() {
+            overlay.minDate = new Date(1999, 11, 3);
+
+            pageUp();
+
+            expect(overlay.focusedDate).to.eql(new Date(1999, 11, 3));
+          });
+
+          it('should focus max date with shift and pagedown', function() {
+            overlay.maxDate = new Date(2000, 11, 28);
+
+            pageDown('shift');
+
+            expect(overlay.focusedDate).to.eql(new Date(2000, 11, 28));
+          });
+
+          it('should focus min date with shift and pageup', function() {
+            overlay.minDate = new Date(1999, 5, 3);
+
+            pageUp('shift');
+
+            expect(overlay.focusedDate).to.eql(new Date(1999, 5, 3));
+          });
         });
       });
     }

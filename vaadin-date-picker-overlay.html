@@ -252,7 +252,15 @@
       <div id="fade"></div>
       <vaadin-infinite-scroller id="scroller" on-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" on-track="_track" item-height="250" buffer-size="6">
         <template>
-          <vaadin-month-calendar i18n="[[i18n]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}" focused-date="[[focusedDate]]" ignore-taps=[[_ignoreTaps]]></vaadin-month-calendar>
+          <vaadin-month-calendar
+            i18n="[[i18n]]"
+            month="[[_dateAfterXMonths(index)]]"
+            selected-date="{{selectedDate}}"
+            focused-date="[[focusedDate]]"
+            ignore-taps=[[_ignoreTaps]]
+            min-date="[[minDate]]"
+            max-date="[[maxDate]]">
+          </vaadin-month-calendar>
         </template>
       </vaadin-infinite-scroller>
       <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" item-height="80" buffer-size="25">
@@ -331,7 +339,17 @@
 
         _ignoreTaps: Boolean,
 
-        _notTapping: Boolean
+        _notTapping: Boolean,
+
+        /**
+         * The earliest date that can be selected. All earlier dates will be disabled.
+         */
+        minDate: Date,
+
+        /**
+         * The latest date that can be selected. All later dates will be disabled.
+         */
+        maxDate: Date
       },
 
       /**
@@ -605,7 +623,8 @@
       },
 
       _onKeydown: function(e) {
-        var focus = this._currentlyFocusedDate();
+        var focus = this._currentlyFocusedDate(),
+            dateToFocus;
 
         var eventKey = this._eventKey(e);
         if (eventKey) {
@@ -638,10 +657,20 @@
               }
               break;
             case 'home':
-              this.focusedDate = new Date(focus.getFullYear(), focus.getMonth(), 1);
+              dateToFocus = new Date(focus.getFullYear(), focus.getMonth(), 1);
+              if (this.minDate && this.minDate > dateToFocus) {
+                this.focusedDate = this.minDate;
+              } else {
+                this.focusedDate = dateToFocus;
+              }
               break;
             case 'end':
-              this.focusedDate = new Date(focus.getFullYear(), focus.getMonth() + 1, 0);
+              dateToFocus = new Date(focus.getFullYear(), focus.getMonth() + 1, 0);
+              if (this.maxDate && dateToFocus > this.maxDate) {
+                this.focusedDate = this.maxDate;
+              } else {
+                this.focusedDate = dateToFocus;
+              }
               break;
             case 'pagedown':
               this._moveFocusByMonths(e.shiftKey ? 12 : 1);
@@ -669,9 +698,11 @@
 
       _moveFocusByDays: function(days) {
         var focus = this._currentlyFocusedDate();
-
-        this.focusedDate = new Date(focus.getFullYear(), focus.getMonth(), focus.getDate() + days);
-        this._focusedMonthDate = this.focusedDate.getDate();
+        var dateToFocus = new Date(focus.getFullYear(), focus.getMonth(), focus.getDate() + days);
+        if (this._dateAllowed(dateToFocus, this.minDate, this.maxDate)) {
+          this.focusedDate = dateToFocus;
+          this._focusedMonthDate = this.focusedDate.getDate();
+        }
       },
 
       _moveFocusByMonths: function(months) {
@@ -683,7 +714,30 @@
         if (dateToFocus.getMonth() !== targetMonth) {
           dateToFocus.setDate(0);
         }
-        this.focusedDate = dateToFocus;
+
+        if (this._dateAllowed(dateToFocus, this.minDate, this.maxDate)) {
+          this.focusedDate = dateToFocus;
+        } else {
+          if (months > 0) { // pagedown
+            this.focusedDate = this.maxDate;
+            this._focusedMonthDate = this.maxDate.getDate();
+          } else { // pageup
+            this.focusedDate = this.minDate;
+            this._focusedMonthDate = this.minDate.getDate();
+          }
+        }
+      },
+
+      _dateAllowed: function(date, min, max) {
+        if (min && max) {
+          return date >= min && date <= max;
+        } else if (min) {
+          return date >= min;
+        } else if (max) {
+          return date <= max;
+        }
+
+        return true;
       }
     });
   </script>
