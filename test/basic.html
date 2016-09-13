@@ -482,6 +482,19 @@
         });
       });
 
+      describe('Date limits', function() {
+
+        beforeEach(function() {
+          datepicker.min = '2016-01-01';
+          datepicker.max = '2016-12-31';
+        });
+
+        it('should be invalid when value is out of limits', function() {
+          datepicker.value = '2017-01-01';
+          expect(datepicker.invalid).to.be.equal(true);
+        });
+      });
+
     });
   </script>
 
