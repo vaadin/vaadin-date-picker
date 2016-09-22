@@ -66,6 +66,17 @@
       </template>
     </demo-snippet>
 
+    <h3>Date picker with week numbers</h3>
+    <demo-snippet>
+      <template>
+        <p>Week numbers are only supported for locales that start the week on Monday.</p>
+        <vaadin-date-picker id="weeks" show-week-numbers></vaadin-date-picker>
+        <script>
+          var datepicker = document.querySelector('vaadin-date-picker#weeks');
+          datepicker.set('i18n.firstDayOfWeek', 1);
+        </script>
+      </template>
+    </demo-snippet>
   </div>
 </body>
 </html>
