@@ -167,23 +167,24 @@ If you want to replace the default input field with a custom implementation, you
     </style>
 
     <paper-input-container id="inputcontainer"
-        auto-validate$="[[autoValidate]]"
-        tabindex$="[[_tabindex(disabled)]]"
-        invalid$="[[invalid]]"
-        disabled$="[[disabled]]">
+                           no-label-float="[[noLabelFloat]]"
+                           auto-validate$="[[autoValidate]]"
+                           tabindex$="[[_tabindex(disabled)]]"
+                           invalid$="[[invalid]]"
+                           disabled$="[[disabled]]">
       <label id="label">[[label]]</label>
       <input id="input"
-          is="iron-input"
-          autocomplete="off"
-          tabindex="-1"
-          type="text"
-          on-focus="_focus"
-          on-keydown="_onKeyDown"
-          name$="[[name]]"
-          invalid="{{invalid}}"
-          required$="[[required]]"
-          validator="[[validator]]"
-          disabled$="[[disabled]]" />
+             is="iron-input"
+             autocomplete="off"
+             tabindex="-1"
+             type="text"
+             on-focus="_focus"
+             on-keydown="_onKeyDown"
+             name$="[[name]]"
+             invalid="{{invalid}}"
+             required$="[[required]]"
+             validator="[[validator]]"
+             disabled$="[[disabled]]" />
       <div suffix id="clear" on-tap="_clear">
         <iron-icon icon="clear"></iron-icon>
         <paper-ripple class="circle" center></paper-ripple>
@@ -197,27 +198,26 @@ If you want to replace the default input field with a custom implementation, you
       </template>
     </paper-input-container>
 
-    <iron-dropdown
-        id="dropdown"
-        fullscreen$=[[_fullscreen]]
-        allow-outside-scroll
-        on-iron-overlay-opened="_onOverlayOpened"
-        on-iron-overlay-closed="_onOverlayClosed"
-        on-iron-overlay-canceled="_preventCancelOnComponentAccess"
-        opened="{{opened}}">
-      <vaadin-date-picker-overlay
-          id="overlay" i18n="[[i18n]]"
-          fullscreen$=[[_fullscreen]]
-          label=[[label]]
-          on-date-tap="close"
-          selected-date="{{_selectedDate}}"
-          class="dropdown-content"
-          on-close="close"
-          focused-date="[[focusedDate]]"
-          show-week-numbers="[[showWeekNumbers]]"
-          min-date="[[_minDate]]"
-          max-date="[[_maxDate]]"
-          tabindex="-1">
+    <iron-dropdown id="dropdown"
+                   fullscreen$=[[_fullscreen]]
+                   allow-outside-scroll
+                   on-iron-overlay-opened="_onOverlayOpened"
+                   on-iron-overlay-closed="_onOverlayClosed"
+                   on-iron-overlay-canceled="_preventCancelOnComponentAccess"
+                   opened="{{opened}}">
+      <vaadin-date-picker-overlay id="overlay"
+                                  i18n="[[i18n]]"
+                                  fullscreen$=[[_fullscreen]]
+                                  label=[[label]]
+                                  on-date-tap="close"
+                                  selected-date="{{_selectedDate}}"
+                                  class="dropdown-content"
+                                  on-close="close"
+                                  focused-date="[[focusedDate]]"
+                                  show-week-numbers="[[showWeekNumbers]]"
+                                  min-date="[[_minDate]]"
+                                  max-date="[[_maxDate]]"
+                                  tabindex="-1">
       </vaadin-date-picker-overlay>
     </iron-dropdown>
 
@@ -240,6 +240,15 @@ If you want to replace the default input field with a custom implementation, you
          * Set to true to auto-validate the input value.
          */
         autoValidate: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * Set to true to disable the floating label. The label disappears when the input value is
+         * not null.
+         */
+        noLabelFloat: {
           type: Boolean,
           value: false
         },
