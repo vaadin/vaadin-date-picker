@@ -129,6 +129,8 @@ This program is available under Apache License Version 2.0, available at https:/
     },
 
     _scroll: function(e, doUpdateClones) {
+      this.setAttribute('aria-busy', 'true');
+
       var scrollTop = this.$.scroller.scrollTop;
       if (scrollTop < this._bufferHeight || scrollTop > this._initialScroll * 2 - this._bufferHeight) {
         // Scrolled near the end/beginning of the scrollable area -> reset.
@@ -157,6 +159,7 @@ This program is available under Apache License Version 2.0, available at https:/
         if (!this._isVisible(this._buffers[0], scrollerRect) && !this._isVisible(this._buffers[1], scrollerRect)) {
           this.position = this.position;
         }
+        this.setAttribute('aria-busy', 'false');
       }, 200);
     },
 

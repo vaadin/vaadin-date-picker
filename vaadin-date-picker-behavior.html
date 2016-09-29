@@ -12,7 +12,8 @@
     observers: [
       '_selectedDateChanged(_selectedDate, i18n.formatDate)',
       '_validateInput(_selectedDate, _minDate, _maxDate)',
-      '_focusedDateChanged(_focusedDate, i18n.formatDate)'
+      '_focusedDateChanged(_focusedDate, i18n.formatDate)',
+      '_announceFocusedDate(_focusedDate, opened)'
     ],
 
     properties: {
@@ -107,8 +108,15 @@
         'October', 'November', 'December'
       ],
 
-      // An array with the short names of days starting
-      // with Sunday.
+      // An array of weekday names starting with Sunday. Used
+      // in screen reader announcements.
+      weekdays: [
+        'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+        'Thursday', 'Friday', 'Saturday'
+      ],
+
+      // An array of short weekday names starting with Sunday.
+      // Displayed in the calendar.
       weekdaysShort: [
         'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
       ],
@@ -116,6 +124,12 @@
       // An integer indicating the first day of the week
       // (0 = Sunday, 1 = Monday, etc.).
       firstDayOfWeek: 0,
+
+      // Translation of the Calendar icon button title.
+      calendar: 'Calendar',
+
+      // Translation of the Clear icon button title
+      clear: 'Clear',
 
       // Translation of the Today shortcut button text.
       today: 'Today',
@@ -159,8 +173,11 @@
               'January', 'February', 'March', 'April', 'May',
               'June', 'July', 'August', 'September', 'October', 'November', 'December'
             ],
+            weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             firstDayOfWeek: 0,
+            calendar: 'Calendar',
+            clear: 'Clear',
             today: 'Today',
             cancel: 'Cancel',
             formatDate: function(d) {
@@ -428,8 +445,8 @@
 
       // focus to enable keyboard navigation and keyboard input
       this._focus();
-      this.updateStyles();
 
+      this.updateStyles();
     },
 
     // A hack needed for iOS to prevent dropdown from being clipped in an
@@ -630,6 +647,14 @@
         this.open();
         // iOS needs a refit after input blur animation has finished
         this.$.dropdown.async(this.$.dropdown.refit, 500);
+      }
+    },
+
+    _announceFocusedDate: function(_focusedDate, opened) {
+      if (opened) {
+        this.debounce('_announceFocusedDate', function() {
+          this.$.overlay.announceFocusedDate();
+        }, 1);
       }
     }
 

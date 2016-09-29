@@ -111,14 +111,22 @@
 
     <div id="title">[[_getTitle(month, i18n.monthNames)]]</div>
     <div id="monthGrid" on-tap="_handleTap" on-touchend="_preventDefault" on-touchstart="_onMonthGridTouchStart">
-      <template is="dom-repeat" items="[[_getWeekDayNames(i18n.weekdaysShort, i18n.firstDayOfWeek)]]">
-        <div class="weekday">[[item]]</div>
+      <template is="dom-repeat" items="[[_getWeekDayNames(i18n.weekdays, i18n.weekdaysShort, i18n.firstDayOfWeek)]]">
+        <div class="weekday" aria-label$="[[item.weekDay]]">[[item.weekDayShort]]</div>
       </template>
       <template is="dom-repeat" items="[[_days]]">
         <template is="dom-if" if="[[_showWeekSeparator(showWeekNumbers, i18n.firstDayOfWeek, index)]]">
           <span class="weekSeparator">[[_getWeekNumber(item, _days)]]</span>
         </template>
-        <div today$="[[_isToday(item)]]" selected$="[[_dateEquals(item, selectedDate)]]" focused$="[[_dateEquals(item, focusedDate)]]" date="[[item]]" disabled$="[[!_dateAllowed(item, minDate, maxDate)]]">[[_getDate(item)]]</div>
+        <div
+            today$="[[_isToday(item)]]"
+            selected$="[[_dateEquals(item, selectedDate)]]"
+            focused$="[[_dateEquals(item, focusedDate)]]"
+            date="[[item]]"
+            disabled$="[[!_dateAllowed(item, minDate, maxDate)]]"
+            role$="[[_getRole(item)]]"
+            aria-label$="[[_getAriaLabel(item)]]"
+            aria-disabled$="[[_getAriaDisabled(item, minDate, maxDate)]]">[[_getDate(item)]]</div>
       </template>
     </div>
   </template>
@@ -215,8 +223,19 @@
         date.setDate(date.getDate() + delta);
       },
 
-      _getWeekDayNames: function(weekDayNames, firstDayOfWeek) {
+      _applyFirstDayOfWeek: function(weekDayNames, firstDayOfWeek) {
         return weekDayNames.slice(firstDayOfWeek).concat(weekDayNames.slice(0, firstDayOfWeek));
+      },
+
+      _getWeekDayNames: function(weekDayNames, weekDayNamesShort, firstDayOfWeek) {
+        weekDayNames = this._applyFirstDayOfWeek(weekDayNames, firstDayOfWeek);
+        weekDayNamesShort = this._applyFirstDayOfWeek(weekDayNamesShort, firstDayOfWeek);
+        return weekDayNames.map(function(day, index, days) {
+          return {
+            weekDay: day,
+            weekDayShort: weekDayNamesShort[index]
+          };
+        });
       },
 
       _getDate: function(date) {
@@ -303,8 +322,32 @@
 
       _dateAllowed: function(date, min, max) {
         return (!min || date >= min) && (!max || date <= max);
-      }
+      },
 
+      _getRole: function(date) {
+        return date ? 'button' : 'presentational';
+      },
+
+      _getAriaLabel: function(date) {
+        if (!date) {
+          return '';
+        }
+
+        var ariaLabel = this._getDate(date) + ' ' +
+          this.i18n.monthNames[date.getMonth()] + ' ' +
+          date.getFullYear() + ', ' +
+          this.i18n.weekdays[date.getDay()];
+
+        if (this._isToday(date)) {
+          ariaLabel += ', ' + this.i18n.today;
+        }
+
+        return ariaLabel;
+      },
+
+      _getAriaDisabled: function(date, min, max) {
+        return this._dateAllowed(date, min, max) ? 'false' : 'true';
+      }
     });
   </script>
 </dom-module>

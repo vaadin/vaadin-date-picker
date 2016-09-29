@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../vaadin-date-picker.html">
+  <link rel="import" href="../vaadin-date-picker-light.html">
+  <script src="common.js"></script>
+</head>
+
+<body>
+
+  <test-fixture id="datepicker">
+    <template>
+      <vaadin-date-picker label="ariatest"></vaadin-date-picker>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="datepickerLight">
+    <template>
+      <vaadin-date-picker-light>
+        <input is="iron-input">
+      </vaadin-date-picker-light>
+    </template>
+  </test-fixture>
+
+  <script>
+    describe('WAI-ARIA', function() {
+      var datepicker;
+
+      beforeEach(function() {
+        datepicker = fixture('datepicker');
+      });
+
+      describe('date picker', function() {
+        it('should have application role on input container', function() {
+          expect(datepicker.$.inputcontainer.getAttribute('role')).to.equal('application');
+        });
+
+        it('should have button roles on buttons', function() {
+          expect(datepicker.$.calendar.getAttribute('role')).to.equal('button');
+          expect(datepicker.$.clear.getAttribute('role')).to.equal('button');
+        });
+
+        it('should have label properties on buttons', function() {
+          expect(datepicker.$.calendar.getAttribute('aria-label')).to.equal('Calendar');
+          expect(datepicker.$.clear.getAttribute('aria-label')).to.equal('Clear');
+        });
+
+        it('should have expanded state false on calendar button', function() {
+          expect(datepicker.$.calendar.getAttribute('aria-expanded')).to.equal('false');
+        });
+
+        it('should have expanded state true on calendar button when opened', function() {
+          datepicker.open();
+
+          expect(datepicker.$.calendar.getAttribute('aria-expanded')).to.equal('true');
+        });
+
+        it('should have hidden state on label', function() {
+          expect(datepicker.$.label.getAttribute('aria-hidden')).to.equal('true');
+        });
+
+        it('should have label property on the input', function() {
+          expect(datepicker.$.input.getAttribute('aria-label')).to.equal('ariatest');
+        });
+      });
+
+      describe('overlay hosting element', function() {
+        var datepickerLight;
+
+        beforeEach(function() {
+          datepickerLight = fixture('datepickerLight');
+        });
+
+        it('should have dialog role', function() {
+          expect(datepicker.$.overlay.getAttribute('role')).to.equal('dialog');
+          expect(datepickerLight.$.overlay.getAttribute('role')).to.equal('dialog');
+        });
+
+        it('should not have tabindex attribute', function() {
+          expect(parseInt(datepicker.$.overlay.getAttribute('tabindex'), 10)).to.be.NaN;
+          expect(parseInt(datepickerLight.$.overlay.getAttribute('tabindex'), 10)).to.be.NaN;
+        });
+      });
+
+      describe('overlay contents', function() {
+        var overlay;
+
+        beforeEach(function() {
+          overlay = datepicker.$.overlay;
+        });
+
+        describe('title announcer', function() {
+          it('should be present in the overlay', function() {
+            expect(overlay.$.announcer).to.be.ok;
+          });
+
+          it('should be the first child of the overlay', function() {
+            expect(Polymer.dom(overlay.root).firstElementChild).to.equal(overlay.$.announcer);
+          });
+
+          it('should be visible', function(done) {
+            datepicker.open();
+
+            Polymer.Base.async(function() {
+              expect(overlay.$.announcer.offsetWidth).to.be.at.least(1);
+              expect(overlay.$.announcer.offsetHeight).to.be.at.least(1);
+              done();
+            }, 10);
+          });
+
+          it('should have role alert', function() {
+            expect(overlay.$.announcer.getAttribute('role')).to.equal('alert');
+          });
+
+          it('should have live property polite', function() {
+            expect(overlay.$.announcer.getAttribute('aria-live')).to.equal('polite');
+          });
+
+          it('should not have hidden state', function() {
+            expect(overlay.$.announcer.getAttribute('aria-hidden')).to.not.equal('true');
+          });
+
+          it('should have text', function() {
+            expect(overlay.$.announcer.textContent.trim()).to.equal('Calendar');
+          });
+        });
+      });
+
+      describe('Announcements', function() {
+        var announceText;
+
+        function testAnnounce(callback) {
+          document.body.addEventListener('iron-announce', function(event) {
+            callback(event.detail.text);
+          });
+        }
+
+        it('should request availability from IronA11yAnnouncer', function(done) {
+          var spy = sinon.spy(Polymer.IronA11yAnnouncer, 'requestAvailability');
+          var datepicker = fixture('datepicker');
+          Polymer.Base.async(function() {
+            expect(spy.called).to.be.true;
+            done();
+          });
+        });
+
+        it('should announce focused date on open', function(done) {
+          testAnnounce(function(text) {
+            expect(text).to.equal('Monday 1 February 2016');
+            done();
+          });
+
+          datepicker._focusedDate = new Date(2016, 1, 1);
+          datepicker.open();
+        });
+
+        it('should announce focused date changes when opened', function(done) {
+          datepicker.open();
+
+          Polymer.Base.async(function() {
+            testAnnounce(function(text) {
+              expect(text).to.equal('Tuesday 2 February 2016');
+              done();
+            });
+
+            datepicker._focusedDate = new Date(2016, 1, 2);
+          }, 100);
+        });
+
+        it('should not announce focused date changes when closed', function(done) {
+          var announceSpy = sinon.spy();
+          testAnnounce(announceSpy);
+
+          datepicker._focusedDate = new Date(2016, 1, 2);
+
+          Polymer.Base.async(function() {
+            expect(announceSpy.called).to.be.false();
+            done();
+          }, 100);
+        });
+
+        it('should announce initial position on open', function(done) {
+          testAnnounce(function(text) {
+            expect(text).to.equal('Monday 1 February 2016');
+            done();
+          });
+
+          datepicker.initialPosition = new Date(2016, 1, 1);
+          datepicker.open();
+        });
+
+        it('should announce today', function(done) {
+          testAnnounce(function(text) {
+            expect(text.indexOf('Today')).to.equal(0);
+            done();
+          });
+
+          datepicker.open();
+        });
+
+        it('should debounce announcements', function(done) {
+          var announceSpy = sinon.spy();
+          testAnnounce(announceSpy);
+
+          datepicker._focusedDate = new Date(2016, 1, 1);
+          datepicker.open();
+          datepicker._focusedDate = new Date(2016, 1, 2);
+
+          Polymer.Base.async(function() {
+            expect(announceSpy.calledCount).to.be.equal(1);
+            done();
+          }, 100);
+        });
+
+        describe('i18n', function() {
+          beforeEach(function() {
+            datepicker.set('i18n.monthNames',
+                'tammikuu_helmikuu_maaliskuu_huhtikuu_toukokuu_kesäkuu_heinäkuu_elokuu_syyskuu_lokakuu_marraskuu_joulukuu'.split('_'));
+            datepicker.set('i18n.weekdays', 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'));
+            datepicker.set('i18n.today', 'Tänään');
+          });
+
+          it('should announce dates in correct locale', function(done) {
+            testAnnounce(function(text) {
+              expect(text).to.equal('maananatai 1 helmikuu 2016');
+              done();
+            });
+
+            datepicker._focusedDate = new Date(2016, 1, 1);
+            datepicker.open();
+          });
+
+          it('should announce today in correct locale', function(done) {
+            testAnnounce(function(text) {
+              expect(text.indexOf('Tänään')).to.equal(0);
+              done();
+            });
+
+            datepicker.open();
+          });
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>
