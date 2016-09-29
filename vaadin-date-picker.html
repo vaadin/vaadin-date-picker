@@ -199,7 +199,7 @@ If you want to replace the default input field with a custom implementation, you
     </paper-input-container>
 
     <iron-dropdown id="dropdown"
-                   fullscreen$=[[_fullscreen]]
+                   fullscreen$="[[_fullscreen]]"
                    allow-outside-scroll
                    on-iron-overlay-opened="_onOverlayOpened"
                    on-iron-overlay-closed="_onOverlayClosed"
@@ -207,8 +207,8 @@ If you want to replace the default input field with a custom implementation, you
                    opened="{{opened}}">
       <vaadin-date-picker-overlay id="overlay"
                                   i18n="[[i18n]]"
-                                  fullscreen$=[[_fullscreen]]
-                                  label=[[label]]
+                                  fullscreen$="[[_fullscreen]]"
+                                  label="[[label]]"
                                   on-date-tap="close"
                                   selected-date="{{_selectedDate}}"
                                   class="dropdown-content"
