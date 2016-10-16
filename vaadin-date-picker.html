@@ -172,6 +172,7 @@ If you want to replace the default input field with a custom implementation, you
         auto-validate$="[[autoValidate]]"
         invalid$="[[invalid]]"
         disabled$="[[disabled]]"
+        no-label-float$="[[noLabelFloat]]"
         role="application">
       <label id="label" aria-hidden="true">[[label]]</label>
       <input id="input"
@@ -187,12 +188,12 @@ If you want to replace the default input field with a custom implementation, you
           validator="[[validator]]"
           disabled$="[[disabled]]"
           readonly$="[[readonly]]"
-          no-input$="[[_noInput]]" />
-      <div suffix id="clear" on-tap="_clear" role="button" aria-label$="[[i18n.clear]]">
+          no-input$="[[_noInput]]"/>
+      <div suffix id="clear" on-tap="_clear" role="button" aria-label$="[[i18n.clear]]" hidden$="{{hideClearIcon}}">
         <iron-icon icon="clear"></iron-icon>
         <paper-ripple class="circle" center></paper-ripple>
       </div>
-      <div suffix id="calendar" on-tap="_toggle" role="button" aria-label$="[[i18n.calendar]]" aria-expanded$="[[_getAriaExpanded(opened)]]">
+      <div suffix id="calendar" on-tap="_toggle" role="button" aria-label$="[[i18n.calendar]]" aria-expanded$="[[_getAriaExpanded(opened)]]" hidden$="{{hideCalendarIcon}}">
         <iron-icon icon="event"></iron-icon>
         <paper-ripple class="circle" center></paper-ripple>
       </div>
@@ -261,6 +262,33 @@ If you want to replace the default input field with a custom implementation, you
          * Set to true to make this element read-only.
          */
         readonly: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Set to true to hide clear icon.
+         */
+        hideClearIcon: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Set to true to hide clear icon.
+         */
+        hideCalendarIcon: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Set to true to disable the floating label. The label disappears when the input value is not null.
+         */
+        noLabelFloat: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
