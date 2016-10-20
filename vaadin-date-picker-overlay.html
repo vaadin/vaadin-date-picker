@@ -128,6 +128,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        height: 80px;
       }
 
       #scrollers[desktop] #yearScroller {
@@ -264,11 +265,11 @@
 
     <div id="scrollers" desktop$="[[_desktopMode]]" on-scroll="_stopPropagation" on-track="_track">
       <div id="fade"></div>
-      <vaadin-infinite-scroller id="scroller" on-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" item-height="250" buffer-size="6" active="[[initialPosition]]">
+      <vaadin-infinite-scroller scroller-height="[[scrollerHeight]]" id="scroller" on-infinite-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" item-height="250" active="[[active]]">
         <template>
           <vaadin-month-calendar
             i18n="[[i18n]]"
-            month="[[_dateAfterXMonths(index)]]"
+            month="[[_monthDateByPhysicalIndex(index)]]"
             selected-date="{{selectedDate}}"
             focused-date="[[focusedDate]]"
             ignore-taps="[[_ignoreTaps]]"
@@ -278,9 +279,9 @@
           </vaadin-month-calendar>
         </template>
       </vaadin-infinite-scroller>
-      <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" item-height="80" buffer-size="25" active="[[initialPosition]]">
+      <vaadin-infinite-scroller scroller-height="[[scrollerHeight]]" id="yearScroller" on-tap="_onYearTap" on-infinite-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" item-height="80" active="[[active]]">
         <template>
-          <div role="button">[[_yearAfterXYears(index)]]</div>
+          <div role="button">[[_yearByPhysicalIndex(index)]]</div>
           <div style="font-size: 18px; line-height: 56px; opacity: 0.3;" aria-hidden="true">•</div>
         </template>
       </vaadin-infinite-scroller>
@@ -380,6 +381,8 @@
        */
 
       attached: function() {
+        this.$.scroller._monthDateByPhysicalIndex = this.$.yearScroller._monthDateByPhysicalIndex = this._monthDateByPhysicalIndex.bind(this);
+        this.$.scroller._yearByPhysicalIndex = this.$.yearScroller._yearByPhysicalIndex = this._yearByPhysicalIndex.bind(this);
         this._translateX = this._yearScrollerWidth;
         this.toggleClass('animate', true);
         this.setScrollDirection('y', this.$.scrollers);
@@ -427,6 +430,16 @@
             this._scrollToPosition(diff - visibleItems + 1, true);
           }
         }
+      },
+
+      _yearByPhysicalIndex: function(index) {
+        var scaledPosition = this.$.yearScroller._getScaledPosition(index);
+        return this._yearAfterXYears(scaledPosition);
+      },
+
+      _monthDateByPhysicalIndex: function(index) {
+        var scaledPosition = this.$.scroller._getScaledPosition(index);
+        return this._dateAfterXMonths(scaledPosition);
       },
 
       _initialPositionChanged: function(initialPosition) {
