@@ -137,19 +137,23 @@ This program is available under Apache License Version 2.0, available at https:/
       'animationend': '_animationEnd'
     },
 
-    _animationEnd: function () {
+    _animationEnd: function() {
       this.initAnimationDone = true;
     },
 
     _animationStart: function() {
       if (!this._initDone) {
         // Once the first set of items start fading in, stamp the rest
-        this.debounce('finish-init', function () {
+        this.debounce('finish-init', function() {
           this._buffers.forEach(function(buffer, bufferIndex) {
             [].forEach.call(buffer.children, function(itemWrapper, index) {
               this._ensureStampedInstance(itemWrapper);
             }.bind(this));
           }, this);
+
+          if (!this._buffers[0].translateY) {
+            this._reset();
+          }
         }, 1);
 
         this._initDone = true;
