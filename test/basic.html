@@ -100,6 +100,18 @@
         tap(datepicker.$.label);
       });
 
+      it('should pass the placeholder attribute to the input tag', function() {
+        var placeholder = 'Pick a date';
+        datepicker.set('placeholder', placeholder);
+        expect(datepicker.$.input.placeholder).to.be.equal(placeholder);
+      });
+
+      it('should set always-float-label when placeholder is provided', function() {
+        expect(datepicker.$.inputcontainer.alwaysFloatLabel).to.be.false;
+        datepicker.set('placeholder', 'Pick a date');
+        expect(datepicker.$.inputcontainer.alwaysFloatLabel).to.be.true;
+      });
+
       it('should scroll to today by default', function(done) {
         var spy = sinon.spy(datepicker.$.overlay, 'scrollToDate');
         datepicker.addEventListener('iron-overlay-opened', function() {
