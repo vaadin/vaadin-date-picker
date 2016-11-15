@@ -175,7 +175,8 @@ If you want to replace the default input field with a custom implementation, you
         auto-validate$="[[autoValidate]]"
         invalid$="[[invalid]]"
         disabled$="[[disabled]]"
-        role="application">
+        role="application"
+        always-float-label$={{placeholder}}>
       <label id="label" aria-hidden="true">[[label]]</label>
       <input id="input"
           is="iron-input"
@@ -184,6 +185,7 @@ If you want to replace the default input field with a custom implementation, you
           on-focus="_focus"
           value="{{_userInputValue::input}}"
           name$="[[name]]"
+          placeholder$="[[placeholder]]"
           aria-label$="[[label]]"
           invalid="{{invalid}}"
           required$="[[required]]"
