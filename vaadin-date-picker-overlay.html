@@ -236,6 +236,12 @@
         @apply(--vaadin-date-picker-footer);
       }
 
+      paper-button.keyboard-focus {
+        color: var(--primary-background-color);
+        background: var(--primary-color);
+        outline: none;
+      }
+
       #announcer {
         display: inline-block;
         position: fixed;
@@ -274,7 +280,8 @@
             ignore-taps="[[_ignoreTaps]]"
             show-week-numbers="[[showWeekNumbers]]"
             min-date="[[minDate]]"
-            max-date="[[maxDate]]">
+            max-date="[[maxDate]]"
+            focused$="[[_focused]]">
           </vaadin-month-calendar>
         </template>
       </vaadin-infinite-scroller>
@@ -287,10 +294,10 @@
     </div>
 
     <div id="footer" on-touchend="_preventDefault" role="toolbar">
-      <paper-button id="todayButton" disabled="[[!_isTodayAllowed(minDate, maxDate)]]" on-tap="_onTodayTap" tabindex="-1">
+      <paper-button id="todayButton" disabled="[[!_isTodayAllowed(minDate, maxDate)]]" on-tap="_onTodayTap" on-focus="_onOverlayBlur" on-blur="_onOverlayFocus">
         [[i18n.today]]
       </paper-button>
-      <paper-button id="cancelButton" on-tap="_cancel" tabindex="-1">
+      <paper-button id="cancelButton" on-tap="_cancel" on-focus="_onOverlayBlur" on-blur="_onOverlayFocus">
         [[i18n.cancel]]
       </paper-button>
     </div>
@@ -304,7 +311,13 @@
       listeners: {
         'keydown': '_onKeydown',
         'scroll': '_stopPropagation',
-        'tap': '_stopPropagation'
+        'tap': '_stopPropagation',
+        'focus': '_onOverlayFocus',
+        'blur': '_onOverlayBlur'
+      },
+
+      hostAttributes: {
+        'tabIndex': '0'
       },
 
       properties: {
@@ -371,7 +384,9 @@
         /**
          * The latest date that can be selected. All later dates will be disabled.
          */
-        maxDate: Date
+        maxDate: Date,
+
+        _focused: Boolean
       },
 
       /**
@@ -409,6 +424,13 @@
       },
 
       /**
+       * Focuses the cancel button
+       */
+      focusCancel: function() {
+        this.$.cancelButton.focus();
+      },
+
+      /**
        * Scrolls the list to the given Date.
        */
       scrollToDate: function(date, animate) {
@@ -429,6 +451,14 @@
             this._scrollToPosition(diff - visibleItems + 1, true);
           }
         }
+      },
+
+      _onOverlayFocus: function() {
+        this._focused = true;
+      },
+
+      _onOverlayBlur: function() {
+        this._focused = false;
       },
 
       _initialPositionChanged: function(initialPosition) {
@@ -687,7 +717,7 @@
        * Keyboard Navigation
        */
       _eventKey: function(e) {
-        var keys = ['down', 'up', 'right', 'left', 'enter', 'space', 'home', 'end', 'pageup', 'pagedown'];
+        var keys = ['down', 'up', 'right', 'left', 'enter', 'space', 'home', 'end', 'pageup', 'pagedown', 'tab'];
 
         for (var i = 0; i < keys.length; i++) {
           var k = keys[i];
@@ -702,7 +732,15 @@
             dateToFocus;
 
         var eventKey = this._eventKey(e);
-        if (eventKey) {
+        if (eventKey === 'tab') {
+          e.stopPropagation();
+          if (this.$.cancelButton.focused && !e.shiftKey) {
+            // Return focus back to the input field
+            e.preventDefault();
+            this.fire('focus-input');
+            this._onOverlayBlur();
+          }
+        } else if (eventKey) {
           e.preventDefault();
           e.stopPropagation();
 
@@ -720,7 +758,9 @@
               this._moveFocusByDays(-1);
               break;
             case 'enter':
-              this._close();
+              if (!this.$.todayButton.focused && !this.$.cancelButton.focused) {
+                this._close();
+              }
               break;
             case 'space':
               if (vaadin.elements.datepicker.DatePickerHelper._dateEquals(this.focusedDate, this.selectedDate)) {
