@@ -856,6 +856,14 @@
            return date !== undefined;
          })
          .reduce(function(closestDate, candidate) {
+           if (!candidate) {
+             return closestDate;
+           }
+
+           if (!closestDate) {
+             return candidate;
+           }
+
            var candidateDiff = Math.abs(date.getTime() - candidate.getTime());
            var closestDateDiff = Math.abs(closestDate.getTime() - date.getTime());
            return candidateDiff < closestDateDiff ? candidate : closestDate;

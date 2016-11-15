@@ -434,8 +434,18 @@
     },
 
     _onOverlayOpened: function() {
-      this.$.overlay.initialPosition = this._selectedDate ||
-        this.$.overlay.initialPosition || this._parseDate(this.initialPosition) || new Date();
+      var parsedInitialPosition = this._parseDate(this.initialPosition);
+
+      var initialPosition = this._selectedDate || this.$.overlay.initialPosition ||
+        parsedInitialPosition || new Date();
+
+      if (parsedInitialPosition ||
+        this.$.overlay._dateAllowed(initialPosition, this.$.overlay.minDate, this.$.overlay.maxDate)) {
+        this.$.overlay.initialPosition = initialPosition;
+      } else {
+        this.$.overlay.initialPosition = this.$.overlay._getClosestDate(initialPosition, [this.$.overlay.minDate, this.$.overlay.maxDate]);
+      }
+
       this.$.overlay.scrollToDate(this.$.overlay.focusedDate || this.$.overlay.initialPosition);
       // Have a default focused date
       this._ignoreFocusedDateChange = true;
