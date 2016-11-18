@@ -436,7 +436,7 @@
           datepicker.open();
         });
 
-        it('should debounce announcements', function(done) {
+        it('should announce once', function(done) {
           var announceSpy = sinon.spy();
           document.body.addEventListener('iron-announce', announceSpy);
 
