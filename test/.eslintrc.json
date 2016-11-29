@@ -1,0 +1,30 @@
+{
+  "globals": {
+    "sinon": false,
+    "WCT": false,
+    "ios": false,
+    "android": false,
+    "describe": false,
+    "expect": false,
+    "it": false,
+    "before": false,
+    "beforeEach": false,
+    "afterEach": false,
+    "tap": false,
+    "tapSpy": true,
+    "valueChangedSpy": true,
+    "isFullscreen": false,
+    "getFirstVisibleItem": false,
+    "getDefaultI18n": false,
+    "monthsEqual": false,
+    "listenForEvent": false,
+    "waitUntilScrolledTo": false,
+    "monthCalendar": true,
+    "fixture": false,
+    "flush": false,
+    "System": false,
+    "Sugar": false,
+    "MockInteractions": false,
+    "MockTouchInteractions": false
+  }
+}
