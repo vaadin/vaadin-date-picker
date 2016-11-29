@@ -1,3 +1,4 @@
+/* exported ios, safari, android, getDefaultI18n, open, close, tap, monthsEqual, getFirstVisibleItem, isFullscreen, describeSkipIf, waitUntilScrolledTo */
 var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 var safari = navigator.userAgent.toLowerCase().indexOf('safari/') > -1 && navigator.userAgent.toLowerCase().indexOf('chrome/') == -1;
 var android = /(android)/i.test(navigator.userAgent);
@@ -56,7 +57,7 @@ function monthsEqual(date1, date2) {
 
 function getFirstVisibleItem(scroller, bufferOffset) {
   var children = [];
-  bufferOffset = (bufferOffset ||  0);
+  bufferOffset = (bufferOffset || 0);
 
   scroller._buffers.forEach(function(buffer) {
     [].forEach.call(buffer.children, function(itemWrapper) {
