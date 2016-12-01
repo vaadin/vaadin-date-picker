@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "sauce": {
+      "browsers": [
+        "${BROWSERS}"
+      ]
+    }
+  },
+  "extraScripts": [
+    "${EXTRA_SCRIPTS}"
+  ]
+}
