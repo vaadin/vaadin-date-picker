@@ -1,17 +1,23 @@
 sudo: false
 language: node_js
-node_js:
-  - "5.3"
-cache:
-  directories:
-    - node_modules
-install: travis_retry npm install && npm install -g bower && bower install
+node_js: stable
 env:
-  - TEST_SUITE=mobile
-  - TEST_SUITE=desktop
-  - TEST_SUITE=mobile:shadow
-  - TEST_SUITE=desktop:shadow
+  # desktop
+  - SAUCE_BROWSERS='[
+      "Windows 10/chrome",
+      "Windows 10/firefox",
+      "Windows 10/microsoftedge",
+      "Windows 10/internet explorer",
+      "OS X 10.11/safari"
+    ]'
+  # mobile
+  - SAUCE_BROWSERS='[
+      "OS X 10.11/iphone",
+      "OS X 10.11/ipad",
+      "Linux/android"
+    ]'
 script:
   - gulp lint:js
   - gulp lint:html
-  - travis_retry gulp test:$TEST_SUITE
+  - travis_retry wct
+  - travis_retry wct test/shadow.html
