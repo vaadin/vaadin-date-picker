@@ -33,13 +33,9 @@
         scroller.active = true;
       });
 
-      afterEach(function(done) {
-        Polymer.Base.async(done, 1000);
-      });
-
       function verifyPosition() {
         var item = getFirstVisibleItem(scroller);
-        expect(Math.abs(parseInt(item.textContent) - scroller.position)).to.be.below(1);
+        expect(item.textContent - scroller.position).to.be.equal(0);
 
         var scrollDiff = item.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
         var ratio = scrollDiff / scroller.itemHeight;
@@ -65,8 +61,8 @@
           if (scroller.position > scroller.bufferSize * 1.5) {
             done();
           } else {
-            scroller.$.scroller.scrollTop += scroller.itemHeight * 3.7;
-            scroller.async(scrollDown, 20);
+            scroller.$.scroller.scrollTop += scroller.itemHeight * 4;
+            scroller.async(scrollDown, 30);
           }
         }
 
@@ -79,20 +75,12 @@
           if (scroller.position < -scroller.bufferSize * 1.5) {
             done();
           } else {
-            scroller.$.scroller.scrollTop -= scroller.itemHeight * 3.7;
-            scroller.async(scrollUp, 20);
+            scroller.$.scroller.scrollTop -= scroller.itemHeight * 4;
+            scroller.async(scrollUp, 30);
           }
         }
 
         scrollUp();
-      });
-
-      it('should reflect position as currently visible item index', function() {
-        scroller.position = -5;
-        while (scroller.position < 5) {
-          scroller.position += 1.1;
-          verifyPosition();
-        }
       });
 
       it('should fire scroll events', function(done) {
