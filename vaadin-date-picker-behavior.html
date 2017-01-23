@@ -316,6 +316,7 @@
     open: function() {
       this._updateAlignmentAndPosition();
       if (!this.disabled && !this.readonly) {
+        this.$.dropdown.backdropElement.style.opacity = 0;
         this.$.dropdown.open();
       }
     },

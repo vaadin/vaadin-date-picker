@@ -60,6 +60,22 @@
         datepicker.open();
       });
 
+      it('should place the backdrop above all other document elements', function(done) {
+        datepicker.addEventListener('iron-overlay-opened', function() {
+          datepicker.async(function() {
+            var linkRect = a.getBoundingClientRect();
+            expect(document.elementFromPoint(linkRect.left, linkRect.top)).to.eql(datepicker.$.dropdown.backdropElement);
+            done();
+          }, 220);
+        });
+        var a = document.createElement('a');
+        var linkText = document.createTextNode('I should not be clicked because of backdrop');
+        a.appendChild(linkText);
+        a.href = 'http://example.com';
+        document.body.insertBefore(a, document.body.firstChild);
+        datepicker.open();
+      });
+
       if (document.createElement('div').style.webkitOverflowScrolling === '') {
         it('should handle webkit-overflow-scrolling', function(done) {
           document.body.style.webkitOverflowScrolling = 'touch';
