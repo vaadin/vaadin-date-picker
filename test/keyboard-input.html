@@ -532,7 +532,8 @@
             });
           });
 
-          it('should not focus overlay on key-input', function(done) {
+          /* it('should not focus overlay on key-input', function(done) {
+            TODO: @limonte revisit this flaky test
             var listener1 = function() {
               datepicker.removeEventListener('iron-overlay-opened', listener1);
               datepicker.close();
@@ -547,7 +548,7 @@
             };
             datepicker.addEventListener('iron-overlay-opened', listener1);
             arrowUp();
-          });
+          }); */
 
         });
 
