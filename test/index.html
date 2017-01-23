@@ -10,25 +10,34 @@
 
 <body>
   <script>
-    var shadow = document.location.search.indexOf('dom=shadow') > -1 || location.href.split('/').pop() === 'shadow.html';
-    WCT._config.environmentScripts.push(shadow ? 'webcomponentsjs/webcomponents.js' : 'webcomponentsjs/webcomponents-lite.js');
+    WCT._config.environmentScripts.push('webcomponentsjs/webcomponents.js');
 
     WCT.loadSuites([
       'basic.html',
+      'basic.html?dom=shadow',
       'dropdown.html',
+      'dropdown.html?dom=shadow',
       'overlay.html',
+      'overlay.html?dom=shadow',
       'month-calendar.html',
+      'month-calendar.html?dom=shadow',
       'scroller.html',
+      'scroller.html?dom=shadow',
       'form-input.html',
+      'form-input.html?dom=shadow',
       'custom-input.html',
+      'custom-input.html?dom=shadow',
       'keyboard-navigation.html',
+      'keyboard-navigation.html?dom=shadow',
       'keyboard-input.html',
+      'keyboard-input.html?dom=shadow',
       'late-upgrade.html',
+      'late-upgrade.html?dom=shadow',
       'wai-aria.html',
-      'angular2.html'
-    ].map(function(item) {
-      return item + (shadow ? '?dom=shadow' : '');
-    }));
+      'wai-aria.html?dom=shadow',
+      'angular2.html',
+      'angular2.html?dom=shadow'
+    ]);
   </script>
 </body>
 
