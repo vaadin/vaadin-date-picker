@@ -92,19 +92,25 @@
       });
 
       it('should fire scroll events', function(done) {
-        scroller.addEventListener('scroll', function() {
+        function scrollHandler() {
+          // cleanup to avoid multiple done() calls
+          scroller.removeEventListener('scroll', scrollHandler);
           done();
-        });
+        }
+        scroller.addEventListener('scroll', scrollHandler);
         scroller.$.scroller.scrollTop += 10;
       });
 
       it('should not fire scroll events', function(done) {
         var spy = sinon.spy();
         scroller.addEventListener('scroll', spy);
-        scroller.$.scroller.addEventListener('scroll', function() {
+        function scrollHandler() {
+          // cleanup to avoid multiple done() calls
+          scroller.$.scroller.removeEventListener('scroll', scrollHandler);
           expect(spy.called).to.be.false;
           done();
-        });
+        }
+        scroller.$.scroller.addEventListener('scroll', scrollHandler);
         scroller.position = 10;
       });
 
