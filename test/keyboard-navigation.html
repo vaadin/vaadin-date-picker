@@ -287,14 +287,15 @@
             expect(overlay.focusedDate).to.eql(new Date(1999, 0, 1));
           });
 
-          it('should scroll up when focus goes invisible', function(done) {
+          /* it('should scroll up when focus goes invisible', function(done) {
+            Flaky test: https://github.com/vaadin/vaadin-date-picker/issues/332
             overlay.addEventListener('scroll-animation-finished', function(e) {
               expect(e.detail.position).to.eql(e.detail.oldPosition - 12);
               done();
             });
 
             pageUp('shift');
-          });
+          });*/
 
           it('should not scroll down when focus keeps visible', function(done) {
             var initialPosition = overlay.$.scroller.position;
@@ -307,14 +308,15 @@
             });
           });
 
-          it('should scroll down when focus goes invisible', function(done) {
+          /* it('should scroll down when focus goes invisible', function(done) {
+            Flaky test: https://github.com/vaadin/vaadin-date-picker/issues/332
             overlay.addEventListener('scroll-animation-finished', function(e) {
               expect(e.detail.position).to.be.greaterThan(e.detail.oldPosition);
               done();
             });
 
             pageDown('shift');
-          });
+          });*/
 
           it('should not focus on today click if no date focused', function() {
             overlay.focusedDate = null;
