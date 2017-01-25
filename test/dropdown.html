@@ -67,7 +67,7 @@
             expect(document.elementFromPoint(spanRect.left, spanRect.top)).to.eql(datepicker.$.dropdown.backdropElement);
             document.body.removeChild(span);
             done();
-          }, 220);
+          }, 220); // https://github.com/PolymerElements/iron-overlay-behavior/blob/master/iron-overlay-backdrop.html#L41
         });
         var span = document.createElement('span');
         span.innerText = 'I should be behind the backdrop';
