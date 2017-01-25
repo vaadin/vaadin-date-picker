@@ -484,6 +484,9 @@
 
       this.updateStyles();
 
+      // bring inputcontainer above the backdrop
+      this.$.inputcontainer.style.zIndex = this.$.dropdown.style.zIndex;
+
       this._ignoreAnnounce = false;
     },
 
