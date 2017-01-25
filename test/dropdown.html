@@ -60,6 +60,21 @@
         datepicker.open();
       });
 
+      it('should place the backdrop above all other document elements', function(done) {
+        datepicker.addEventListener('iron-overlay-opened', function() {
+          datepicker.async(function() {
+            var spanRect = span.getBoundingClientRect();
+            expect(document.elementFromPoint(spanRect.left, spanRect.top)).to.eql(datepicker.$.dropdown.backdropElement);
+            document.body.removeChild(span);
+            done();
+          }, 220); // https://github.com/PolymerElements/iron-overlay-behavior/blob/master/iron-overlay-backdrop.html#L41
+        });
+        var span = document.createElement('span');
+        span.innerText = 'I should be behind the backdrop';
+        document.body.insertBefore(span, document.body.firstChild);
+        datepicker.open();
+      });
+
       if (document.createElement('div').style.webkitOverflowScrolling === '') {
         it('should handle webkit-overflow-scrolling', function(done) {
           document.body.style.webkitOverflowScrolling = 'touch';

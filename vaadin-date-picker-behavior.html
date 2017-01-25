@@ -316,6 +316,7 @@
     open: function() {
       this._updateAlignmentAndPosition();
       if (!this.disabled && !this.readonly) {
+        this.$.dropdown.backdropElement.style.opacity = 0;
         this.$.dropdown.open();
       }
     },
@@ -482,6 +483,9 @@
       }
 
       this.updateStyles();
+
+      // bring inputcontainer above the backdrop
+      this.$.inputcontainer.style.zIndex = this.$.dropdown.style.zIndex;
 
       this._ignoreAnnounce = false;
     },

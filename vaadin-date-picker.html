@@ -83,6 +83,7 @@ If you want to replace the default input field with a custom implementation, you
 
       #inputcontainer {
         padding-bottom: 0;
+        position: relative;
       }
 
       #inputcontainer,
@@ -217,6 +218,7 @@ If you want to replace the default input field with a custom implementation, you
         on-iron-overlay-closed="_onOverlayClosed"
         on-iron-overlay-canceled="_preventCancelOnComponentAccess"
         opened="{{opened}}"
+        with-backdrop="true"
         no-auto-focus>
       <vaadin-date-picker-overlay
           id="overlay" i18n="[[i18n]]"
