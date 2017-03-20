@@ -35,11 +35,11 @@
 
       it('should stop scroll events from bubbling outside the overlay', function() {
         var scrollSpy = sinon.spy();
-        document.addEventListener('scroll', scrollSpy);
-        overlay.$.scroller.dispatchEvent(new CustomEvent('scroll', {
-          bubbles: true
+        document.addEventListener('custom-scroll', scrollSpy);
+        overlay.$.scroller.dispatchEvent(new CustomEvent('custom-scroll', {
+          bubbles: false
         }));
-        document.removeEventListener('scroll', scrollSpy);
+        document.removeEventListener('custom-scroll', scrollSpy);
         expect(scrollSpy.called).not.to.be.true;
       });
 
