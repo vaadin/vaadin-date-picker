@@ -298,7 +298,7 @@
     },
 
     created: function() {
-      this._boundOnScroll = this._onScroll.bind(this);
+      this._boundOnResize = this._onResize.bind(this);
     },
 
     listeners: {
@@ -472,10 +472,9 @@
       this.$.overlay.focusedDate = this.$.overlay.focusedDate || this.$.overlay.initialPosition;
       this._ignoreFocusedDateChange = false;
 
-      window.addEventListener('scroll', this._boundOnScroll, true);
       // We cannot use iron-resize event because 1- we fire it, 2- it's fired
       // many times, 3- causes heigth and scroll issues in safari.
-      window.addEventListener('resize', this._boundOnScroll, true);
+      window.addEventListener('resize', this._boundOnResize);
 
       // Checking if the browser supports webkitOverflowScrolling
       if (document.createElement('div').style.webkitOverflowScrolling === '') {
@@ -520,8 +519,7 @@
     _onOverlayClosed: function() {
       this._ignoreAnnounce = true;
 
-      window.removeEventListener('scroll', this._boundOnScroll, true);
-      window.removeEventListener('resize', this._boundOnScroll, true);
+      window.removeEventListener('resize', this._boundOnResize);
 
       if (this._touchPrevented) {
         this._touchPrevented.forEach(function(prevented) {
@@ -563,13 +561,10 @@
       this._onOverlayClosed();
     },
 
-    _onScroll: function(e) {
-      if (e.target === window || !this.$.overlay.contains(e.target)) {
-        this.$.dropdown.style.bottom = 'auto';
-        this.$.dropdown.resetFit();
-        this._updateAlignmentAndPosition();
-        this.$.dropdown.fire('iron-resize');
-      }
+    _onResize: function(e) {
+      this.$.dropdown.resetFit();
+      this._updateAlignmentAndPosition();
+      this.$.dropdown.fire('iron-resize');
     },
 
     _preventCancelOnComponentAccess: function(e) {

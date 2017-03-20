@@ -256,68 +256,6 @@
         expect(datepicker.$.dropdown.noAutoFocus).to.equal(true);
       });
 
-      describe('window scroll realign', function() {
-
-        beforeEach(function(done) {
-          open(datepicker, done);
-        });
-
-        it('should realign on window scroll', function(done) {
-          sinon.stub(datepicker, '_updateAlignmentAndPosition', function() {
-            if (!done._called) {
-              done._called = true;
-              done();
-            }
-          });
-          Polymer.Base.fire('scroll', {}, {
-            node: window
-          });
-        });
-
-        it('should realign on container scroll', function(done) {
-          datepicker.close();
-
-          var container = fixture('datepicker-wrapped');
-          var datepickerWrapped = container.querySelector('vaadin-date-picker');
-
-          open(datepickerWrapped, function() {
-            sinon.stub(datepickerWrapped, '_updateAlignmentAndPosition', function() {
-              if (!done._called) {
-                done._called = true;
-                done();
-              }
-            });
-            container.scrollTop += 100;
-          });
-        });
-
-        if (!ios) { // https://github.com/vaadin/vaadin-date-picker/issues/330
-          it('should not realign on year/month scroll', function(done) {
-            var spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
-            datepicker.$.overlay.$.yearScroller.$.scroller.scrollTop += 100;
-            datepicker.async(function() {
-              expect(spy.called).to.be.false;
-              done();
-            }, 1);
-          });
-        }
-
-        it('should not realign once closed', function(done) {
-          datepicker.addEventListener('iron-overlay-closed', function() {
-            var spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
-            Polymer.Base.fire('scroll', {}, {
-              node: window
-            });
-            datepicker.async(function() {
-              expect(spy.called).to.be.false;
-              done();
-            }, 1);
-          });
-          datepicker.close();
-        });
-
-      });
-
       describe('value property formats', function() {
 
         it('should accept ISO format', function() {
