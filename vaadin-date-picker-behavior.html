@@ -262,7 +262,8 @@
        */
       _minDate: {
         type: Date,
-        value: null
+        // null does not work here because minimizer passes undefined to overlay (#351)
+        value: new Date(-8640000000000000)
       },
 
       /**
@@ -270,7 +271,7 @@
        */
       _maxDate: {
         type: Date,
-        value: null
+        value: new Date(+8640000000000000)
       },
 
       _noInput: {
