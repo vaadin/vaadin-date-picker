@@ -2,7 +2,6 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../paper-input/paper-input-container.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
@@ -12,6 +11,7 @@
 <link rel="import" href="vaadin-month-calendar.html">
 <link rel="import" href="vaadin-infinite-scroller.html">
 <link rel="import" href="vaadin-date-picker-helper.html">
+<link rel="import" href="vaadin-date-picker-icons.html">
 
 <dom-module id="vaadin-date-picker-overlay">
   <template>
@@ -49,7 +49,7 @@
 
       #toolbar iron-icon {
         fill: var(--primary-color);
-        padding: 0px;
+        padding: 0;
         transition: transform 200ms;
         will-change: transform;
         --iron-icon-width: 20px;
@@ -144,12 +144,12 @@
         }
       }
 
-      #yearScroller:before {
+      #yearScroller::before {
         content: '';
         display: block;
         background: transparent;
-        width: 0px;
-        height: 0px;
+        width: 0;
+        height: 0;
         position: absolute;
         left: 0;
         top: 50%;
@@ -230,16 +230,22 @@
         @apply(--paper-font-body2);
         background: var(--primary-background-color);
         z-index: 2;
-        box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.50);
+        box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.5);
         color: var(--primary-color);
         flex-shrink: 0;
         @apply(--vaadin-date-picker-footer);
       }
 
+      paper-button.keyboard-focus {
+        color: var(--primary-background-color);
+        background: var(--primary-color);
+        outline: none;
+      }
+
       #announcer {
         display: inline-block;
         position: fixed;
-        clip: rect(0px, 0px, 0px, 0px);
+        clip: rect(0, 0, 0, 0);
         clip-path: inset(100%);
       }
     </style>
@@ -252,19 +258,19 @@
       <paper-input-container>
         <label>[[label]]</label>
         <input id="input" readonly is="iron-input" autocomplete="off" bind-value="[[_formatDisplayed(selectedDate, i18n.formatDate)]]">
-        <iron-icon id="clear" suffix on-tap="_clear" icon="clear" showclear$="[[_showClear(selectedDate)]]"></iron-icon>
+        <iron-icon id="clear" suffix on-tap="_clear" icon="vaadin-date-picker:clear" showclear$="[[_showClear(selectedDate)]]"></iron-icon>
       </paper-input-container>
-      <iron-icon id="toggle" icon="event" on-tap="_cancel"></iron-icon>
+      <iron-icon id="toggle" icon="vaadin-date-picker:event" on-tap="_cancel"></iron-icon>
     </div>
 
     <div id="toolbar" desktop$="[[_desktopMode]]" on-tap="_toggleYearScroller" aria-hidden="true">
       [[_yearAfterXMonths(_visibleMonthIndex)]]
-      <iron-icon rotate$="[[_isYearScrollerVisible(_translateX)]]" icon="chevron-right"></iron-icon>
+      <iron-icon rotate$="[[_isYearScrollerVisible(_translateX)]]" icon="vaadin-date-picker:chevron-right"></iron-icon>
     </div>
 
-    <div id="scrollers" desktop$="[[_desktopMode]]" on-scroll="_stopPropagation" on-track="_track">
+    <div id="scrollers" desktop$="[[_desktopMode]]" on-track="_track">
       <div id="fade"></div>
-      <vaadin-infinite-scroller id="scroller" on-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" item-height="250" buffer-size="6">
+      <vaadin-infinite-scroller id="scroller" on-custom-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" item-height="250" buffer-size="6" active="[[initialPosition]]">
         <template>
           <vaadin-month-calendar
             i18n="[[i18n]]"
@@ -274,11 +280,12 @@
             ignore-taps="[[_ignoreTaps]]"
             show-week-numbers="[[showWeekNumbers]]"
             min-date="[[minDate]]"
-            max-date="[[maxDate]]">
+            max-date="[[maxDate]]"
+            focused$="[[_focused]]">
           </vaadin-month-calendar>
         </template>
       </vaadin-infinite-scroller>
-      <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" item-height="80" buffer-size="25">
+      <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-custom-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" item-height="80" buffer-size="25" active="[[initialPosition]]">
         <template>
           <div role="button">[[_yearAfterXYears(index)]]</div>
           <div style="font-size: 18px; line-height: 56px; opacity: 0.3;" aria-hidden="true">•</div>
@@ -287,13 +294,10 @@
     </div>
 
     <div id="footer" on-touchend="_preventDefault" role="toolbar">
-      <paper-button id="todayButton" on-tap="_onTodayTap" tabindex="-1">
+      <paper-button id="todayButton" disabled="[[!_isTodayAllowed(minDate, maxDate)]]" on-tap="_onTodayTap">
         [[i18n.today]]
       </paper-button>
-      <paper-button id="todayClear" on-tap="_clear" tabindex="-1">
-        [[i18n.clear]]
-      </paper-button>
-      <paper-button id="cancelButton" on-tap="_cancel" tabindex="-1">
+      <paper-button id="cancelButton" on-tap="_cancel">
         [[i18n.cancel]]
       </paper-button>
     </div>
@@ -305,7 +309,14 @@
       is: 'vaadin-date-picker-overlay',
 
       listeners: {
-        'keydown': '_onKeydown'
+        'keydown': '_onKeydown',
+        'tap': '_stopPropagation',
+        'focus': '_onOverlayFocus',
+        'blur': '_onOverlayBlur'
+      },
+
+      hostAttributes: {
+        'tabIndex': '0'
       },
 
       properties: {
@@ -372,7 +383,9 @@
         /**
          * The latest date that can be selected. All later dates will be disabled.
          */
-        maxDate: Date
+        maxDate: Date,
+
+        _focused: Boolean
       },
 
       /**
@@ -410,15 +423,29 @@
       },
 
       /**
+       * Focuses the cancel button
+       */
+      focusCancel: function() {
+        this.$.cancelButton.focus();
+      },
+
+      /**
        * Scrolls the list to the given Date.
        */
       scrollToDate: function(date, animate) {
         this._scrollToPosition(this._differenceInMonths(date, this._originDate), animate);
       },
 
-      _focusedDateChanged: function(focusedDate, oldFocusedDate) {
-        if (focusedDate) {
-          var diff = this._differenceInMonths(focusedDate, this._originDate);
+      _focusedDateChanged: function(focusedDate) {
+        this.revealDate(focusedDate);
+      },
+
+      /**
+       * Scrolls the month and year scrollers enough to reveal the given date.
+       */
+      revealDate: function(date) {
+        if (date) {
+          var diff = this._differenceInMonths(date, this._originDate);
           var scrolledAboveViewport = this.$.scroller.position > diff;
 
           var visibleItems = this.$.scroller.clientHeight / this.$.scroller.itemHeight;
@@ -430,6 +457,14 @@
             this._scrollToPosition(diff - visibleItems + 1, true);
           }
         }
+      },
+
+      _onOverlayFocus: function() {
+        this._focused = true;
+      },
+
+      _onOverlayBlur: function() {
+        this._focused = false;
       },
 
       _initialPositionChanged: function(initialPosition) {
@@ -484,7 +519,9 @@
 
       _onTodayTap: function() {
         var today = new Date();
-        if (this._visibleMonthIndex === this._differenceInMonths(new Date(), this._originDate)) {
+        if (this.$.scroller.position === this._differenceInMonths(today, this._originDate)) {
+          // Select today only if the month scroller is positioned exactly
+          // at the beginning of the current month
           this.selectedDate = today;
           this._close();
         } else {
@@ -686,7 +723,7 @@
        * Keyboard Navigation
        */
       _eventKey: function(e) {
-        var keys = ['down', 'up', 'right', 'left', 'enter', 'space', 'home', 'end', 'pageup', 'pagedown'];
+        var keys = ['down', 'up', 'right', 'left', 'enter', 'space', 'home', 'end', 'pageup', 'pagedown', 'tab'];
 
         for (var i = 0; i < keys.length; i++) {
           var k = keys[i];
@@ -697,35 +734,59 @@
       },
 
       _onKeydown: function(e) {
-        var focus = this._currentlyFocusedDate(),
-            dateToFocus;
+        var focus = this._currentlyFocusedDate();
 
         var eventKey = this._eventKey(e);
-        if (eventKey) {
+        if (eventKey === 'tab') {
+          e.stopPropagation();
+          if (this.hasAttribute('fullscreen')) {
+            e.preventDefault();
+          } else if ((this.$.cancelButton.focused && !e.shiftKey) || (this._focused && e.shiftKey)) {
+            // Return focus back to the input field
+            e.preventDefault();
+            this.fire('focus-input');
+          } else {
+            this.async(function() {
+              if (this._focused) {
+                this.revealDate(this.focusedDate);
+              }
+            }, 1);
+          }
+        } else if (eventKey) {
           e.preventDefault();
           e.stopPropagation();
 
           switch (eventKey) {
             case 'down':
               this._moveFocusByDays(7);
+              this.focus();
               break;
             case 'up':
               this._moveFocusByDays(-7);
+              this.focus();
               break;
             case 'right':
-              this._moveFocusByDays(1);
+              if (!this._buttonFocused()) {
+                this._moveFocusByDays(1);
+              }
               break;
             case 'left':
-              this._moveFocusByDays(-1);
+              if (!this._buttonFocused()) {
+                this._moveFocusByDays(-1);
+              }
               break;
             case 'enter':
-              this._close();
+              if (!this._buttonFocused()) {
+                this._close();
+              }
               break;
             case 'space':
-              if (vaadin.elements.datepicker.DatePickerHelper._dateEquals(this.focusedDate, this.selectedDate)) {
+              var focusedDate = this.focusedDate;
+              if (vaadin.elements.datepicker.DatePickerHelper._dateEquals(focusedDate, this.selectedDate)) {
                 this.selectedDate = '';
+                this.focusedDate = focusedDate;
               } else {
-                this.selectedDate = this.focusedDate;
+                this.selectedDate = focusedDate;
               }
               break;
             case 'home':
@@ -744,13 +805,21 @@
         }
       },
 
+      _buttonFocused: function() {
+        return this.$.todayButton.focused || this.$.cancelButton.focused;
+      },
+
       _currentlyFocusedDate: function() {
         return this.focusedDate || this.selectedDate || this.initialPosition || new Date();
       },
 
       _moveFocusByDays: function(days) {
         var focus = this._currentlyFocusedDate();
-        var dateToFocus = new Date(focus.getFullYear(), focus.getMonth(), focus.getDate() + days);
+        var dateToFocus = new Date(0, 0);
+        dateToFocus.setFullYear(focus.getFullYear());
+        dateToFocus.setMonth(focus.getMonth());
+        dateToFocus.setDate(focus.getDate() + days);
+
         if (this._dateAllowed(dateToFocus, this.minDate, this.maxDate)) {
           this.focusedDate = dateToFocus;
           this._focusedMonthDate = this.focusedDate.getDate();
@@ -766,7 +835,7 @@
             }
           } else {
             // Move to closest allowed date
-            this.focusedDate = this._getClosestDate(focus, [this.minDate, this.maxDate]);
+            this.focusedDate = vaadin.elements.datepicker.DatePickerHelper._getClosestDate(focus, [this.minDate, this.maxDate]);
             this._focusedMonthDate = this.focusedDate.getDate();
           }
         }
@@ -774,7 +843,10 @@
 
       _moveFocusByMonths: function(months) {
         var focus = this._currentlyFocusedDate();
-        var dateToFocus = new Date(focus.getFullYear(), focus.getMonth() + months, 1);
+        var dateToFocus = new Date(0, 0);
+        dateToFocus.setFullYear(focus.getFullYear());
+        dateToFocus.setMonth(focus.getMonth() + months);
+
         var targetMonth = dateToFocus.getMonth();
 
         dateToFocus.setDate(this._focusedMonthDate || (this._focusedMonthDate = focus.getDate()));
@@ -796,19 +868,22 @@
             }
           } else {
             // Move to closest allowed date
-            this.focusedDate = this._getClosestDate(focus, [this.minDate, this.maxDate]);
+            this.focusedDate = vaadin.elements.datepicker.DatePickerHelper._getClosestDate(focus, [this.minDate, this.maxDate]);
             this._focusedMonthDate = this.focusedDate.getDate();
           }
         }
       },
 
       _moveFocusInsideMonth: function(focusedDate, property) {
-        var dateToFocus;
+        var dateToFocus = new Date(0, 0);
+        dateToFocus.setFullYear(focusedDate.getFullYear());
 
         if (property === 'minDate') {
-          dateToFocus = new Date(focusedDate.getFullYear(), focusedDate.getMonth(), 1);
+          dateToFocus.setMonth(focusedDate.getMonth());
+          dateToFocus.setDate(1);
         } else {
-          dateToFocus = new Date(focusedDate.getFullYear(), focusedDate.getMonth() + 1, 0);
+          dateToFocus.setMonth(focusedDate.getMonth() + 1);
+          dateToFocus.setDate(0);
         }
 
         if (this._dateAllowed(dateToFocus, this.minDate, this.maxDate)) {
@@ -821,7 +896,7 @@
             this._focusedMonthDate = this[property].getDate();
           } else {
             // Move to closest allowed date
-            this.focusedDate = this._getClosestDate(focusedDate, [this.minDate, this.maxDate]);
+            this.focusedDate = vaadin.elements.datepicker.DatePickerHelper._getClosestDate(focusedDate, [this.minDate, this.maxDate]);
             this._focusedMonthDate = this.focusedDate.getDate();
           }
         }
@@ -831,15 +906,13 @@
         return (!min || date >= min) && (!max || date <= max);
       },
 
-      _getClosestDate: function(date, dates) {
-        return dates.filter(function(date) {
-           return date !== undefined;
-         })
-         .reduce(function(closestDate, candidate) {
-           var candidateDiff = Math.abs(date.getTime() - candidate.getTime());
-           var closestDateDiff = Math.abs(closestDate.getTime() - date.getTime());
-           return candidateDiff < closestDateDiff ? candidate : closestDate;
-         });
+      _isTodayAllowed: function(min, max) {
+        var today = new Date();
+        var todayMidnight = new Date(0, 0);
+        todayMidnight.setFullYear(today.getFullYear());
+        todayMidnight.setMonth(today.getMonth());
+        todayMidnight.setDate(today.getDate());
+        return this._dateAllowed(todayMidnight, min, max);
       },
 
       _stopPropagation: function(e) {

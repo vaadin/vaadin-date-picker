@@ -1,7 +1,6 @@
 {
   "name": "vaadin-date-picker",
-  "version": "1.2.0-alpha1",
-  "description": "Vaadin Date Picker",
+  "description": "Polymer element providing a date selection field with scrollable month calendar",
   "authors": [
     "Vaadin Ltd"
   ],
@@ -23,7 +22,6 @@
     "iron-dropdown": "polymerelements/iron-dropdown#^1.3.0",
     "iron-overlay-behavior": "polymerelements/iron-overlay-behavior#^1.3.2",
     "iron-icon": "polymerelements/iron-icon#^1.0.7",
-    "iron-icons": "polymerelements/iron-icons#^1.1.2",
     "iron-input": "polymerelements/iron-input#^1.0.8",
     "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#^1.0.6",
     "iron-validatable-behavior": "PolymerElements/iron-validatable-behavior#^1.0.5",
@@ -34,10 +32,11 @@
     "iron-media-query": "polymerelements/iron-media-query#^1.0.8",
     "paper-ripple": "polymerelements/paper-ripple#^1.0.5",
     "iron-a11y-keys-behavior": "polymerelements/iron-a11y-keys-behavior#^1.1.1",
-    "iron-a11y-announcer": "PolymerElements/iron-a11y-announcer#^1.0.5"
+    "iron-a11y-announcer": "PolymerElements/iron-a11y-announcer#^1.0.5",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.1.0",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.5"
   },
   "devDependencies": {
-    "web-component-tester": "^4.1.0",
     "iron-test-helpers": "polymerelements/iron-test-helpers#^1.1.5",
     "iron-component-page": "polymerelements/iron-component-page#^1.1.0",
     "iron-form": "PolymerElements/iron-form#^1.0.15",
@@ -45,6 +44,8 @@
     "elements-demo-resources": "vaadin/elements-demo-resources#master",
     "iron-flex-layout": "polymerelements/iron-flex-layout#^1.3.0",
     "iron-meta": "polymerelements/iron-meta#^1.1.1",
-    "sugar": "^2.0.0"
+    "sugar": "^2.0.0",
+    "iron-icons": "polymerelements/iron-icons#^1.1.2",
+    "web-component-tester": "^6.0.0-prerelease.7"
   }
 }

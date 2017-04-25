@@ -5,22 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>vaadin-date-picker Basic Examples</title>
+  <title>vaadin-date-picker Advanced Usage</title>
 
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
   <script src="../../sugar/dist/sugar.min.js"></script>
   <script src="../../sugar/dist/locales/fi.js"></script>
   <link rel="import" href="common.html">
+  <link rel="import" href="../../iron-icon/iron-icon.html">
+  <link rel="import" href="../../iron-icons/iron-icons.html">
+
 </head>
 
 <body unresolved>
   <div class="vertical-section-container centered">
-    <nav class="vertical-section">
-      <ul class="layout horizontal wrap">
-        <li><a href="index.html">Basic Examples</a></li>
-        <li><b>Advanced Usage</b></li>
-      </ul>
-    </nav>
+    <demo-navigation></demo-navigation>
 
     <h3>Localizing</h3>
     <demo-snippet>
@@ -80,7 +78,7 @@
           start.addEventListener('value-changed', function() {
             // Open the end date picker with a delay to
             // make it less confusing.
-            window.setTimeout(function() {
+            window.setTimeout(function() {
               end.value = start.value;
               end.open();
             }, 500);

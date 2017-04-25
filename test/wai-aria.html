@@ -113,13 +113,6 @@
           expect(datepickerLight.$.overlay.getAttribute('role')).to.equal('dialog');
         });
 
-        it('should not have tabindex attribute', function() {
-          // tabindex makes the overlay focusable, breaks iOS VoiceOver mode:
-          // the VoiceOver cursor always jumps to the (focused) overlay
-          // when a user taps inside to hear what is under the finger.
-          expect(parseInt(datepicker.$.overlay.getAttribute('tabindex'), 10)).to.be.NaN;
-          expect(parseInt(datepickerLight.$.overlay.getAttribute('tabindex'), 10)).to.be.NaN;
-        });
       });
 
       describe('overlay contents', function() {
@@ -132,6 +125,16 @@
         });
 
         describe('title announcer', function() {
+
+          beforeEach(function(done) {
+            Polymer.RenderStatus.afterNextRender(overlay.$.scroller, function() {
+              Polymer.Base.async(function() {
+                done();
+              }, 1);
+            });
+            overlay.initialPosition = new Date();
+          });
+
           // Title announcer notifies the user when the overlay opens with
           // an explicit “<alert> Calender” announce.
 
@@ -178,11 +181,17 @@
           var yearScrollerContents;
 
           beforeEach(function(done) {
-            Polymer.Base.async(function() {
-              yearScrollerContents = Polymer.dom(overlay.$.yearScroller.root)
-                .querySelectorAll('.buffer > div > *');
-              done();
-            }, 1);
+            var scroller = overlay.$.yearScroller;
+            scroller.active = true;
+
+            Polymer.RenderStatus.afterNextRender(scroller, function() {
+              Polymer.Base.async(function() {
+                scroller.flushDebouncer('updateAllClones');
+                yearScrollerContents = Polymer.dom(overlay.$.yearScroller.root)
+                  .querySelectorAll('.buffer > div > *');
+                done();
+              }, 1);
+            });
           });
 
           it('should contain button role for years', function() {
@@ -214,7 +223,6 @@
       });
 
       describe('month calendar contents', function() {
-        var monthCalenar;
 
         beforeEach(function(done) {
           monthCalendar = fixture('month-calendar');
@@ -342,7 +350,7 @@
 
         it('should request availability from IronA11yAnnouncer', function(done) {
           var spy = sinon.spy(Polymer.IronA11yAnnouncer, 'requestAvailability');
-          var datepicker = fixture('datepicker');
+          fixture('datepicker');
           Polymer.Base.async(function() {
             expect(spy.called).to.be.true;
             done();
@@ -362,14 +370,12 @@
         it('should announce focused date changes when opened', function(done) {
           datepicker.open();
 
-          Polymer.Base.async(function() {
-            waitForAnnounce(function(text) {
-              expect(text).to.equal('Tuesday 2 February 2016');
-              done();
-            });
+          waitForAnnounce(function(text) {
+            expect(text).to.equal('Tuesday 2 February 2016');
+            done();
+          });
 
-            datepicker._focusedDate = new Date(2016, 1, 2);
-          }, 100);
+          datepicker._focusedDate = new Date(2016, 1, 2);
         });
 
         it('should not announce focused date changes when closed', function(done) {
@@ -378,11 +384,9 @@
 
           datepicker._focusedDate = new Date(2016, 1, 2);
 
-          Polymer.Base.async(function() {
-            expect(announceSpy.called).to.be.false;
-            document.body.removeEventListener('iron-announce', announceSpy);
-            done();
-          }, 100);
+          expect(announceSpy.called).to.be.false;
+          document.body.removeEventListener('iron-announce', announceSpy);
+          done();
         });
 
         it('should announce value on open', function(done) {
@@ -427,20 +431,22 @@
           datepicker.open();
         });
 
-        it('should debounce announcements', function(done) {
-          var announceSpy = sinon.spy();
-          document.body.addEventListener('iron-announce', announceSpy);
+        if (!ios) {
+          it('should announce once', function(done) {
+            var announceSpy = sinon.spy();
+            document.body.addEventListener('iron-announce', announceSpy);
 
-          datepicker._focusedDate = new Date(2016, 1, 1);
-          datepicker.open();
-          datepicker._focusedDate = new Date(2016, 1, 2);
+            datepicker._focusedDate = new Date(2016, 1, 1);
+            datepicker.open();
+            datepicker._focusedDate = new Date(2016, 1, 2);
 
-          Polymer.Base.async(function() {
-            expect(announceSpy.callCount).to.be.equal(1);
-            document.body.removeEventListener('iron-announce', announceSpy);
-            done();
-          }, 100);
-        });
+            Polymer.Base.async(function() {
+              expect(announceSpy.callCount).to.be.equal(1);
+              document.body.removeEventListener('iron-announce', announceSpy);
+              done();
+            }, 1);
+          });
+        }
 
         describe('i18n', function() {
           beforeEach(function() {

@@ -49,6 +49,11 @@
         @apply(--vaadin-date-picker-calendar-date-cell);
       }
 
+      #monthGrid div:not(:empty):not([disabled]):not(.weekday):not(.weeknumber):active {
+        background: var(--light-primary-color);
+        border-radius: 2px;
+      }
+
       #monthGrid div.weekday {
         text-transform: uppercase;
         color: var(--secondary-text-color);
@@ -71,7 +76,6 @@
       }
 
       #monthGrid div[today][selected] {
-        color: var(--dark-theme-text-color);
         @apply(--vaadin-date-picker-calendar-cell-today-selected);
       }
 
@@ -82,12 +86,19 @@
         @apply(--vaadin-date-picker-calendar-cell-focused);
       }
 
-      #monthGrid div[selected] {
-        color: var(--light-primary-color);
+      :host([focused]) #monthGrid div[focused] {
         background: var(--primary-color);
-        box-sizing: border-box;
-        border-radius: 2px;
+        color: var(--primary-background-color);
+        @apply(--vaadin-date-picker-calendar-focused-cell-focused);
+      }
+
+      #monthGrid div[selected] {
+        font-weight: 600;
         @apply(--vaadin-date-picker-calendar-cell-selected);
+      }
+
+      #monthGrid div[today][selected] {
+        @apply(--vaadin-date-picker-calendar-cell-today-selected);
       }
 
       #monthGrid div[disabled] {
@@ -253,7 +264,7 @@
         return this._dateEquals(new Date(), date);
       },
 
-      _getDays: function(month, firstDayOfWeek, minDate, maxDate) {
+      _getDays: function(month, firstDayOfWeek) {
         // First day of the month (at midnight).
         var date = new Date(0, 0);
         date.setFullYear(month.getFullYear());
@@ -280,7 +291,9 @@
       _getWeekNumber: function(date, days) {
         if (!date) {
           // Get the first non-null date from the days array.
-          date = days.reduce(function(acc, d) { return (!acc && d ? d : acc); });
+          date = days.reduce(function(acc, d) {
+            return (!acc && d ? d : acc);
+          });
         }
 
         return vaadin.elements.datepicker.DatePickerHelper._getISOWeekNumber(date);

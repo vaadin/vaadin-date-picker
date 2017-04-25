@@ -25,6 +25,24 @@ function getDefaultI18n() {
   };
 }
 
+function listenForEvent(elem, type, callback) {
+  var listener = function() {
+    elem.removeEventListener(type, listener);
+    callback();
+  };
+  elem.addEventListener(type, listener);
+}
+
+function open(datepicker, callback) {
+  listenForEvent(datepicker, 'iron-overlay-opened', callback);
+  datepicker.open();
+}
+
+function close(datepicker, callback) {
+  listenForEvent(datepicker, 'iron-overlay-closed', callback);
+  datepicker.close();
+}
+
 function tap(element) {
   Polymer.Base.fire('tap', {}, {
     bubbles: true,
@@ -38,7 +56,7 @@ function monthsEqual(date1, date2) {
 
 function getFirstVisibleItem(scroller, bufferOffset) {
   var children = [];
-  bufferOffset = (bufferOffset ||  0);
+  bufferOffset = (bufferOffset || 0);
 
   scroller._buffers.forEach(function(buffer) {
     [].forEach.call(buffer.children, function(itemWrapper) {
@@ -70,7 +88,7 @@ function waitUntilScrolledTo(overlay, date, callback) {
   }
   var monthIndex = overlay._differenceInMonths(date, new Date());
   if (overlay.$.scroller.position === monthIndex) {
-    callback();
+    Polymer.RenderStatus.afterNextRender(overlay, callback);
   } else {
     setTimeout(waitUntilScrolledTo, 10, overlay, date, callback);
   }

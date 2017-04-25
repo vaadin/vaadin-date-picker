@@ -1,6 +1,7 @@
 <link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="vaadin-date-picker-helper.html">
 
 <script>
@@ -14,7 +15,7 @@
       '_selectedDateChanged(_selectedDate, i18n.formatDate)',
       '_validateInput(_selectedDate, _minDate, _maxDate)',
       '_focusedDateChanged(_focusedDate, i18n.formatDate)',
-      '_announceFocusedDate(_focusedDate, opened)'
+      '_announceFocusedDate(_focusedDate, opened, _ignoreAnnounce)'
     ],
 
     properties: {
@@ -187,7 +188,12 @@
             today: 'Today',
             cancel: 'Cancel',
             formatDate: function(d) {
-              return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+              var year = d.getFullYear();
+              var yearString = year.toString();
+              if (yearString.length < 3 && year >= 0) {
+                yearString = (year < 10 ? '000' : '00') + year;
+              }
+              return (d.getMonth() + 1) + '/' + d.getDate() + '/' + yearString;
             },
             parseDate: function(text) {
               var parts = text.split('/');
@@ -196,7 +202,7 @@
 
               if (parts.length === 3) {
                 year = parseInt(parts[2]);
-                if (parts[2].length === 2 && year >= 0) {
+                if (parts[2].length < 3 && year >= 0) {
                   year += year < 50 ? 2000 : 1900;
                 }
                 month = parseInt(parts[0]) - 1;
@@ -256,7 +262,8 @@
        */
       _minDate: {
         type: Date,
-        value: null
+        // null does not work here because minimizer passes undefined to overlay (#351)
+        value: ''
       },
 
       /**
@@ -264,12 +271,8 @@
        */
       _maxDate: {
         type: Date,
-        value: null
+        value: ''
       },
-
-      _forwardKeysToOverlay: Boolean,
-
-      _cachedInputValue: String,
 
       _noInput: {
         type: Boolean,
@@ -279,7 +282,21 @@
       _ios: {
         type: Boolean,
         value: navigator.userAgent.match(/iP(?:hone|ad;(?: U;)? CPU) OS (\d+)/)
-      }
+      },
+
+      _ignoreAnnounce: {
+        value: true
+      },
+
+      _focusOverlayOnOpen: Boolean,
+
+      /**
+       * When datepicker is opened, we're setting body pointer-events to none
+       * to make the datepicker behave in "modal" way. This variable keeps the
+       * previous state of body pointer-events to restore it when datepicker is
+       * closed.
+       */
+      _documentPointerEvents: String
     },
 
     created: function() {
@@ -289,7 +306,10 @@
     listeners: {
       'tap': 'open',
       'touchend': '_preventDefault',
-      'keydown': '_onKeydown'
+      'keydown': '_onKeydown',
+      'close': '_close',
+      'date-tap': '_close',
+      'focus-input': '_focusAndSelect'
     },
 
     ready: function() {
@@ -303,14 +323,19 @@
     /**
      * Opens the dropdown.
      */
-    open: function(e) {
-      this._updateAlignmentAndPosition();
-      // Prevent dropdown.open() being called when input is disabled or read-only, or tapped
-      // inside the overlay
-      if (!this.disabled && !this.readonly && (!e || Polymer.dom(e).path.indexOf(this.$.overlay) < 0)) {
+    open: function() {
+      if (!this.disabled && !this.readonly) {
         this.$.dropdown.open();
-        this._forwardKeysToOverlay = false;
+        this._updateAlignmentAndPosition();
       }
+    },
+
+    _close: function(e) {
+      if (e) {
+        e.stopPropagation();
+      }
+      this.inputElement.focus();
+      this.close();
     },
 
     /**
@@ -355,13 +380,12 @@
     _selectedDateChanged: function(selectedDate, formatDate) {
       this.value = this._formatISO(selectedDate);
       this._focusedDate = selectedDate;
-      this._cachedInputValue = this._inputValue = selectedDate ? formatDate(selectedDate) : '';
+      this._inputValue = selectedDate ? formatDate(selectedDate) : '';
     },
 
     _focusedDateChanged: function(focusedDate, formatDate) {
-      if (!this._ignoreFocusedDateChange && !this._noInput && this.opened) {
+      if (!this._ignoreFocusedDateChange && !this._noInput) {
         this._inputValue = focusedDate ? formatDate(focusedDate) : '';
-        this._input().setSelectionRange(0, this._inputValue.length);
       }
     },
 
@@ -371,7 +395,7 @@
 
     _handleDateChange: function(property, value, oldValue) {
       if (!value) {
-        this[property] = null;
+        this[property] = '';
         return;
       }
 
@@ -380,10 +404,7 @@
         this.value = oldValue;
         return;
       }
-      if (!(this[property] instanceof Date) ||
-        date.getFullYear() !== this[property].getFullYear() ||
-        date.getMonth() !== this[property].getMonth() ||
-        date.getDate() !== this[property].getDate()) {
+      if (!vaadin.elements.datepicker.DatePickerHelper._dateEquals(this[property], date)) {
         this[property] = date;
       }
     },
@@ -420,8 +441,6 @@
         this.$.dropdown.style.marginTop = (bottomAlign ? 10 : this.clientHeight + 2) + 'px';
         this.$.dropdown.style.marginBottom = (bottomAlign ? this.clientHeight : 10) + 'px';
       }
-
-      this.$.dropdown.refit();
     },
 
     _fullscreenChanged: function() {
@@ -431,8 +450,19 @@
     },
 
     _onOverlayOpened: function() {
-      this.$.overlay.initialPosition = this._selectedDate ||
-        this.$.overlay.initialPosition || this._parseDate(this.initialPosition) || new Date();
+      var parsedInitialPosition = this._parseDate(this.initialPosition);
+
+      var initialPosition = this._selectedDate || this.$.overlay.initialPosition ||
+        parsedInitialPosition || new Date();
+
+      if (parsedInitialPosition ||
+        vaadin.elements.datepicker.DatePickerHelper._dateAllowed(initialPosition, this._minDate, this._maxDate)) {
+        this.$.overlay.initialPosition = initialPosition;
+      } else {
+        this.$.overlay.initialPosition =
+          vaadin.elements.datepicker.DatePickerHelper._getClosestDate(initialPosition, [this._minDate, this._maxDate]);
+      }
+
       this.$.overlay.scrollToDate(this.$.overlay.focusedDate || this.$.overlay.initialPosition);
       // Have a default focused date
       this._ignoreFocusedDateChange = true;
@@ -440,19 +470,28 @@
       this._ignoreFocusedDateChange = false;
 
       window.addEventListener('scroll', this._boundOnScroll, true);
-      // We cannot use iron-resize event because 1- we fire it, 2- it's fired
-      // many times, 3- causes heigth and scroll issues in safari.
-      window.addEventListener('resize', this._boundOnScroll, true);
+      this.listen(this, 'iron-resize', '_updateAlignmentAndPosition');
 
       // Checking if the browser supports webkitOverflowScrolling
       if (document.createElement('div').style.webkitOverflowScrolling === '') {
         this._touchPrevented = this._preventWebkitOverflowScrollingTouch(this.parentElement);
       }
 
-      // focus to enable keyboard navigation and keyboard input
-      this._focus();
+      if (this._focusOverlayOnOpen) {
+        this.$.overlay.focus();
+        this._focusOverlayOnOpen = false;
+      } else {
+        this._focus();
+      }
 
       this.updateStyles();
+
+      // Set body pointer-events to 'none' to disable mouse interactions with
+      // other document nodes (datepicker is "modal")
+      this._documentPointerEvents = document.body.style.pointerEvents;
+      document.body.style.pointerEvents = 'none';
+
+      this._ignoreAnnounce = false;
     },
 
     // A hack needed for iOS to prevent dropdown from being clipped in an
@@ -474,8 +513,10 @@
     },
 
     _onOverlayClosed: function() {
+      this._ignoreAnnounce = true;
+
       window.removeEventListener('scroll', this._boundOnScroll, true);
-      window.removeEventListener('resize', this._boundOnScroll, true);
+      this.unlisten(this, 'iron-resize', '_updateAlignmentAndPosition');
 
       if (this._touchPrevented) {
         this._touchPrevented.forEach(function(prevented) {
@@ -485,7 +526,9 @@
       }
 
       this.updateStyles();
-      this._forwardKeysToOverlay = false;
+
+      // Restore the initial body pointer-events
+      document.body.style.pointerEvents = this._documentPointerEvents;
 
       // Select the parsed input or focused date
       this._ignoreFocusedDateChange = true;
@@ -503,7 +546,7 @@
       }
       this._ignoreFocusedDateChange = false;
 
-      var input = window.unwrap(this.inputElement);
+      var input = window.unwrap ? window.unwrap(this.inputElement) : this.inputElement;
       if ((this.shadowRoot && this.shadowRoot.activeElement === input) || document.activeElement === input) {
         input.selectionStart = input.selectionEnd;
       }
@@ -517,10 +560,7 @@
 
     _onScroll: function(e) {
       if (e.target === window || !this.$.overlay.contains(e.target)) {
-        this.$.dropdown.style.bottom = 'auto';
-        this.$.dropdown.resetFit();
         this._updateAlignmentAndPosition();
-        this.$.dropdown.fire('iron-resize');
       }
     },
 
@@ -536,6 +576,13 @@
         this.$.overlay.focus();
       } else {
         this.inputElement.focus();
+      }
+    },
+
+    _focusAndSelect: function() {
+      if (!this._noInput) {
+        this._focus();
+        this.inputElement.setSelectionRange(0, this._inputValue.length);
       }
     },
 
@@ -579,14 +626,15 @@
         case 'up':
           // prevent scrolling the page with arrows
           e.preventDefault();
-          if (!this._forwardKeysToOverlay) {
-            if (this.opened) {
-              this._cachedInputValue = this._inputValue;
-              this._forwardKeysToOverlay = true;
-            } else {
-              this.open();
-            }
+
+          if (this.opened) {
+            this.$.overlay.focus();
+            this.$.overlay._onKeydown(e);
+          } else {
+            this._focusOverlayOnOpen = true;
+            this.open();
           }
+
           break;
         case 'enter':
           if (this.$.overlay.focusedDate) {
@@ -595,38 +643,25 @@
           this.close();
           break;
         case 'esc':
-          if (this._forwardKeysToOverlay) {
-            // The keys are forwarded to ovelay, revert the input text to the cached value
-            this._inputValue = this._cachedInputValue;
-            this._userInputValueChanged();
-
-            if (!this._inputValue) {
-              // Default to today
-              this.$.overlay.focusedDate = new Date();
-            }
-          } else {
-            var newInputValue = this._selectedDate ? this.i18n.formatDate(this._selectedDate) : '';
-            if (newInputValue !== this._inputValue) {
-              this.open();
-              this.$.overlay.focusedDate = this._selectedDate || new Date();
-            } else {
-              this._focusedDate = this._selectedDate;
-            }
-            this._inputValue = newInputValue;
-          }
-
-          this._forwardKeysToOverlay = false;
+          this._focusedDate = this._selectedDate;
+          this._close();
           break;
+        case 'tab':
+          if (this.opened) {
+            e.preventDefault();
+            // Clear the selection range (remains visible on IE)
+            this.inputElement.setSelectionRange(0, 0);
+            if (e.shiftKey) {
+              this.$.overlay.focusCancel();
+            } else {
+              this.$.overlay.focus();
+              this.$.overlay.revealDate(this._focusedDate);
+            }
 
-          case 'tab':
-            this.close();
-            return;
-
+          }
+          break;
       }
 
-      if (this.opened && this._forwardKeysToOverlay) {
-        this.$.overlay._onKeydown(e);
-      }
     },
 
     _validateInput: function(date, min, max) {
@@ -641,8 +676,6 @@
         this._ignoreFocusedDateChange = true;
         this._focusedDate = parsedDate;
         this._ignoreFocusedDateChange = false;
-      } else {
-        this._forwardKeysToOverlay = false;
       }
 
       if (!this.opened) {
@@ -652,11 +685,9 @@
       }
     },
 
-    _announceFocusedDate: function(_focusedDate, opened) {
-      if (opened) {
-        this.debounce('_announceFocusedDate', function() {
-          this.$.overlay.announceFocusedDate();
-        }, 1);
+    _announceFocusedDate: function(_focusedDate, opened, _ignoreAnnounce) {
+      if (opened && !_ignoreAnnounce) {
+        this.$.overlay.announceFocusedDate();
       }
     }
   };
@@ -666,6 +697,7 @@
     Polymer.IronFormElementBehavior,
     Polymer.IronValidatableBehavior,
     Polymer.IronA11yKeysBehavior,
+    Polymer.IronResizableBehavior,
     vaadin.elements.datepicker.DatePickerBehaviorImpl
   ];
 

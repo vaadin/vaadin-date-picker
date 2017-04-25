@@ -65,10 +65,6 @@
           MockInteractions.keyDownOn(target, 33, modifiers);
         }
 
-        function ctrl() {
-          MockInteractions.keyDownOn(target, 17);
-        }
-
         function enter() {
           MockInteractions.pressEnter(target);
         }
@@ -155,6 +151,16 @@
 
             expect(focusedDate()).to.eql(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
           });
+
+          it('should not lose focused date after deselecting', function() {
+            var _focused = focusedDate();
+            datepicker.open();
+            target = overlay;
+            space();
+            space();
+
+            expect(focusedDate()).to.equal(_focused);
+          });
         });
 
         describe('overlay', function() {
@@ -164,13 +170,13 @@
             overlay.i18n = getDefaultI18n();
             target = overlay;
 
+            overlay.initialPosition = new Date();
             overlay.focusedDate = new Date(2000, 0, 1);
-            overlay.async(function() {
-              overlay.scrollToDate(overlay.focusedDate);
-              waitUntilScrolledTo(overlay, overlay.focusedDate, function() {
-                done();
-              });
-            }, 1);
+
+            overlay.scrollToDate(overlay.focusedDate);
+            listenForEvent(overlay, 'scroll-animation-finished', function() {
+              Polymer.RenderStatus.afterNextRender(overlay, done);
+            });
           });
 
           it('should focus one week forward with arrow down', function() {
@@ -223,8 +229,9 @@
 
           it('should deselect selected date with space', function() {
             space();
+            space();
 
-            expect(datepicker.value).to.be.empty;
+            expect(overlay.selectedDate).to.be.empty;
           });
 
           it('should focus first day of the month with home', function() {
@@ -475,6 +482,39 @@
             arrowRight(overlay);
 
             expect(overlay.focusedDate).to.eql(new Date(1999, 11, 25));
+          });
+
+          it('should focus two-digit years while navigating days', function() {
+            var date = new Date(99, 0, 1);
+            date.setFullYear(99);
+            overlay.focusedDate = date;
+
+            arrowRight(overlay);
+
+            date.setDate(2);
+            expect(overlay.focusedDate).to.eql(date);
+          });
+
+          it('should focus two-digit years while navigating months', function() {
+            var date = new Date(99, 0, 1);
+            date.setFullYear(99);
+            overlay.focusedDate = date;
+
+            pageDown();
+
+            date.setMonth(1);
+            expect(overlay.focusedDate).to.eql(date);
+          });
+
+          it('should focus two-digit years while navigating in month', function() {
+            var date = new Date(99, 0, 1);
+            date.setFullYear(99);
+            overlay.focusedDate = date;
+
+            end();
+
+            date.setDate(31);
+            expect(overlay.focusedDate).to.eql(date);
           });
         });
       });
