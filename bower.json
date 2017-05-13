@@ -47,16 +47,5 @@
     "iron-test-helpers": "#2.0-preview",
     "sugar": "^2.0.0",
     "web-component-tester": "^6.0.0"
-  },
-  "variants": {
-    "1.x": {
-      "dependencies": {
-        "polymer": "^1.7.0"
-      },
-      "resolutions": {
-        "polymer": "^1.7.0",
-        "webcomponentsjs": "^0.7.24"
-      }
-    }
   }
 }
