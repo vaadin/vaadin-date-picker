@@ -31,7 +31,7 @@
     "iron-resizable-behavior": "#2.0-preview",
     "iron-validatable-behavior": "#2.0-preview",
     "paper-input": "#2.0-preview",
-    "paper-button": "#2.0-preview",
+    "paper-button": "#master",
     "paper-ripple": "polymerelements/paper-ripple#2.0-preview",
     "paper-styles": "#2.0-preview",
     "polymer": "^2.0"
@@ -47,5 +47,8 @@
     "iron-test-helpers": "#2.0-preview",
     "sugar": "^2.0.0",
     "web-component-tester": "^6.0.0"
+  },
+  "resolutions": {
+    "paper-button": "master"
   }
 }
