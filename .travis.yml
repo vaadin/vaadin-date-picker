@@ -17,17 +17,27 @@ addons:
   google-chrome: latest
 
 install:
-  - yarn
+  # not working in travis - yarn
+  - npm install
   - polymer install
 
 before_script:
   - gulp lint
-  - xvfb-run -s '-screen 0 1024x768x24' polymer test
+  - TRAVIS_EVENT_TYPE=skip xvfb-run -s '-screen 0 1024x768x24' polymer test -l chrome -l firefox test/index-0.html
+  - TRAVIS_EVENT_TYPE=skip xvfb-run -s '-screen 0 1024x768x24' polymer test -l chrome -l firefox test/index-1.html
+  - TRAVIS_EVENT_TYPE=skip xvfb-run -s '-screen 0 1024x768x24' polymer test -l chrome -l firefox test/index-2.html
+  - TRAVIS_EVENT_TYPE=skip xvfb-run -s '-screen 0 1024x768x24' polymer test -l chrome -l firefox test/index-3.html
 
 script:
   - if [[ "$TRAVIS_EVENT_TYPE" == "push" && "$TRAVIS_BRANCH" != quick/* ]]; then
-      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs;
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs test/index-0.html &&
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs test/index-1.html &&
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs test/index-2.html &&
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs test/index-3.html;
     fi
   - if [ "$TRAVIS_EVENT_TYPE" = "cron" ]; then
-      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron;
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron test/index-0.html &&
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron test/index-1.html &&
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron test/index-2.html &&
+      xvfb-run -s '-screen 0 1024x768x24' polymer test --env saucelabs-cron test/index-3.html;
     fi

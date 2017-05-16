@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>vaadin-date-picker tests</title>
+  <script src="../../web-component-tester/browser.js"></script>
+</head>
+
+<body>
+  <script>
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && window.Polymer && Polymer.Element) {
+      WCT._config.environmentScripts.push('webcomponentsjs/custom-elements-es5-adapter.js');
+    }
+
+    WCT._config.environmentScripts.push('webcomponentsjs/webcomponents-lite.js');
+
+    WCT.loadSuites([
+      'keyboard-navigation.html',
+      'keyboard-input.html'
+    ].reduce(function(suites, suite) {
+      // Browser supports Shadow DOM
+      if (document.head.createShadowRoot || document.head.attachShadow) {
+        return suites.concat([suite, suite + '?wc-shadydom=true&dom=shadow']);
+      } else {
+        return suites.concat([suite]);
+      }
+    }, []));
+  </script>
+</body>
+
+</html>
