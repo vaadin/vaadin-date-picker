@@ -9,7 +9,6 @@ This program is available under Apache License Version 2.0, available at https:/
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-input/iron-input.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../iron-a11y-announcer/iron-a11y-announcer.html">
@@ -182,29 +181,36 @@ This program is available under Apache License Version 2.0, available at https:/
 
       #header {
         background: var(--primary-color);
-        padding: 0 14px 14px;
-        display: flex;
-        flex-shrink: 0;
+        padding: 0 14px;
         height: 64px; /* height set to 64px to match app-toolbar height */
         box-sizing: border-box;
 
         @apply --paper-font-subhead;
         @apply --shadow-elevation-2dp;
         @apply --vaadin-date-picker-header;
-      }
 
-      #header label,
-      #header input {
-        color: var(--dark-theme-text-color);
-      }
-
-      #header iron-icon {
         color: var(--dark-theme-text-color);
         cursor: pointer;
+
+        display: flex;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
+        align-items: center;
       }
 
+      #label {
+        position: absolute;
+        top: 0;
+        font-size: 80%;
+      }
+
+      #input {
+        flex-grow: 1;
+      }
+
+      #clear,
       #toggle {
-        align-self: flex-end;
+        margin-left: 10px;
       }
 
       #clear {
@@ -234,7 +240,6 @@ This program is available under Apache License Version 2.0, available at https:/
         clip: rect(0, 0, 0, 0);
         clip-path: inset(100%);
       }
-
     </style>
 
     <div id="announcer" role="alert" aria-live="polite">
@@ -242,26 +247,24 @@ This program is available under Apache License Version 2.0, available at https:/
     </div>
 
     <div id="header" on-touchend="_preventDefault" aria-hidden="true">
-
-      <vaadin-text-field id="input"
+      <div id="label">[[label]]</div>
+      <div id="input"
           role="application"
-          autocomplete="off"
-          readonly
-          value="[[_formatDisplayed(selectedDate, i18n.formatDate)]]"
+          value=""
           invalid="{{invalid}}"
-          label="[[label]]"
           placeholder="[[placeholder]]"
           required="[[required]]"
           disabled="[[disabled]]"
           readonly="[[readonly]]"
           error-message="[[errorMessage]]"
         >
+           [[_formatDisplayed(selectedDate, i18n.formatDate)]]
+      </div>
 
-        <iron-icon id="clear" slot="suffix" on-tap="_clear" icon="vaadin-date-picker:clear" showclear$="[[_showClear(selectedDate)]]"></iron-icon>
-
-      </vaadin-text-field>
-
+      <iron-icon id="clear" slot="suffix" on-tap="_clear" icon="vaadin-date-picker:clear" showclear$="[[_showClear(selectedDate)]]"></iron-icon>
       <iron-icon id="toggle" icon="vaadin-date-picker:event" on-tap="_cancel"></iron-icon>
+    </div>
+
     </div>
 
     <div id="toolbar" desktop$="[[_desktopMode]]" on-tap="_toggleYearScroller" aria-hidden="true">
@@ -554,7 +557,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
 
         _showClear(selectedDate) {
-          return selectedDate !== null;
+          return !!selectedDate;
         }
 
         _onYearTap(e) {
