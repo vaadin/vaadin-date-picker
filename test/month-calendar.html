@@ -32,8 +32,10 @@
         monthCalendar.addEventListener('selected-date-changed', valueChangedSpy);
 
         // Need to wait for the templates to be rendered.
-        setTimeout(done);
+        flush(done);
       });
+
+      afterEach(done => flush(done));
 
       // A helper for async test functions for 2016 month rendering.
       function createMonthTest(monthNumber) {
@@ -161,7 +163,7 @@
         var month = new Date(0, 0);
         month.setFullYear(99);
         monthCalendar.month = month;
-        setTimeout(() => {
+        flush(() => {
           var date = monthCalendar.$.monthGrid.querySelector('div:not(.weekday):not(:empty)').date;
           expect(date.getFullYear()).to.equal(month.getFullYear());
           done();
@@ -172,7 +174,7 @@
 
         monthCalendar.maxDate = new Date('2016-02-09');
 
-        setTimeout(() => {
+        flush(() => {
           var dateElements = monthCalendar.$.monthGrid.querySelectorAll('div:not(.weekday):not(:empty)');
           for (var i = 0; i < dateElements.length; i++) {
             if (dateElements[i].date.getDate() === 10) {
@@ -197,7 +199,7 @@
             today: 'Tänään',
             formatTitle: (monthName, fullYear) => monthName + '-' + fullYear
           };
-          setTimeout(done);
+          animationFrameFlush(done);
         });
 
         it('should render weekdays in correct locale', () => {
@@ -225,7 +227,7 @@
 
         it('should label today in correct locale', done => {
           monthCalendar.month = new Date();
-          setTimeout(() => {
+          flush(() => {
             var today = monthCalendar.$.monthGrid.querySelector('div:not(.weekday):not(:empty)[today]');
             expect(today.getAttribute('aria-label').split(', ').pop()).to.equal('Tänään');
             done();
@@ -240,7 +242,7 @@
           monthCalendar.showWeekNumbers = 1;
           monthCalendar.month = new Date(2016, 1, 1);
 
-          setTimeout(() => {
+          flush(() => {
             var weekNumberElements = monthCalendar.$.monthGrid.querySelectorAll('.weeknumber');
             expect(weekNumberElements[0].getAttribute('aria-label')).to.equal('viikko 5');
             expect(weekNumberElements[1].getAttribute('aria-label')).to.equal('viikko 6');
@@ -264,7 +266,7 @@
           var month = new Date(2016, 0, 1);
           monthCalendar.month = month;
 
-          setTimeout(() => {
+          flush(() => {
             var weekNumbers = getWeekNumbers(monthCalendar);
             expect(weekNumbers).to.eql([53, 1, 2, 3, 4]);
             done();
@@ -275,7 +277,7 @@
           var month = new Date(2015, 11, 1);
           monthCalendar.month = month;
 
-          setTimeout(() => {
+          flush(() => {
             var weekNumbers = getWeekNumbers(monthCalendar);
             expect(weekNumbers).to.eql([49, 50, 51, 52, 53]);
             done();
@@ -286,7 +288,7 @@
           var month = new Date(2016, 1, 1);
           monthCalendar.month = month;
 
-          setTimeout(() => {
+          flush(() => {
             var weekNumbers = getWeekNumbers(monthCalendar);
             expect(weekNumbers).to.eql([5, 6, 7, 8, 9]);
             done();
@@ -299,7 +301,7 @@
 
           monthCalendar.month = month;
 
-          setTimeout(() => {
+          flush(() => {
             var weekNumbers = getWeekNumbers(monthCalendar);
             expect(weekNumbers).to.eql([18, 19, 20, 21, 22]);
             done();

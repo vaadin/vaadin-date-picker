@@ -26,10 +26,9 @@
 
       beforeEach(done => {
         scroller = document.querySelector('#scroller');
-
-        Polymer.RenderStatus.afterNextRender(scroller, () => setTimeout(done, 1));
-
         scroller.active = true;
+
+        animationFrameFlush(done);
       });
 
       function verifyPosition() {
@@ -118,19 +117,18 @@
         var parent = scroller.parentNode;
         parent.removeChild(scroller);
         parent.appendChild(scroller);
-        setTimeout(() => {
+        flush(() => {
           expect(spy.called).to.be.false;
           done();
         });
       });
 
-      it('should have an instance stamped to every wrapper', done => {
+      it('should have an instance stamped to every wrapper', () => {
         scroller._buffers.forEach(buffer => {
           [].forEach.call(buffer.children, itemWrapper => {
             expect(itemWrapper.firstElementChild).to.be.ok;
           });
         }, this);
-        done();
       });
 
     });

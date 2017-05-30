@@ -59,7 +59,7 @@
       beforeEach(done => {
         datepicker = fixture('datepicker');
         // Needed so as iron-input has time to look for it's inputElement
-        setTimeout(done);
+        flush(done);
       });
 
       it('should have the given name', () => {
@@ -84,7 +84,7 @@
         datepicker.name = 'foo';
         datepicker.required = true;
 
-        setTimeout(() => {
+        flush(() => {
           expect(datepicker.validate()).to.equal(false);
           expect(datepicker.invalid).to.be.equal(true);
 
@@ -99,7 +99,7 @@
       describe('custom validator', () => {
         beforeEach(done => {
           datepicker = fixture('custom-validation');
-          setTimeout(done);
+          flush(done);
         });
 
         it('should validate correctly with custom validator', () => {
@@ -197,7 +197,7 @@
         ironForm = fixture('datepicker-in-form');
         datepicker = ironForm.querySelector('vaadin-date-picker');
         form = ironForm.querySelector('form');
-        setTimeout(done);
+        flush(done);
       });
 
       it('should serialize correctly', () => {

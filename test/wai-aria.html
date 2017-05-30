@@ -45,6 +45,8 @@
   <script>
     describe('WAI-ARIA', () => {
 
+      afterEach(done => flush(done));
+
       describe('date picker', () => {
         var datepicker;
 
@@ -114,18 +116,14 @@
         beforeEach(done => {
           overlay = fixture('overlay');
           overlay.i18n = getDefaultI18n();
-          setTimeout(done);
+          flush(done);
         });
 
         describe('title announcer', () => {
 
           beforeEach(done => {
-            Polymer.RenderStatus.afterNextRender(overlay.$.scroller, () => {
-              setTimeout(() => {
-                done();
-              }, 1);
-            });
             overlay.initialPosition = new Date();
+            animationFrameFlush(done);
           });
 
           // Title announcer notifies the user when the overlay opens with
@@ -177,13 +175,11 @@
             var scroller = overlay.$.yearScroller;
             scroller.active = true;
 
-            Polymer.RenderStatus.afterNextRender(scroller, () => {
-              setTimeout(() => {
-                scroller._debouncerUpdateClones.flush();
-                yearScrollerContents = overlay.$.yearScroller.root
-                  .querySelectorAll('.buffer > div > *');
-                done();
-              }, 1);
+            animationFrameFlush(() => {
+              scroller._debouncerUpdateClones.flush();
+              yearScrollerContents = overlay.$.yearScroller.root
+                .querySelectorAll('.buffer > div > *');
+              done();
             });
           });
 
@@ -220,7 +216,7 @@
           monthCalendar = fixture('month-calendar');
           monthCalendar.i18n = getDefaultI18n();
           monthCalendar.month = new Date(2016, 1, 1);
-          setTimeout(done);
+          flush(done);
         });
 
         it('should have heading role on the title', () => {
@@ -266,7 +262,7 @@
         it('should indicate today on date cells', done => {
           monthCalendar.month = new Date();
 
-          setTimeout(() => {
+          flush(() => {
             var todayElement = monthCalendar.$.monthGrid.querySelector('div:not(.weekday):not(:empty)[today]');
             expect(todayElement.getAttribute('aria-label')).to.match(/, Today$/);
             done();
@@ -300,7 +296,7 @@
           beforeEach(done => {
             monthCalendar.showWeekNumbers = true;
             monthCalendar.set('i18n.firstDayOfWeek', 1);
-            setTimeout(done);
+            flush(done);
           });
 
           it('should have heading roles on week numbers', () => {
@@ -343,7 +339,7 @@
         it('should request availability from IronA11yAnnouncer', done => {
           var spy = sinon.spy(Polymer.IronA11yAnnouncer, 'requestAvailability');
           fixture('datepicker');
-          setTimeout(() => {
+          flush(() => {
             expect(spy.called).to.be.true;
             done();
           });
@@ -432,11 +428,11 @@
             datepicker.open();
             datepicker._focusedDate = new Date(2016, 1, 2);
 
-            setTimeout(() => {
+            flush(() => {
               expect(announceSpy.callCount).to.be.equal(1);
               document.body.removeEventListener('iron-announce', announceSpy);
               done();
-            }, 1);
+            });
           });
         }
 

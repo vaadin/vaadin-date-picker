@@ -80,14 +80,10 @@
           datepicker = fixture('datepicker');
           overlay = datepicker.$.overlay;
           target = datepicker._inputElement;
-          setTimeout(done, 1);
+          flush(done);
         });
 
-        afterEach(() => {
-          if (datepicker._debouncerRefit) {
-            datepicker._debouncerRefit.flush();
-          }
-        });
+        afterEach(done => flush(done));
 
         it('should open overlay on input', () => {
           inputChar('j');
@@ -461,21 +457,30 @@
             arrowDown();
             esc();
             // IE11 needs timeout
-            waitUntil(() => datepicker._inputElement.focused, done);
+            animationFrameFlush(() => {
+              expect(datepicker._inputElement.focused).to.be.true;
+              done();
+            });
           });
 
           it('should focus the input on date tap', done => {
             arrowDown();
             datepicker.$.overlay.dispatchEvent(new CustomEvent('date-tap', {bubbles: true, composed: true}));
             // IE11 needs timeout
-            waitUntil(() => datepicker._inputElement.focused, done);
+            animationFrameFlush(() => {
+              expect(datepicker._inputElement.focused).to.be.true;
+              done();
+            });
           });
 
           it('should focus the input on date cancel', done => {
             arrowDown();
             MockInteractions.tap(datepicker.$.overlay.$.cancelButton);
             // IE11 needs timeout
-            waitUntil(() => datepicker._inputElement.focused, done);
+            animationFrameFlush(() => {
+              expect(datepicker._inputElement.focused).to.be.true;
+              done();
+            });
           });
 
           it('should focus cancel on input shift tab', function(done) {
@@ -483,7 +488,10 @@
               MockInteractions.focus(datepicker._inputElement);
               MockInteractions.pressAndReleaseKeyOn(datepicker._inputElement, 9, 'shift');
               // IE11 needs timeout
-              waitUntil(() => datepicker.$.overlay.$.cancelButton.focused, done);
+              animationFrameFlush(() => {
+                expect(datepicker.$.overlay.$.cancelButton.focused).to.be.true;
+                done();
+              });
             });
           });
 
@@ -494,10 +502,8 @@
               // IE11 needs spy the focus instead of checking _inputElement.focused
               var spy = sinon.spy(datepicker, '_focus');
               MockInteractions.pressAndReleaseKeyOn(datepicker.$.overlay.$.cancelButton, 9);
-              setTimeout(() => {
-                expect(spy.called).to.be.true;
-                done();
-              }, 1);
+              expect(spy.called).to.be.true;
+              done();
             });
           });
 
@@ -507,6 +513,7 @@
               MockInteractions.tap(datepicker.$.overlay);
               MockInteractions.focus(datepicker.$.overlay);
               setTimeout(() => {
+                // Firefox needs timeout
                 expect(spy.called).to.be.false;
                 done();
               }, 1);
@@ -528,6 +535,7 @@
               MockInteractions.pressAndReleaseKeyOn(datepicker.$.overlay.$.todayButton, 9, 'shift');
               MockInteractions.focus(datepicker.$.overlay);
               setTimeout(() => {
+                // Firefox needs timeout
                 expect(spy.called).to.be.true;
                 done();
               }, 1);

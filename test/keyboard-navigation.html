@@ -82,18 +82,14 @@
           return overlay.focusedDate;
         }
 
+        afterEach(done => flush(done));
+
         describe('date-picker', () => {
           var datepicker;
 
           beforeEach(() => {
             datepicker = fixture('datepicker');
             overlay = datepicker.$.overlay;
-          });
-
-          afterEach(() => {
-            if (datepicker._debouncerRefit) {
-              datepicker._debouncerRefit.flush();
-            }
           });
 
           it('should open overlay on down', () => {
@@ -111,23 +107,24 @@
           });
 
           it('should close overlay on esc', done => {
-            datepicker.open();
-            target = datepicker.$.overlay;
-            setTimeout(() => {
+            open(datepicker, () => {
+              target = datepicker.$.overlay;
               esc();
               expect(datepicker.opened).to.be.false;
               done();
-            }, 1);
+            });
           });
 
-          it('should be focused on selected value when overlay is opened', () => {
+          it('should be focused on selected value when overlay is opened', done => {
             datepicker.value = '2001-01-01';
 
-            datepicker.open();
-            target = overlay;
-            arrowRight();
+            open(datepicker, () => {
+              target = overlay;
+              arrowRight();
 
-            expect(focusedDate()).to.eql(new Date(2001, 0, 2));
+              expect(focusedDate()).to.eql(new Date(2001, 0, 2));
+              done();
+            });
           });
 
           it('should be focused on initial position when no value is set', done => {
@@ -139,31 +136,37 @@
             open(datepicker, () => {
               target = overlay;
               arrowRight();
+
               expect(focusedDate()).to.eql(new Date(2001, 0, 2));
               done();
             });
           });
 
-          it('should be focused on today if no initial position is set', () => {
+          it('should be focused on today if no initial position is set', done => {
             var today = new Date();
             datepicker.value = null;
             datepicker.initialPosition = null;
 
-            datepicker.open();
-            target = overlay;
-            arrowRight();
+            open(datepicker, () => {
+              target = overlay;
+              arrowRight();
 
-            expect(focusedDate()).to.eql(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
+              expect(focusedDate()).to.eql(new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1));
+              done();
+            });
           });
 
-          it('should not lose focused date after deselecting', () => {
+          it('should not lose focused date after deselecting', done => {
             var _focused = focusedDate();
-            datepicker.open();
-            target = overlay;
-            space();
-            space();
 
-            expect(focusedDate().getTime()).to.equal(_focused.getTime());
+            open(datepicker, () => {
+              target = overlay;
+              space();
+              space();
+
+              expect(focusedDate().getTime()).to.equal(_focused.getTime());
+              done();
+            });
           });
         });
 
@@ -178,8 +181,7 @@
             overlay.focusedDate = new Date(2000, 0, 1);
 
             overlay.scrollToDate(overlay.focusedDate);
-            listenForEvent(overlay, 'scroll-animation-finished', () =>
-              Polymer.RenderStatus.afterNextRender(overlay, done));
+            listenForEvent(overlay, 'scroll-animation-finished', () => animationFrameFlush(done));
           });
 
           it('should focus one week forward with arrow down', () => {
@@ -303,7 +305,7 @@
 
             pageDown();
 
-            setTimeout(() => {
+            flush(() => {
               // FF sometimes reports subpixel differences
               expect(overlay.$.scroller.position).to.be.closeTo(initialPosition, 1);
               done();

@@ -33,6 +33,8 @@
 
       });
 
+      afterEach(done => flush(done));
+
       it('should stop tap events from bubbling outside the overlay', () => {
         var tapSpy = sinon.spy();
         document.addEventListener('tap', tapSpy);

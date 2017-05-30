@@ -47,7 +47,7 @@
         dropdown = datepicker.$.dropdown;
       });
 
-      afterEach(done => setTimeout(done, 1));
+      afterEach(done => flush(done));
 
       it('should set body `pointer-events: none` on open and restore initial value on close', done => {
         document.body.style.pointerEvents = 'painted';
@@ -114,9 +114,7 @@
             expect(dropdown.positionTarget).to.equal(fullscreen ? document.documentElement : datepicker);
             done();
           });
-          setTimeout(() => {
-            datepicker.open();
-          });
+          datepicker.open();
         });
 
       });
@@ -155,9 +153,7 @@
 
       beforeEach(() => datepicker = fixture('datepicker-wrapped').$.datepicker);
 
-      afterEach(done => {
-        setTimeout(done, 1);
-      });
+      afterEach(done => flush(done));
 
       it('should not close on calendar icon down', done => {
         datepicker.addEventListener('iron-overlay-opened', () => {
