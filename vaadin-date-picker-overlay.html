@@ -314,8 +314,8 @@ This program is available under Apache License Version 2.0, available at https:/
         ready() {
           super.ready();
           this.setAttribute('tabindex', 0);
+          Polymer.Gestures.addListener(this, 'tap', this._stopPropagation);
           this.addEventListener('keydown', this._onKeydown.bind(this));
-          this.addEventListener('tap', this._stopPropagation.bind(this));
           this.addEventListener('focus', this._onOverlayFocus.bind(this));
           this.addEventListener('blur', this._onOverlayBlur.bind(this));
         }
