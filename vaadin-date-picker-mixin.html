@@ -336,6 +336,9 @@ This program is available under Apache License Version 2.0, available at https:/
       this.addEventListener('date-tap', this._close.bind(this));
       this.addEventListener('focus-input', this._focusAndSelect.bind(this));
       this.addEventListener('input', this._onUserInput.bind(this));
+
+      const rtlEl = document.querySelector('[dir=rtl]');
+      this._isRtl = rtlEl && rtlEl.contains(this);
     }
 
     /**
@@ -458,6 +461,10 @@ This program is available under Apache License Version 2.0, available at https:/
       var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
       var bottomAlign = this.getBoundingClientRect().top > viewportHeight / 2;
       var rightAlign = this.getBoundingClientRect().left + this.clientWidth / 2 > viewportWidth / 2;
+
+      if (this._isRtl) {
+        rightAlign = !rightAlign;
+      }
 
       this.$.dropdown.verticalAlign = bottomAlign ? 'bottom' : 'top';
       this.$.dropdown.horizontalAlign = this._fullscreen ? null : rightAlign ? 'right' : 'left';
