@@ -491,6 +491,11 @@
       this._documentPointerEvents = document.body.style.pointerEvents;
       document.body.style.pointerEvents = 'none';
 
+      // Click on date cells do not work on Chrome 63 otherwise
+      var _pointerEvents = this.style.pointerEvents;
+      this.style.pointerEvents = 'auto';
+      this.style.pointerEvents = _pointerEvents;
+
       this._ignoreAnnounce = false;
     },
 
