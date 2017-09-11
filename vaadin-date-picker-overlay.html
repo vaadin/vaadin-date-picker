@@ -5,7 +5,6 @@ This program is available under Apache License Version 2.0, available at https:/
 -->
 
 <link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../polymer/lib/mixins/gesture-event-listeners.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
 <link rel="import" href="../iron-a11y-announcer/iron-a11y-announcer.html">
@@ -180,10 +179,10 @@ This program is available under Apache License Version 2.0, available at https:/
 
     <div part="overlay-header" on-touchend="_preventDefault" desktop$="[[_desktopMode]]" aria-hidden="true">
       <div part="label">[[_formatDisplayed(selectedDate, i18n.formatDate, label)]]</div>
-      <div part="clear-button" on-tap="_clear" showclear$="[[_showClear(selectedDate)]]"></div>
-      <div part="toggle-button" on-tap="_cancel"></div>
+      <div part="clear-button" on-click="_clear" showclear$="[[_showClear(selectedDate)]]"></div>
+      <div part="toggle-button" on-click="_cancel"></div>
 
-      <div part="years-toggle-button" desktop$="[[_desktopMode]]" on-tap="_toggleYearScroller" aria-hidden="true">
+      <div part="years-toggle-button" desktop$="[[_desktopMode]]" on-click="_toggleYearScroller" aria-hidden="true">
         [[_yearAfterXMonths(_visibleMonthIndex)]]
       </div>
     </div>
@@ -196,7 +195,6 @@ This program is available under Apache License Version 2.0, available at https:/
             month="[[_dateAfterXMonths(index)]]"
             selected-date="{{selectedDate}}"
             focused-date="[[focusedDate]]"
-            ignore-taps="[[_ignoreTaps]]"
             show-week-numbers="[[showWeekNumbers]]"
             min-date="[[minDate]]"
             max-date="[[maxDate]]"
@@ -205,7 +203,7 @@ This program is available under Apache License Version 2.0, available at https:/
           </vaadin-month-calendar>
         </template>
       </vaadin-infinite-scroller>
-      <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-custom-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" buffer-size="25" active="[[initialPosition]]" part="years">
+      <vaadin-infinite-scroller id="yearScroller" on-click="_onYearClick" on-custom-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" buffer-size="25" active="[[initialPosition]]" part="years">
         <template>
           <div part="year-number" role="button" current$="[[_isCurrentYear(index)]]" selected$="[[_isSelectedYear(index, selectedDate)]]">
             [[_yearAfterXYears(index)]]
@@ -216,10 +214,10 @@ This program is available under Apache License Version 2.0, available at https:/
     </div>
 
     <div on-touchend="_preventDefault" role="toolbar" part="toolbar">
-      <vaadin-button id="todayButton" part="today-button" disabled="[[!_isTodayAllowed(minDate, maxDate)]]" on-tap="_onTodayTap">
+      <vaadin-button id="todayButton" part="today-button" disabled="[[!_isTodayAllowed(minDate, maxDate)]]" on-click="_onTodayClick">
         [[i18n.today]]
       </vaadin-button>
-      <vaadin-button id="cancelButton" part="cancel-button" on-tap="_cancel">
+      <vaadin-button id="cancelButton" part="cancel-button" on-click="_cancel">
         [[i18n.cancel]]
       </vaadin-button>
     </div>
@@ -228,7 +226,7 @@ This program is available under Apache License Version 2.0, available at https:/
   </template>
   <script>
     {
-      class DatePickerOverlayElement extends Vaadin.ThemableMixin(Polymer.GestureEventListeners(Polymer.Element)) {
+      class DatePickerOverlayElement extends Vaadin.ThemableMixin(Polymer.Element) {
 
         static get is() {
           return 'vaadin-date-picker-overlay';
@@ -287,10 +285,6 @@ This program is available under Apache License Version 2.0, available at https:/
               type: Boolean
             },
 
-            _ignoreTaps: Boolean,
-
-            _notTapping: Boolean,
-
             /**
              * The earliest date that can be selected. All earlier dates will be disabled.
              */
@@ -314,7 +308,7 @@ This program is available under Apache License Version 2.0, available at https:/
           super.ready();
           this.setAttribute('tabindex', 0);
           this.addEventListener('keydown', this._onKeydown.bind(this));
-          this.addEventListener('tap', this._stopPropagation.bind(this));
+          this.addEventListener('click', this._stopPropagation.bind(this));
           this.addEventListener('focus', this._onOverlayFocus.bind(this));
           this.addEventListener('blur', this._onOverlayBlur.bind(this));
         }
@@ -330,7 +324,6 @@ This program is available under Apache License Version 2.0, available at https:/
           super.connectedCallback();
           this._translateX = this._yearScrollerWidth;
           this._toggleAnimateClass(true);
-          Polymer.Gestures.setTouchAction(this.$.scrollers, 'pan-y');
           Polymer.IronA11yAnnouncer.requestAvailability();
         }
 
@@ -431,29 +424,18 @@ This program is available under Apache License Version 2.0, available at https:/
 
         _onMonthScroll() {
           this._repositionYearScroller();
-          this._doIgnoreTaps();
         }
 
         _onYearScroll() {
           this._repositionMonthScroller();
-          this._doIgnoreTaps();
         }
 
         _onYearScrollTouchStart() {
-          this._notTapping = false;
-          setTimeout(() => this._notTapping = true, 300);
-
           this._repositionMonthScroller();
         }
 
         _onMonthScrollTouchStart() {
           this._repositionYearScroller();
-        }
-
-        _doIgnoreTaps() {
-          this._ignoreTaps = true;
-          this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
-            Polymer.Async.timeOut.after(300), () => this._ignoreTaps = false);
         }
 
         _formatDisplayed(date, formatDate, label) {
@@ -464,7 +446,7 @@ This program is available under Apache License Version 2.0, available at https:/
           }
         }
 
-        _onTodayTap() {
+        _onTodayClick() {
           var today = new Date();
           if (this.$.monthScroller.position === this._differenceInMonths(today, this._originDate)) {
             // Select today only if the month scroller is positioned exactly
@@ -488,12 +470,10 @@ This program is available under Apache License Version 2.0, available at https:/
           return !!selectedDate;
         }
 
-        _onYearTap(e) {
-          if (!this._ignoreTaps && !this._notTapping) {
-            var scrollDelta = e.detail.y - (this.$.yearScroller.getBoundingClientRect().top + this.$.yearScroller.clientHeight / 2);
-            var yearDelta = scrollDelta / this.$.yearScroller.itemHeight;
-            this._scrollToPosition(this.$.monthScroller.position + yearDelta * 12, true);
-          }
+        _onYearClick(e) {
+          var scrollDelta = e.detail.y - (this.$.yearScroller.getBoundingClientRect().top + this.$.yearScroller.clientHeight / 2);
+          var yearDelta = scrollDelta / this.$.yearScroller.itemHeight;
+          this._scrollToPosition(this.$.monthScroller.position + yearDelta * 12, true);
         }
 
         _scrollToPosition(targetPosition, animate) {
@@ -753,14 +733,14 @@ This program is available under Apache License Version 2.0, available at https:/
                 if (isScroller || isCancel) {
                   this._close();
                 } else if (isToday) {
-                  this._onTodayTap();
+                  this._onTodayClick();
                 }
                 break;
               case 'space':
                 if (isCancel) {
                   this._close();
                 } else if (isToday) {
-                  this._onTodayTap();
+                  this._onTodayClick();
                 } else {
                   var focusedDate = this.focusedDate;
                   if (Vaadin.DatePickerHelper._dateEquals(focusedDate, this.selectedDate)) {

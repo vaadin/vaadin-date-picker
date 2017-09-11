@@ -174,11 +174,11 @@
           inputText('1/2/2000');
         });
 
-        it('should not forward after input tap', done => {
+        it('should not forward after input click', done => {
           open(datepicker, () => {
             arrowDown();
             var focused = focusedDate();
-            target.dispatchEvent(new CustomEvent('tap', {bubbles: true, composed: true}));
+            target.dispatchEvent(new CustomEvent('click', {bubbles: true, composed: true}));
             arrowLeft();
             expect(focusedDate()).to.eql(focused);
             done();
@@ -461,15 +461,15 @@
             expect(datepicker._inputElement.focused).to.be.true;
           });
 
-          it('should focus the input on date tap', () => {
+          it('should focus the input on date click', () => {
             arrowDown();
-            datepicker.$.overlay.dispatchEvent(new CustomEvent('date-tap', {bubbles: true, composed: true}));
+            datepicker.$.overlay.dispatchEvent(new CustomEvent('date-click', {bubbles: true, composed: true}));
             expect(datepicker._inputElement.focused).to.be.true;
           });
 
           it('should focus the input on date cancel', () => {
             arrowDown();
-            MockInteractions.tap(datepicker.$.overlay.$.cancelButton);
+            click(datepicker.$.overlay.$.cancelButton);
             expect(datepicker._inputElement.focused).to.be.true;
           });
 
@@ -496,10 +496,10 @@
             });
           });
 
-          it('should not reveal the focused date on tap', done => {
+          it('should not reveal the focused date on click', done => {
             open(datepicker, () => {
               var spy = sinon.spy(datepicker.$.overlay, 'revealDate');
-              MockInteractions.tap(datepicker.$.overlay);
+              click(datepicker.$.overlay);
               MockInteractions.focus(datepicker.$.overlay);
               setTimeout(() => {
                 expect(spy.called).to.be.false;

@@ -111,9 +111,9 @@
         });
       });
 
-      it('should open on input tap', done => {
+      it('should open on input click', done => {
         listenForEvent(datepicker, 'iron-overlay-opened', done);
-        tap(datepicker.$.input);
+        click(datepicker.$.input);
       });
 
       it('should pass the placeholder attribute to the input tag', () => {
@@ -167,11 +167,11 @@
         });
       });
 
-      it('should close on overlay date tap', done => {
+      it('should close on overlay date click', done => {
         listenForEvent(datepicker, 'iron-overlay-closed', done);
 
         open(datepicker, () => {
-          datepicker.$.overlay.dispatchEvent(new CustomEvent('date-tap', {bubbles: true, composed: true}));
+          datepicker.$.overlay.dispatchEvent(new CustomEvent('date-click', {bubbles: true, composed: true}));
         });
       });
 
@@ -181,7 +181,7 @@
 
       it('should clear the value', () => {
         datepicker.value = '2000-02-01';
-        tap(clearButton);
+        click(clearButton);
         expect(datepicker.value).to.equal('');
       });
 
@@ -206,7 +206,7 @@
 
       it('should show clear icon', done => {
         datepicker.value = '2000-02-01';
-        datepicker.$.overlay.dispatchEvent(new CustomEvent('date-tap', {bubbles: true}));
+        datepicker.$.overlay.dispatchEvent(new CustomEvent('date-click', {bubbles: true}));
 
         open(datepicker, () => {
           if (isFullscreen(datepicker)) {
@@ -218,9 +218,9 @@
         });
       });
 
-      it('should open by tapping the calendar icon', done => {
+      it('should open by clicking the calendar icon', done => {
         listenForEvent(datepicker, 'iron-overlay-opened', done);
-        tap(toggleButton);
+        click(toggleButton);
       });
 
       it('should scroll to a date on open', done => {
