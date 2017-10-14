@@ -429,7 +429,7 @@ This program is available under Apache License Version 2.0, available at https:/
         return;
       }
 
-      var date = this._parseDate(value);
+      var date = value instanceof Date ? value : this._parseDate(value);
       if (!date) {
         this.value = oldValue;
         return;
