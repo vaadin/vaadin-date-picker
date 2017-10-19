@@ -54,6 +54,16 @@
         expect(datepicker.value).to.equal('');
       });
 
+      it('should be possible to set value by using strings', () => {
+        datepicker.value = '2013-11-02';
+        expect(datepicker.value).to.equal('2013-11-02');
+      });
+
+      it('should be possible to set value by using date objects', () => {
+        datepicker.value = new Date(2017, 1, 11);
+        expect(datepicker.value).to.equal('2017-02-11');
+      });
+
       // Needs to be in this order to pass in IE
       it('should not show clear icon', done => {
         datepicker.$.overlay.$.monthScroller.bufferSize = 1;
