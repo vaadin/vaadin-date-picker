@@ -40,7 +40,7 @@
               },
               parseDate: function(dateString) {
                 var matches = datepicker.i18n.monthNames.filter(function(monthName) {
-                  return monthName.toLowerCase().startsWith(dateString.trim().toLowerCase());
+                  return monthName.toLowerCase().substr(0, dateString.trim().toLowerCase().length) === dateString.trim().toLowerCase();
                 });
                 dateString = matches.length === 1 ? matches[0] : dateString;
                 // Parse the date
@@ -55,22 +55,44 @@
 
 
     <h3>Custom Validator</h3>
-    <p>Extend <code>Vaadin.DatePickerElement</code> to create your own custom element,
-       then override the <code>checkValidity(value)</code> method to validate the input.
+    <p>
+      Either extend <code>Vaadin.DatePickerElement</code> and override the <code>checkValidity(value)</code> method or
+      replace the entire <code>checkValidity(value)</code> method.
+    </p>
     <vaadin-demo-snippet id='date-picker-advanced-demos-custom-validator'>
       <template preserve-content>
-        <vaadin-date-picker-current-year></vaadin-date-picker-current-year>
+        <vaadin-date-picker id="custom-validator"></vaadin-date-picker>
 
         <script>
           window.addDemoReadyListener('#date-picker-advanced-demos-custom-validator', function(document) {
-            class DatePickerCurrentYearElement extends Vaadin.DatePickerElement {
-              checkValidity(value) {
+            // Async call needed here for IE11 compatibility.
+            Polymer.Base.async(function() {
+              var datepicker = document.querySelector('vaadin-date-picker#custom-validator');
+              datepicker.checkValidity = function(value) {
+                var inputValid = !value || (this._selectedDate && value === this.i18n.formatDate(this._selectedDate));
+                var minMaxValid = !this._selectedDate ||
+                Vaadin.DatePickerHelper._dateAllowed(this._selectedDate, this._minDate, this._maxDate);
+
+                var inputValidity = true;
+                if (this._inputElement) {
+                  if (this._inputElement.checkValidity) {
+                    // vaadin native input elements have the checkValidity method
+                    inputValidity = this._inputElement.checkValidity(value);
+                  } else if (this._inputElement.validate) {
+                    // iron-form-elements have the validate API
+                    inputValidity = this._inputElement.validate(value);
+                  }
+                }
+
+                // Validate year to equal to current year
                 var currentYear = new Date().getFullYear();
-                return new Date(value).getFullYear() === currentYear;
+                var yearValid = new Date(value).getFullYear() === currentYear;
+
+                return inputValid && minMaxValid && inputValidity && yearValid;
               }
-            }
-            customElements.define('vaadin-date-picker-current-year', DatePickerCurrentYearElement);
+            });
           });
+          
         </script>
       </template>
     </vaadin-demo-snippet>
