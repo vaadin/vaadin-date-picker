@@ -22,5 +22,16 @@
       "image": ""
      }
   }
+  ,
+  {
+    "name": "Custom Validators",
+    "url": "date-picker-validators-demos",
+    "src": "date-picker-validators-demos.html",
+    "meta": {
+      "title": "vaadin-date-picker Custom Validators",
+      "description": "",
+      "image": ""
+    }
+  }
   ]
 }
