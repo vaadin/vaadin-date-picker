@@ -97,6 +97,26 @@
         });
       }
 
+      it('should not focus when blurred', done => {
+        const input = datepicker._nativeInput;
+        datepicker.value = '2000-01-01';
+        input.focus();
+
+        datepicker.addEventListener('iron-overlay-opened', () => {
+          const input = document.createElement('input');
+          document.body.appendChild(input);
+          input.focus();
+          input.click();
+          document.body.removeChild(input);
+        });
+
+        datepicker.addEventListener('iron-overlay-closed', () => {
+          expect(input.getRootNode().activeElement).to.not.equal(input);
+          done();
+        });
+        datepicker.open();
+      });
+
       describe('Sizing', () => {
 
         beforeEach(() => {
