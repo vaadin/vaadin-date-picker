@@ -80,6 +80,24 @@
         datepicker.open();
       });
 
+      it('should keep focus after outside is clicked once', (done) => {
+        datepicker._nativeInput.focus();
+
+        datepicker.addEventListener('iron-overlay-opened', () => {
+          const input = document.createElement('input');
+          document.body.appendChild(input);
+          input.click();
+          document.body.removeChild(input);
+        });
+
+        datepicker.addEventListener('iron-overlay-closed', () => {
+          const input = datepicker._nativeInput;
+          expect(input.getRootNode().activeElement).to.be.equal(input);
+          done();
+        });
+        datepicker.open();
+      });
+
       if (document.createElement('div').style.webkitOverflowScrolling === '') {
         it('should handle webkit-overflow-scrolling', done => {
           document.body.style.webkitOverflowScrolling = 'touch';
