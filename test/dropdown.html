@@ -80,6 +80,21 @@
         datepicker.open();
       });
 
+      it('should keep focus on the input when the overlay closes', (done) => {
+        datepicker.addEventListener('iron-overlay-opened', () => {
+          expect(datepicker._inputElement.focused).to.be.true;
+          datepicker._inputElement.blur();
+          expect(datepicker._inputElement.focused).to.be.false;
+          datepicker.close();
+        });
+
+        datepicker.addEventListener('iron-overlay-closed', () => {
+          expect(datepicker._inputElement.focused).to.be.true;
+          done();
+        });
+        datepicker.open();
+      });
+
       if (document.createElement('div').style.webkitOverflowScrolling === '') {
         it('should handle webkit-overflow-scrolling', done => {
           document.body.style.webkitOverflowScrolling = 'touch';
