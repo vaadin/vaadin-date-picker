@@ -5,7 +5,6 @@ This program is available under Apache License Version 2.0, available at https:/
 -->
 
 <link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../polymer/lib/mixins/gesture-event-listeners.html">
 <link rel="import" href="../iron-dropdown/iron-dropdown.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="../vaadin-themable-mixin/vaadin-themable-mixin.html">
@@ -81,8 +80,8 @@ This program is available under Apache License Version 2.0, available at https:/
         part="text-field"
       >
       <slot name="prefix" slot="prefix"></slot>
-      <div part="clear-button" slot="suffix" on-tap="_clear" role="button" aria-label$="[[i18n.clear]]"></div>
-      <div part="toggle-button" slot="suffix" on-tap="_toggle" role="button" aria-label$="[[i18n.calendar]]" aria-expanded$="[[_getAriaExpanded(opened)]]"></div>
+      <div part="clear-button" slot="suffix" on-click="_clear" role="button" aria-label$="[[i18n.clear]]"></div>
+      <div part="toggle-button" slot="suffix" on-click="_toggle" role="button" aria-label$="[[i18n.calendar]]" aria-expanded$="[[_getAriaExpanded(opened)]]"></div>
     </vaadin-text-field>
 
     <iron-dropdown
@@ -175,10 +174,9 @@ This program is available under Apache License Version 2.0, available at https:/
        * @memberof Vaadin
        * @mixes Vaadin.ThemableMixin
        * @mixes Vaadin.DatePickerMixin
-       * @mixes Polymer.GestureEventListeners
        * @demo demo/index.html
        */
-      class DatePickerElement extends Vaadin.ThemableMixin(Vaadin.DatePickerMixin(Polymer.GestureEventListeners(Polymer.Element))) {
+      class DatePickerElement extends Vaadin.ThemableMixin(Vaadin.DatePickerMixin(Polymer.Element)) {
 
         static get is() {
           return 'vaadin-date-picker';

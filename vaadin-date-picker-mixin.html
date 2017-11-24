@@ -327,11 +327,11 @@ This program is available under Apache License Version 2.0, available at https:/
     ready() {
       super.ready();
       this._boundOnScroll = this._onScroll.bind(this);
-      this.addEventListener('tap', this.open.bind(this));
+      this.addEventListener('click', this.open.bind(this));
       this.addEventListener('touchend', this._preventDefault.bind(this));
       this.addEventListener('keydown', this._onKeydown.bind(this));
       this.addEventListener('close', this._close.bind(this));
-      this.addEventListener('date-tap', this._close.bind(this));
+      this.addEventListener('date-click', this._close.bind(this));
       this.addEventListener('focus-input', this._focusAndSelect.bind(this));
       this.addEventListener('input', this._onUserInput.bind(this));
     }
