@@ -80,19 +80,16 @@
         datepicker.open();
       });
 
-      it('should keep focus after outside is clicked once', (done) => {
-        datepicker._nativeInput.focus();
-
+      it('should keep focus on the input when the overlay closes', done => {
         datepicker.addEventListener('iron-overlay-opened', () => {
-          const input = document.createElement('input');
-          document.body.appendChild(input);
-          input.click();
-          document.body.removeChild(input);
+          expect(datepicker._inputElement.focused).to.be.true;
+          datepicker._inputElement.blur();
+          expect(datepicker._inputElement.focused).to.be.false;
+          datepicker.close();
         });
 
         datepicker.addEventListener('iron-overlay-closed', () => {
-          const input = datepicker._nativeInput;
-          expect(input.getRootNode().activeElement).to.be.equal(input);
+          expect(datepicker._inputElement.focused).to.be.true;
           done();
         });
         datepicker.open();

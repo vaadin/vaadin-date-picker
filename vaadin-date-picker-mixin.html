@@ -581,10 +581,10 @@ This program is available under Apache License Version 2.0, available at https:/
       this._ignoreFocusedDateChange = false;
 
       if (this._nativeInput && !isNaN(this._nativeInput.selectionStart)) {
-        this._focus();
         this._nativeInput.selectionStart = this._nativeInput.selectionEnd;
       }
 
+      this._focus();
       this.validate();
     }
 
