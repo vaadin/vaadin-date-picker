@@ -30,7 +30,8 @@
     "vaadin-text-field": "#next",
     "vaadin-themable-mixin": "^1.1.0",
     "vaadin-control-state-mixin": "^1.1.7",
-    "vaadin-valo-theme": "^2.0.0"
+    "vaadin-valo-theme": "^2.0.0",
+    "vaadin-overlay": "next"
   },
   "devDependencies": {
     "iron-component-page": "^3.0.0",
