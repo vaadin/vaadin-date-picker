@@ -8,8 +8,8 @@ cache:
     - node_modules
 
 addons:
-  firefox: latest
-  google-chrome: latest
+  firefox: stable
+  chrome: stable
 
 install:
   - npm install
