@@ -1,3 +1,6 @@
+<link rel="import" href="../src/vaadin-date-picker-helper.html">
+<script src="../../sugar/dist/sugar.min.js"></script>
+
 <dom-module id="date-picker-advanced-demos">
   <template>
     <style>
@@ -33,7 +36,8 @@
               weekdays: 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'),
               weekdaysShort: 'su_ma_ti_ke_to_pe_la'.split('_'),
               formatDate: function(date) {
-                return Sugar.Date.format(date, '{short}');
+                // Sugar Date expects a native date; this `date` parameter however is in our new format.
+                return Sugar.Date.format(Sugar.Date.create(date), '{short}');
               },
               formatTitle: function(monthName, fullYear) {
                 return monthName + ' ' + fullYear;
@@ -44,7 +48,7 @@
                 });
                 dateString = matches.length === 1 ? matches[0] : dateString;
                 // Parse the date
-                return Sugar.Date.create(dateString);
+                return Vaadin.DatePickerHelper._extractDateParts(Sugar.Date.create(dateString));
               }
             };
           });

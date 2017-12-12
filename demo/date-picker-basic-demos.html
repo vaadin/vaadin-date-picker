@@ -1,3 +1,6 @@
+<link rel="import" href="../src/vaadin-date-picker-helper.html">
+<script src="../../sugar/dist/sugar.min.js"></script>
+
 <dom-module id="date-picker-basic-demos">
   <template>
     <style>
@@ -165,7 +168,7 @@
                 });
                 dateString = matches.length === 1 ? matches[0] : dateString;
                 // Parse the date (using a 3rd party library)
-                return Sugar.Date.create(dateString);
+                return Vaadin.DatePickerHelper._extractDateParts(Sugar.Date.create(dateString));
               });
             });
           });
