@@ -89,5 +89,16 @@ This program is available under Apache License Version 2.0, available at https:/
           return candidateDiff < closestDateDiff ? candidate : closestDate;
         });
     }
+
+    /**
+     * 
+     */
+    static _extractDateParts(date) {
+      return {
+        day: date.getDate(),
+        month: date.getMonth(),
+        year: date.getFullYear()
+      };
+    }
   };
 </script>

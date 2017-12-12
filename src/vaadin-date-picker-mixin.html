@@ -196,9 +196,15 @@ This program is available under Apache License Version 2.0, available at https:/
               today: 'Today',
               cancel: 'Cancel',
               formatDate: d => {
-                let yearStr = String(d.getFullYear());
-                yearStr = yearStr.replace(/\d+/, y => '0000'.substr(y.length) + y);
-                return [d.getMonth() + 1, d.getDate(), yearStr].join('/');
+                const formatYear = yearStr => yearStr.replace(/\d+/, y => '0000'.substr(y.length) + y);
+
+                if (typeof d.getMonth === 'function') {
+                  const yearStr = formatYear(String(d.getFullYear()));
+                  return [d.getMonth() + 1, d.getDate(), yearStr].join('/');
+                } else {
+                  const yearStr = formatYear(String(d.year));
+                  return [d.month + 1, d.day, yearStr].join('/');
+                }
               },
               parseDate: text => {
                 const parts = text.split('/');
@@ -403,7 +409,7 @@ This program is available under Apache License Version 2.0, available at https:/
       }
       this.value = this._formatISO(selectedDate);
       this._focusedDate = selectedDate;
-      this._inputValue = selectedDate ? formatDate(selectedDate) : '';
+      this._inputValue = selectedDate ? formatDate(Vaadin.DatePickerHelper._extractDateParts(selectedDate)) : '';
     }
 
     _focusedDateChanged(focusedDate, formatDate) {
@@ -411,7 +417,7 @@ This program is available under Apache License Version 2.0, available at https:/
         return;
       }
       if (!this._ignoreFocusedDateChange && !this._noInput) {
-        this._inputValue = focusedDate ? formatDate(focusedDate) : '';
+        this._inputValue = focusedDate ? formatDate(Vaadin.DatePickerHelper._extractDateParts(focusedDate)) : '';
       }
     }
 
@@ -610,7 +616,8 @@ This program is available under Apache License Version 2.0, available at https:/
      * @return {boolean} True if the value is valid
      */
     checkValidity(value) {
-      var inputValid = !value || (this._selectedDate && value === this.i18n.formatDate(this._selectedDate));
+      var inputValid = !value ||
+        (this._selectedDate && value === this.i18n.formatDate(Vaadin.DatePickerHelper._extractDateParts(this._selectedDate)));
       var minMaxValid = !this._selectedDate ||
       Vaadin.DatePickerHelper._dateAllowed(this._selectedDate, this._minDate, this._maxDate);
 

@@ -33,7 +33,12 @@
               weekdays: 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'),
               weekdaysShort: 'su_ma_ti_ke_to_pe_la'.split('_'),
               formatDate: function(date) {
-                return Sugar.Date.format(date, '{short}');
+                // Sugar Date expects a native date; this `date` parameter however is in our new format.
+                const result = new Date(0, 0); // Wrong date (1900-01-01), but with midnight in local time
+                result.setFullYear(date.year);
+                result.setMonth(date.month);
+                result.setDate(date.day);
+                return Sugar.Date.format(result, '{short}');
               },
               formatTitle: function(monthName, fullYear) {
                 return monthName + ' ' + fullYear;

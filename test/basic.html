@@ -426,7 +426,7 @@
           datepicker.set('i18n.firstDayOfWeek', 1);
           datepicker.set('i18n.formatDate', d => {
             if (d) {
-              return [d.getDate(), d.getMonth() + 1, d.getFullYear()].join('.');
+              return [d.day, d.month + 1, d.year].join('.');
             }
           });
           datepicker.set('i18n.calendar', 'Kalenteri');
