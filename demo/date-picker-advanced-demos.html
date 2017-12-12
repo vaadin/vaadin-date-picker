@@ -1,3 +1,5 @@
+<script src="../../sugar/dist/sugar.min.js"></script>
+
 <dom-module id="date-picker-advanced-demos">
   <template>
     <style>
@@ -33,7 +35,8 @@
               weekdays: 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'),
               weekdaysShort: 'su_ma_ti_ke_to_pe_la'.split('_'),
               formatDate: function(date) {
-                return Sugar.Date.format(date, '{short}');
+                // Sugar Date expects a native date; this `date` parameter however is in our format.
+                return Sugar.Date.format(Sugar.Date.create(date), '{short}');
               },
               formatTitle: function(monthName, fullYear) {
                 return monthName + ' ' + fullYear;
@@ -44,7 +47,12 @@
                 });
                 dateString = matches.length === 1 ? matches[0] : dateString;
                 // Parse the date
-                return Sugar.Date.create(dateString);
+                const date = Sugar.Date.create(dateString);
+                return {
+                  day: date.getDate(),
+                  month: date.getMonth(),
+                  year: date.getFullYear()
+                };
               }
             };
           });
