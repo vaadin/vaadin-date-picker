@@ -89,5 +89,15 @@ This program is available under Apache License Version 2.0, available at https:/
           return candidateDiff < closestDateDiff ? candidate : closestDate;
         });
     }
+
+    /**
+     * Check if this is a mobile browser.
+     */
+    static _mobile() {
+      var ua = navigator.userAgent;
+      var ios = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      var android = /(android)/i.test(ua);
+      return ios || android;
+    }
   };
 </script>
