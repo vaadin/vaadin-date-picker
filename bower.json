@@ -24,8 +24,13 @@
     "iron-media-query": "^2.0.0",
     "iron-resizable-behavior": "^2.0.0",
     "polymer": "^2.0",
+<<<<<<< HEAD
     "vaadin-button": "^2.0.0",
     "vaadin-text-field": "^2.0.0",
+=======
+    "vaadin-button": "v2.0.0",
+    "vaadin-text-field": "v2.0.0",
+>>>>>>> Update dependencies
     "vaadin-themable-mixin": "^1.1.0",
     "vaadin-control-state-mixin": "^2.0.0",
     "vaadin-overlay": "^2.0.0",
@@ -42,7 +47,11 @@
     "iron-input": "^2.0.0",
     "iron-test-helpers": "^2.0.0",
     "sugar": "^2.0.0",
+<<<<<<< HEAD
     "vaadin-button": "^2.0.0",
+=======
+    "vaadin-button": "v2.0.0",
+>>>>>>> Update dependencies
     "web-component-tester": "^6.1.5",
     "vaadin-demo-helpers": "^1.0.0"
   }
