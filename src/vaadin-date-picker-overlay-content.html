@@ -337,6 +337,11 @@ This program is available under Apache License Version 2.0, available at https:/
           Polymer.IronA11yAnnouncer.requestAvailability();
         }
 
+        disconnectedCallback() {
+          super.disconnectedCallback();
+          this.removeAttribute('years-visible');
+        }
+
         announceFocusedDate() {
           var focusedDate = this._currentlyFocusedDate();
           var announce = [];
