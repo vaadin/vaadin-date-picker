@@ -1,0 +1,46 @@
+<dom-module id="date-picker-validators-demos">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h3>Custom Validator</h3>
+    <p>Extend <code>Vaadin.DatePickerElement</code> to create your own custom element,
+      then override the <code>checkValidity(value)</code> method to validate the input.
+    <vaadin-demo-snippet id='date-picker-advanced-demos-custom-validator'>
+      <template preserve-content>
+        <vaadin-date-picker-current-year></vaadin-date-picker-current-year>
+
+        <script>
+          window.addDemoReadyListener('#date-picker-advanced-demos-custom-validator', function(document) {
+            class DatePickerCurrentYearElement extends Vaadin.DatePickerElement {
+              checkValidity(value) {
+                var currentYear = new Date().getFullYear();
+                return new Date(value).getFullYear() === currentYear;
+              }
+            }
+            customElements.define('vaadin-date-picker-current-year', DatePickerCurrentYearElement);
+          });
+        </script>
+      </template>
+    </vaadin-demo-snippet>
+
+  </template>
+  <script>
+    class DatePickerValidatorsDemos extends DemoReadyEventEmitter(DatePickerDemo(Polymer.Element)) {
+      static get is() {
+        return 'date-picker-validators-demos';
+      }
+      static get template() {
+        if (Array.prototype.find.toString().indexOf('[native code]') !== -1) {
+          return super.template;
+        } else {
+          return '<p>This demo must be viewed with an ES6 compatible browser</p>';
+        }
+      }
+    }
+    customElements.define(DatePickerValidatorsDemos.is, DatePickerValidatorsDemos);
+  </script>
+</dom-module>

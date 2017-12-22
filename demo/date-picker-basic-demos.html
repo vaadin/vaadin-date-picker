@@ -161,7 +161,7 @@
               datepicker.set('i18n.parseDate', function(dateString) {
                 // See if we get exactly 1 match from the month names
                 var matches = datepicker.i18n.monthNames.filter(function(monthName) {
-                  return monthName.toLowerCase().startsWith(dateString.trim().toLowerCase());
+                  return monthName.toLowerCase().substr(0, dateString.trim().toLowerCase().length) === dateString.trim().toLowerCase();
                 });
                 dateString = matches.length === 1 ? matches[0] : dateString;
                 // Parse the date (using a 3rd party library)
