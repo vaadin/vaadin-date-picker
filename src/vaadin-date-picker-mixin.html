@@ -464,9 +464,15 @@ This program is available under Apache License Version 2.0, available at https:/
 
       if (!this._fullscreen) {
         if (rightAlign) {
-          this.$.overlay.setAttribute('right-aligned', '');
-          this.$.overlay.style.removeProperty('left');
-          this.$.overlay.style.right = (viewportWidth - inputRect.right) + 'px';
+          if (document.querySelector('body').getAttribute('dir') === 'rtl') {
+            this.$.overlay.removeAttribute('right-aligned');
+            this.$.overlay.style.removeProperty('right');
+            this.$.overlay.style.right = (viewportWidth - inputRect.right) + 'px';
+          } else {
+            this.$.overlay.setAttribute('right-aligned', '');
+            this.$.overlay.style.removeProperty('left');
+            this.$.overlay.style.right = (viewportWidth - inputRect.right) + 'px';
+          }
         } else {
           this.$.overlay.removeAttribute('right-aligned');
           this.$.overlay.style.removeProperty('right');
