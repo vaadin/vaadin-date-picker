@@ -288,7 +288,9 @@ This program is available under Apache License Version 2.0, available at https:/
           value: true
         },
 
-        _focusOverlayOnOpen: Boolean
+        _focusOverlayOnOpen: Boolean,
+
+        _touchDevice: Boolean
       };
     }
 
@@ -322,6 +324,8 @@ This program is available under Apache License Version 2.0, available at https:/
     connectedCallback() {
       super.connectedCallback();
 
+      this._touchDevice = 'ontouchstart' in window;
+
       this.$.overlay.addEventListener('vaadin-overlay-escape-press', this._boundFocus);
     }
 
@@ -339,10 +343,13 @@ This program is available under Apache License Version 2.0, available at https:/
     /**
      * Opens the dropdown.
      */
-    open() {
-      if (!this.disabled && !this.readonly) {
+    open(e) {
+      const clearButtonTap = (e) ? e.composedPath()[0].getAttribute('part') === 'clear-button' : false;
+      if (!this.disabled && !this.readonly && !clearButtonTap) {
         this.$.overlay.opened = true;
         this._updateAlignmentAndPosition();
+      } else if (clearButtonTap && !this._touchDevice) {
+        this._inputElement.focus();
       }
     }
 
