@@ -14,14 +14,21 @@
 
 <body>
   <script>
-    listenForEvent(document, 'WebComponentsReady', () => {
+    const initCustomValidator = () => {
       class DatePicker2016Element extends Vaadin.DatePickerElement {
         checkValidity(value) {
           return new Date(value).getFullYear() === 2016;
         }
       }
       customElements.define('vaadin-date-picker-2016', DatePicker2016Element);
-    });
+    };
+
+    // with P3 using ES modules we are sure that DatePickerElement is defined, no need to wait
+    if (window['Polymer'] && window['Polymer'].version) {
+      listenForEvent(document, 'WebComponentsReady', initCustomValidator);
+    } else {
+      initCustomValidator();
+    }
   </script>
 
   <test-fixture id="custom-validation">
