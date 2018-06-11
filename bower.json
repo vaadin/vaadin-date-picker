@@ -28,7 +28,8 @@
     "bower_components",
     "gulpfile.js",
     "package-lock.json",
-    "wct.conf.js"
+    "wct.conf.js",
+    "test"
   ],
   "dependencies": {
     "iron-a11y-announcer": "^2.0.0",
