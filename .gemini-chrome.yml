@@ -13,5 +13,5 @@ browsers:
   chrome:
     desiredCapabilities:
       browserName: "chrome"
-      version: "61.0"
+      version: "66.0"
       platform: "Windows 10"
