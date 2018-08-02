@@ -12,6 +12,7 @@ addons:
   chrome: stable
 
 install:
+  - npm install -g polymer-cli
   - npm install
   - polymer install
 
