@@ -1,0 +1,94 @@
+<!--
+@license
+Copyright (c) 2017 Vaadin Ltd.
+This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
+-->
+
+<link rel="import" href="../../iron-media-query/iron-media-query.html">
+
+<script>
+  window.Vaadin = window.Vaadin || {};
+
+  const publishers = {};
+  const subscribers = {};
+
+  const hasSubscribers = query => Array.isArray(subscribers[query]);
+
+  function setupQuery(query) {
+    if (!publishers[query]) {
+      const instance = document.createElement('iron-media-query');
+      instance.query = query;
+      instance.addEventListener('query-matches-changed', event => {
+        subscribers[query].forEach(subscriber => {
+          subscriber._onMediaQueryChange.call(subscriber, event.detail.value);
+        });
+      });
+      publishers[query] = instance;
+      document.body.appendChild(instance);
+    }
+  }
+
+  /**
+   * @polymerMixin
+   */
+  Vaadin.MediaQueryMixin = superClass => class MediaQueryMixin extends superClass {
+    static get properties() {
+      return {
+        /**
+         * @protected
+         * @override
+         */
+        _mediaQuery: {
+          type: String,
+          observer: '_mediaQueryChanged'
+        }
+      };
+    }
+
+    /**
+     * @protected
+     */
+    connectedCallback() {
+      super.connectedCallback();
+      this._subscribe(this._mediaQuery);
+    }
+
+    /**
+     * @protected
+     */
+    disconnectedCallback() {
+      super.disconnectedCallback();
+      this._unsubscribe(this._mediaQuery);
+    }
+
+    _mediaQueryChanged(query, oldQuery) {
+      if (typeof query === 'string' && typeof oldQuery === 'string') {
+        this._unsubscribe(oldQuery);
+        this._subscribe(query);
+      }
+    }
+
+    _subscribe(query) {
+      if (typeof query === 'string' && typeof this._onMediaQueryChange === 'function') {
+        if (!hasSubscribers(query)) {
+          subscribers[query] = [];
+        }
+        subscribers[query].push(this);
+
+        // if <iron-media-query> instance already exists, get initial value from it
+        // otherwise, create an instance, which will evaluate it automatically
+        if (publishers[query]) {
+          this._onMediaQueryChange(publishers[query].queryMatches);
+        } else {
+          setupQuery(query);
+        }
+      }
+    }
+
+    _unsubscribe(query) {
+      if (typeof query === 'string' && hasSubscribers(query)) {
+        subscribers[query].splice(subscribers[query].indexOf(this), 1);
+      }
+    }
+  };
+</script>
