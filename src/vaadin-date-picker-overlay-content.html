@@ -190,18 +190,20 @@ This program is available under Apache License Version 2.0, available at https:/
     <div id="scrollers" desktop$="[[_desktopMode]]" on-track="_track">
       <vaadin-infinite-scroller id="monthScroller" on-custom-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" buffer-size="3" active="[[initialPosition]]" part="months">
         <template>
-          <vaadin-month-calendar
-            i18n="[[i18n]]"
-            month="[[_dateAfterXMonths(index)]]"
-            selected-date="{{selectedDate}}"
-            focused-date="[[focusedDate]]"
-            ignore-taps="[[_ignoreTaps]]"
-            show-week-numbers="[[showWeekNumbers]]"
-            min-date="[[minDate]]"
-            max-date="[[maxDate]]"
-            focused$="[[_focused]]"
-            part="month">
-          </vaadin-month-calendar>
+          <template is="dom-if" if="[[opened]]">
+            <vaadin-month-calendar
+              i18n="[[i18n]]"
+              month="[[_dateAfterXMonths(index)]]"
+              selected-date="{{selectedDate}}"
+              focused-date="[[focusedDate]]"
+              ignore-taps="[[_ignoreTaps]]"
+              show-week-numbers="[[showWeekNumbers]]"
+              min-date="[[minDate]]"
+              max-date="[[maxDate]]"
+              focused$="[[_focused]]"
+              part="month">
+            </vaadin-month-calendar>
+          </template>
         </template>
       </vaadin-infinite-scroller>
       <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-custom-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" buffer-size="12" active="[[initialPosition]]" part="years">
@@ -273,6 +275,8 @@ This program is available under Apache License Version 2.0, available at https:/
             _visibleMonthIndex: Number,
 
             _desktopMode: Boolean,
+
+            opened: Boolean,
 
             _translateX: {
               observer: '_translateXChanged'
