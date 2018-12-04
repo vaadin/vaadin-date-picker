@@ -52,20 +52,29 @@
 
   <script>
     describe('Basic features', () => {
-      var datepicker, clearButton, toggleButton, overlayContent;
+      var datepicker, clearButton, toggleButton;
 
       beforeEach(() => {
         datepicker = fixture('datepicker');
         clearButton = datepicker.root.querySelector('[part="clear-button"]');
         toggleButton = datepicker.root.querySelector('[part="toggle-button"]');
-        overlayContent = datepicker.$.overlay.content.querySelector('#overlay-content');
-        overlayContent.$.monthScroller.bufferSize = 0;
-        overlayContent.$.yearScroller.bufferSize = 0;
       });
 
       afterEach(done => {
         setTimeout(done, 1);
       });
+
+      // As a side-effect has to toggle the overlay once to initialize it
+      const getOverlayContent = () => {
+        if (!datepicker.$.overlay) {
+          datepicker.open();
+          datepicker.close();
+        }
+        const overlayContent = datepicker.$.overlay.content.querySelector('#overlay-content');
+        overlayContent.$.monthScroller.bufferSize = 0;
+        overlayContent.$.yearScroller.bufferSize = 0;
+        return overlayContent;
+      };
 
       it('should parse date components with varying number of digits', () => {
         const composeDate = (year, month, day) => {
@@ -88,7 +97,7 @@
 
       // Needs to be in this order to pass in IE
       it('should not show clear icon', done => {
-        overlayContent.$.monthScroller.bufferSize = 1;
+        getOverlayContent().$.monthScroller.bufferSize = 1;
         datepicker.value = '2000-02-01';
 
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', () => {
@@ -167,8 +176,8 @@
       });
 
       it('should open on input tap', done => {
-        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
         tap(datepicker.$.input);
+        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
 
       it('should pass the placeholder attribute to the input tag', () => {
@@ -178,6 +187,7 @@
       });
 
       it('should scroll to today by default', done => {
+        const overlayContent = getOverlayContent();
         var spy = sinon.spy(overlayContent, 'scrollToDate');
         open(datepicker, () => {
           expect(monthsEqual(spy.firstCall.args[0], new Date())).to.be.true;
@@ -189,6 +199,7 @@
         datepicker.initialPosition = '2016-01-01';
         var initialPositionDate = new Date(2016, 0, 1);
 
+        const overlayContent = getOverlayContent();
         var spy = sinon.spy(overlayContent, 'scrollToDate');
 
         open(datepicker, () => {
@@ -201,6 +212,9 @@
         datepicker.initialPosition = null;
         var initialPosition;
 
+        datepicker.open();
+        const overlayContent = getOverlayContent();
+
         datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
           if (initialPosition) {
             expect(overlayContent.initialPosition).to.eql(initialPosition);
@@ -211,10 +225,10 @@
             datepicker.open();
           }
         });
-        datepicker.open();
       });
 
       it('should scroll to selected value by default', done => {
+        const overlayContent = getOverlayContent();
         var spy = sinon.spy(overlayContent, 'scrollToDate');
         datepicker.value = '2000-02-01';
         open(datepicker, () => {
@@ -224,11 +238,10 @@
       });
 
       it('should close on overlay date tap', done => {
-        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-close', done);
-
         open(datepicker, () => {
-          overlayContent.dispatchEvent(new CustomEvent('date-tap', {bubbles: true, composed: true}));
+          getOverlayContent().dispatchEvent(new CustomEvent('date-tap', {bubbles: true, composed: true}));
         });
+        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-close', done);
       });
 
       it('should not have label defined by default', () => {
@@ -262,6 +275,8 @@
 
       it('should show clear icon', done => {
         datepicker.value = '2000-02-01';
+
+        const overlayContent = getOverlayContent();
         overlayContent.dispatchEvent(new CustomEvent('date-tap', {bubbles: true}));
 
         open(datepicker, () => {
@@ -275,11 +290,12 @@
       });
 
       it('should open by tapping the calendar icon', done => {
-        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
         tap(toggleButton);
+        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
 
       it('should scroll to a date on open', done => {
+        const overlayContent = getOverlayContent();
         // We must scroll to a date on every open because at least IE11 seems to reset
         // scrollTop while the dropdown is closed. This will result in all kind of problems.
         var spy = sinon.spy(overlayContent, 'scrollToDate');
@@ -376,7 +392,7 @@
         if (!ios) { // https://github.com/vaadin/vaadin-date-picker/issues/330
           it('should not realign on year/month scroll', done => {
             var spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
-            overlayContent.$.yearScroller.$.scroller.scrollTop += 100;
+            getOverlayContent().$.yearScroller.$.scroller.scrollTop += 100;
             setTimeout(() => {
               expect(spy.called).to.be.false;
               done();
@@ -464,6 +480,7 @@
 
       });
       describe('i18n', () => {
+        let overlayContent;
         beforeEach(done => {
           datepicker.set('i18n.weekdays', 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'));
           datepicker.set('i18n.weekdaysShort', 'su_ma_ti_ke_to_pe_la'.split('_'));
@@ -478,6 +495,7 @@
           datepicker.set('i18n.today', 'Tänään');
           datepicker.set('i18n.cancel', 'Peruuta');
 
+          overlayContent = getOverlayContent();
           overlayContent.$.monthScroller.bufferSize = 1;
 
           open(datepicker,
@@ -522,7 +540,7 @@
 
         it('dropdown should not open', () => {
           datepicker.open();
-          expect(datepicker.$.overlay.opened).not.to.be.ok;
+          expect(datepicker.$.overlay).not.to.be.ok;
         });
 
         it('calendar icon should not be hidden', () => {
@@ -542,7 +560,7 @@
 
         it('dropdown should not open', () => {
           datepicker.open();
-          expect(datepicker.$.overlay.opened).not.to.be.ok;
+          expect(datepicker.$.overlay).not.to.be.ok;
         });
 
         it('calendar icon should not be hidden', () => {
@@ -596,7 +614,7 @@
           });
 
           datepicker.open();
-          overlayContent.selectedDate = new Date('2017-01-01'); // invalid
+          getOverlayContent().selectedDate = new Date('2017-01-01'); // invalid
         });
 
         it('should scroll to min date when today is not allowed', done => {
@@ -604,18 +622,23 @@
           datepicker.min = '2100-01-01';
           var minDate = new Date(2100, 0, 1);
 
+          datepicker.open();
+          const overlayContent = getOverlayContent();
+
           var spy = sinon.spy(overlayContent, 'scrollToDate');
           datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
             expect(spy.firstCall.args[0]).to.eql(minDate);
             done();
           });
-          datepicker.open();
         });
 
         it('should scroll to max date when today is not allowed', done => {
           datepicker.min = null;
           datepicker.max = '2000-01-01';
           var maxDate = new Date(2000, 0, 1);
+
+          datepicker.open();
+          const overlayContent = getOverlayContent();
 
           var spy = sinon.spy(overlayContent, 'scrollToDate');
           datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
@@ -628,6 +651,9 @@
         it('should scroll to initial position even when not allowed', done => {
           datepicker.initialPosition = '2015-01-01';
           var initialPositionDate = new Date(2015, 0, 1);
+
+          datepicker.open();
+          const overlayContent = getOverlayContent();
 
           var spy = sinon.spy(overlayContent, 'scrollToDate');
           datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
@@ -671,7 +697,7 @@
 
         it('overlay should position correctly', () => {
           datepicker.open();
-          expect((overlayContent.getBoundingClientRect().right >= datepicker.getBoundingClientRect().right))
+          expect((getOverlayContent().getBoundingClientRect().right >= datepicker.getBoundingClientRect().right))
             .to.be.true;
         });
       });
@@ -687,6 +713,7 @@
       });
 
       it('should propagate theme attribute to overlay', () => {
+        datepicker.open();
         expect(datepicker.$.overlay.getAttribute('theme')).to.equal('foo');
       });
 
@@ -701,11 +728,11 @@
         let overlayContent;
 
         beforeEach(done => {
-          overlayContent = datepicker.$.overlay.content
-            .querySelector('#overlay-content');
-          overlayContent.$.yearScroller.bufferSize = 0;
-          overlayContent.$.monthScroller.bufferSize = 1;
           open(datepicker, () => {
+            overlayContent = datepicker.$.overlay.content
+              .querySelector('#overlay-content');
+            overlayContent.$.yearScroller.bufferSize = 0;
+            overlayContent.$.monthScroller.bufferSize = 1;
             overlayContent.$.yearScroller._finishInit();
             overlayContent.$.monthScroller._finishInit();
             done();
