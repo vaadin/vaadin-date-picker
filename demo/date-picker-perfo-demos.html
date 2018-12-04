@@ -1,0 +1,44 @@
+<dom-module id="date-picker-perfo-demos">
+  <template>
+    <style include="vaadin-component-demo-shared-styles">
+      :host {
+        display: block;
+      }
+    </style>
+
+    <h3>Date picker</h3>
+    <script>
+      window.addDatePicker = function() {
+        const picker = document.createElement('vaadin-date-picker');
+        // picker.hidden=true;
+        document.body.appendChild(picker);
+      };
+    </script>
+    <vaadin-demo-snippet id="date-picker-perfo-demos">
+      <template preserve-content>
+        <!-- <vaadin-date-picker label="Date" placeholder="Pick a date">
+        </vaadin-date-picker> -->
+        <button>add</button>
+        <input type="number" value="1">
+        <script>
+          window.addDemoReadyListener('#date-picker-perfo-demos', function(document) {
+            document.querySelector('button').addEventListener('click', e => {
+              const count = parseInt(document.querySelector('input').value);
+              [...Array(count).keys()].forEach(i => {
+                addDatePicker();
+              });
+            });
+          });
+        </script>
+      </template>
+    </vaadin-demo-snippet>
+  </template>
+  <script>
+    class DatePickerPerfoDemos extends DemoReadyEventEmitter(DatePickerDemo(Polymer.Element)) {
+      static get is() {
+        return 'date-picker-perfo-demos';
+      }
+    }
+    customElements.define(DatePickerPerfoDemos.is, DatePickerPerfoDemos);
+  </script>
+</dom-module>
