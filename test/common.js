@@ -85,6 +85,18 @@ function describeSkipIf(bool, title, callback) {
   }
 }
 
+// As a side-effect has to toggle the overlay once to initialize it
+function getOverlayContent(datepicker) {
+  if (!datepicker.$.overlay) {
+    datepicker.open();
+    datepicker.close();
+  }
+  const overlayContent = datepicker.$.overlay.content.querySelector('#overlay-content');
+  overlayContent.$.monthScroller.bufferSize = 0;
+  overlayContent.$.yearScroller.bufferSize = 0;
+  return overlayContent;
+}
+
 // IE11 throws errors when the fixture is removed from the DOM and the focus remains in the native control.
 // Also, FF and Chrome are unable to focus input/button when tests are run in the headless window manager used in Travis
 function monkeyPatchNativeFocus() {
