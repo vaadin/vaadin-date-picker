@@ -310,12 +310,14 @@ This program is available under Apache License Version 2.0, available at https:/
 
     ready() {
       super.ready();
+      this._boundOnScroll = this._onScroll.bind(this);
+      this._boundFocus = this._focus.bind(this);
+      this._boundUpdateAlignmentAndPosition = this._updateAlignmentAndPosition.bind(this);
       Polymer.Gestures.addListener(this, 'tap', this.open);
       this.addEventListener('touchend', this._preventDefault.bind(this));
       this.addEventListener('keydown', this._onKeydown.bind(this));
       this.addEventListener('input', this._onUserInput.bind(this));
       this.addEventListener('focus', e => this._noInput && e.target.blur());
-      this._boundUpdateAlignmentAndPosition = this._updateAlignmentAndPosition.bind(this);
     }
 
     _initOverlay() {
@@ -326,8 +328,6 @@ This program is available under Apache License Version 2.0, available at https:/
       this.$.overlay = this.shadowRoot.querySelector('#overlay');
       this.$.overlay.addEventListener('opened-changed', e => this.opened = e.detail.value);
 
-      this._boundOnScroll = this._onScroll.bind(this);
-      this._boundFocus = this._focus.bind(this);
       this._overlayContent.addEventListener('close', this._close.bind(this));
       this._overlayContent.addEventListener('focus-input', this._focusAndSelect.bind(this));
       this.$.overlay.addEventListener('vaadin-overlay-escape-press', this._boundFocus);
@@ -357,7 +357,6 @@ This program is available under Apache License Version 2.0, available at https:/
     open() {
       if (!this.disabled && !this.readonly) {
         this.opened = true;
-        // this.$.overlay.opened = true;
       }
     }
 

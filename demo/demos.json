@@ -2,16 +2,6 @@
   "name": "Vaadin Date Picker",
   "pages": [
   {
-    "name": "Perfo Test",
-    "url": "date-picker-perfo-demos",
-    "src": "date-picker-perfo-demos.html",
-    "meta": {
-      "title": "vaadin-date-picker Perfo Test",
-      "description": "",
-      "image": ""
-    }
-  },
-  {
     "name": "Basics",
     "url": "date-picker-basic-demos",
     "src": "date-picker-basic-demos.html",
