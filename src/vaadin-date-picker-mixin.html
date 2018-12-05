@@ -323,8 +323,8 @@ This program is available under Apache License Version 2.0, available at https:/
       template.if = true;
       template.render();
 
-      // this.$.overlay = this.shadowRoot.querySelector('#overlay');
-      this.$.overlay = document.body.querySelector('#overlay');
+      this.$.overlay = this.shadowRoot.querySelector('#overlay');
+      this.$.overlay.addEventListener('opened-changed', e => this.opened = e.detail.value);
 
       this._boundOnScroll = this._onScroll.bind(this);
       this._boundFocus = this._focus.bind(this);
@@ -442,7 +442,7 @@ This program is available under Apache License Version 2.0, available at https:/
       if (!this.$.overlay) {
         this._initOverlay();
       }
-
+      this.$.overlay.opened = opened;
       this._updateAlignmentAndPosition();
     }
 
