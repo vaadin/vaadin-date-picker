@@ -10,10 +10,6 @@
 
 # &lt;vaadin-date-picker&gt;
 
-[Live Demo ↗](https://vaadin.com/components/vaadin-date-picker/html-examples)
-|
-[API documentation ↗](https://vaadin.com/components/vaadin-date-picker/html-api)
-
 [&lt;vaadin-date-picker&gt;](https://vaadin.com/components/vaadin-date-picker) is a Web Component providing a date selection field which includes a scrollable month calendar view, part of the [Vaadin components](https://vaadin.com/components).
 
 <!--
@@ -33,6 +29,11 @@
 ```
 
 [<img src="https://raw.githubusercontent.com/vaadin/vaadin-date-picker/master/screenshot.png" width="439" alt="Screenshot of vaadin-date-picker">](https://vaadin.com/components/vaadin-date-picker)
+
+## Live demo and API Documentation
+[Live Demo ↗](https://vaadin.com/components/vaadin-date-picker/html-examples)
+|
+[API documentation ↗](https://vaadin.com/components/vaadin-date-picker/html-api)
 
 ## Installation
 
