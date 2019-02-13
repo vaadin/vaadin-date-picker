@@ -47,9 +47,10 @@
     <p>Use two date pickers to create a date range selector.</p>
     <vaadin-demo-snippet id="date-picker-basic-demos-date-range" when-defined="vaadin-date-picker">
       <template preserve-content>
-        <vaadin-date-picker id="start" label="Start"></vaadin-date-picker>
-        <vaadin-date-picker id="end" label="End"></vaadin-date-picker>
-
+        <vaadin-custom-field label="Date range">
+          <vaadin-date-picker id="start"></vaadin-date-picker>
+          <vaadin-date-picker id="end"></vaadin-date-picker>
+        </vaadin-custom-field>
         <script>
           window.addDemoReadyListener('#date-picker-basic-demos-date-range', function(document) {
             var start = document.querySelector('#start');
