@@ -294,7 +294,9 @@ This program is available under Apache License Version 2.0, available at https:/
           value: true
         },
 
-        _focusOverlayOnOpen: Boolean
+        _focusOverlayOnOpen: Boolean,
+
+        _overlayInitialized: Boolean
       };
     }
 
@@ -322,6 +324,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     _initOverlay() {
       this.$.overlay.removeAttribute('disable-upgrade');
+      this._overlayInitialized = true;
 
       this.$.overlay.addEventListener('opened-changed', e => this.opened = e.detail.value);
 
@@ -341,7 +344,7 @@ This program is available under Apache License Version 2.0, available at https:/
     disconnectedCallback() {
       super.disconnectedCallback();
 
-      if (!this.$.overlay.hasAttribute('disable-upgrade')) {
+      if (this._overlayInitialized) {
         this.$.overlay.removeEventListener('vaadin-overlay-escape-press', this._boundFocus);
       }
 
@@ -369,7 +372,7 @@ This program is available under Apache License Version 2.0, available at https:/
      * Closes the dropdown.
      */
     close() {
-      if (!this.$.overlay.hasAttribute('disable-upgrade')) {
+      if (this._overlayInitialized) {
         this.$.overlay.close();
       }
     }
@@ -432,10 +435,10 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _openedChanged(opened) {
-      if (opened && this.$.overlay.hasAttribute('disable-upgrade')) {
+      if (opened && !this._overlayInitialized) {
         this._initOverlay();
       }
-      if (!this.$.overlay.hasAttribute('disable-upgrade')) {
+      if (this._overlayInitialized) {
         this.$.overlay.opened = opened;
       }
       if (opened) {
@@ -512,7 +515,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _updateAlignmentAndPosition() {
-      if (this.$.overlay.hasAttribute('disable-upgrade')) {
+      if (!this._overlayInitialized) {
         return;
       }
       if (!this._fullscreen) {
@@ -551,7 +554,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _fullscreenChanged() {
-      if (!this.$.overlay.hasAttribute('disable-upgrade') && this.$.overlay.opened) {
+      if (this._overlayInitialized && this.$.overlay.opened) {
         this._updateAlignmentAndPosition();
       }
     }
@@ -707,7 +710,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     _focus() {
       if (this._noInput) {
-        !this.$.overlay.hasAttribute('disable-upgrade') && this._overlayContent.focus();
+        this._overlayInitialized && this._overlayContent.focus();
       } else {
         this._inputElement.focus();
       }
