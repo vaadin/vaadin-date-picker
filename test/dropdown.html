@@ -122,12 +122,11 @@
     });
 
     describe('Dropdown-wrapped', () => {
-      var datepicker, clearButton, toggleButton;
+      var datepicker, toggleButton;
 
       beforeEach(() => {
         datepicker = fixture('datepicker-wrapped').$.datepicker;
         toggleButton = datepicker.shadowRoot.querySelector('[part="toggle-button"]');
-        clearButton = datepicker.shadowRoot.querySelector('[part="clear-button"]');
       });
 
       afterEach(done => {
@@ -157,24 +156,6 @@
         datepicker.opened = false;
         expect(datepicker.focusElement.hasAttribute('focus-ring')).to.be.false;
       });
-
-      it('should not close on clear-button down', () => {
-        datepicker.open();
-        datepicker.value = '2001-01-01';
-
-        click(clearButton);
-
-        expect(datepicker.$.overlay.opened).to.be.true;
-      });
-
-      it('should not open on clear-button down if was not opened initially', () => {
-        datepicker.value = '2001-01-01';
-
-        click(clearButton);
-
-        expect(datepicker.$.overlay.hasAttribute('disable-upgrade')).to.be.true;
-      });
-
     });
   </script>
 
