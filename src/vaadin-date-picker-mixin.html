@@ -156,9 +156,9 @@ This program is available under Apache License Version 2.0, available at https:/
               // A function to format given `Object` as
               // date string. Object is in the format `{ day: ..., month: ..., year: ... }`
               // Note: The argument month is 0-based. This means that January = 0 and December = 11.
-              formatDate: d => {
+              formatDate: (d, hideFullYear) => {
                 // returns a string representation of the given
-                // object in 'MM/DD/YYYY' -format
+                // object in 'MM/DD/YYYY' or 'MM/DD/YY' -format
               },
 
               // A function to parse the given text to an `Object` in the format `{ day: ..., month: ..., year: ... }`.
@@ -196,8 +196,9 @@ This program is available under Apache License Version 2.0, available at https:/
               clear: 'Clear',
               today: 'Today',
               cancel: 'Cancel',
-              formatDate: d => {
-                const yearStr = String(d.year).replace(/\d+/, y => '0000'.substr(y.length) + y);
+              formatDate: (d, hideFullYear) => {
+                const yearStr = String(d.year).replace(/\d+/, y => '0000'.substr(y.length) + y).substr(hideFullYear ? 2 : 0);
+
                 return [d.month + 1, d.day, yearStr].join('/');
               },
               parseDate: text => {
@@ -273,6 +274,13 @@ This program is available under Apache License Version 2.0, available at https:/
         _maxDate: {
           type: Date,
           value: ''
+        },
+
+        /**
+         * Whether to show the year in 2-digit format.
+         */
+        hideFullYear: {
+          type: Boolean,
         },
 
         _noInput: {
@@ -468,7 +476,7 @@ This program is available under Apache License Version 2.0, available at https:/
       if (this.__userInputOccurred) {
         this.__dispatchChange = true;
       }
-      const inputValue = selectedDate && formatDate(Vaadin.DatePickerHelper._extractDateParts(selectedDate));
+      const inputValue = selectedDate && formatDate(Vaadin.DatePickerHelper._extractDateParts(selectedDate), this.hideFullYear);
       const value = this._formatISO(selectedDate);
       if (value !== this.value) {
         this.validate(inputValue);
@@ -486,7 +494,7 @@ This program is available under Apache License Version 2.0, available at https:/
       }
       this.__userInputOccurred = true;
       if (!this._ignoreFocusedDateChange && !this._noInput) {
-        this._inputValue = focusedDate ? formatDate(Vaadin.DatePickerHelper._extractDateParts(focusedDate)) : '';
+        this._inputValue = focusedDate ? formatDate(Vaadin.DatePickerHelper._extractDateParts(focusedDate), this.hideFullYear) : '';
       }
     }
 
@@ -706,7 +714,9 @@ This program is available under Apache License Version 2.0, available at https:/
      */
     checkValidity(value) {
       var inputValid = !value ||
-        (this._selectedDate && value === this.i18n.formatDate(Vaadin.DatePickerHelper._extractDateParts(this._selectedDate)));
+        (this._selectedDate && value === this.i18n.formatDate(
+          Vaadin.DatePickerHelper._extractDateParts(this._selectedDate), this.hideFullYear
+        ));
       var minMaxValid = !this._selectedDate ||
         Vaadin.DatePickerHelper._dateAllowed(this._selectedDate, this._minDate, this._maxDate);
 
