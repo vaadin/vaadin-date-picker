@@ -27,43 +27,45 @@
     <h3>Min and max date validation</h3>
     <vaadin-demo-snippet>
       <template preserve-content>
-        <vaadin-date-picker label="Label" min="2019-11-10" max="2019-11-11" initial-position="2020-11-11"></vaadin-date-picker>
+        <vaadin-date-picker label="Label" min="2019-11-10" max="2019-11-11" initial-position="2019-11-11"></vaadin-date-picker>
       </template>
     </vaadin-demo-snippet>
 
     <h3>Custom validator</h3>
-    <p>Extend <code>Vaadin.DatePickerElement</code> to create your own custom element,
-      then override the <code>checkValidity(value)</code> method to validate the input.</p>
-      <vaadin-demo-snippet id="date-picker-custom-validator" ignore-ie when-defined="vaadin-date-picker">
-        <template preserve-content>
-          <vaadin-date-picker-current-year label="Select a date working day"></vaadin-date-picker-current-year>
+    <p>
+      Extend <code>Vaadin.DatePickerElement</code> to create your own custom element,
+      then override the <code>checkValidity(value)</code> method to validate the input.
+    </p>
+    <vaadin-demo-snippet id="date-picker-custom-validator" ignore-ie when-defined="vaadin-date-picker">
+      <template preserve-content>
+        <vaadin-date-picker-current-year label="Select a date working day"></vaadin-date-picker-current-year>
 
-          <script>
-            window.addDemoReadyListener('#date-picker-custom-validator', function(document) {
-              class DatePickerCurrentYearElement extends Vaadin.DatePickerElement {
-                checkValidity(value) {
+        <script>
+          window.addDemoReadyListener('#date-picker-custom-validator', function(document) {
+            class DatePickerWorkingDaysElement extends Vaadin.DatePickerElement {
+              checkValidity(value) {
 
-                  if (new Date(value).getDay() == 0 || new Date(value).getDay() == 6) {
-                    return false;
-                  }
-                  return true;
+                if (new Date(value).getDay() == 0 || new Date(value).getDay() == 6) {
+                  return false;
                 }
+                return true;
               }
-              if (!customElements.get('vaadin-date-picker-current-year')) {
-                customElements.define('vaadin-date-picker-current-year', DatePickerCurrentYearElement);
-              }
-            });
-          </script>
-        </template>
-      </vaadin-demo-snippet>
+            }
+            if (!customElements.get('vaadin-date-picker-current-year')) {
+              customElements.define('vaadin-date-picker-current-year', DatePickerWorkingDaysElement);
+            }
+          });
+        </script>
+      </template>
+    </vaadin-demo-snippet>
 
-    </template>
-    <script>
-      class DatePickerValidationDemos extends DemoReadyEventEmitter(DatePickerDemo(Polymer.Element)) {
-        static get is() {
-          return 'date-picker-validation-demos';
-        }
+  </template>
+  <script>
+    class DatePickerValidationDemos extends DemoReadyEventEmitter(DatePickerDemo(Polymer.Element)) {
+      static get is() {
+        return 'date-picker-validation-demos';
       }
-      customElements.define(DatePickerValidationDemos.is, DatePickerValidationDemos);
-    </script>
-  </dom-module>
+    }
+    customElements.define(DatePickerValidationDemos.is, DatePickerValidationDemos);
+  </script>
+</dom-module>
