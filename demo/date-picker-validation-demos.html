@@ -38,7 +38,7 @@
     </p>
     <vaadin-demo-snippet id="date-picker-custom-validator" ignore-ie when-defined="vaadin-date-picker">
       <template preserve-content>
-        <vaadin-date-picker-current-year label="Select a date working day"></vaadin-date-picker-current-year>
+        <vaadin-date-picker-working-days label="Select a date working day"></vaadin-date-picker-working-days>
 
         <script>
           window.addDemoReadyListener('#date-picker-custom-validator', function(document) {
@@ -51,8 +51,8 @@
                 return true;
               }
             }
-            if (!customElements.get('vaadin-date-picker-current-year')) {
-              customElements.define('vaadin-date-picker-current-year', DatePickerWorkingDaysElement);
+            if (!customElements.get('vaadin-date-picker-working-days')) {
+              customElements.define('vaadin-date-picker-working-days', DatePickerWorkingDaysElement);
             }
           });
         </script>
