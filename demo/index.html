@@ -26,11 +26,22 @@
 <body>
   <vaadin-component-demo config-src="demos.json"></vaadin-component-demo>
 
-  <dom-module id="custom-overlay-font" theme-for="vaadin-date-picker-overlay-content">
+  <dom-module id="input-field-style" theme-for="vaadin-text-field">
     <template>
       <style>
-        :host([theme~="custom"]) {
-          font-family: monospace;
+        :host([theme~="custom-input-field-border"]) [part="input-field"] {
+          border: 1px solid black;
+          background-color: white;
+        }
+      </style>
+    </template>
+  </dom-module>
+
+  <dom-module id="date-picker-icon" theme-for="vaadin-date-picker">
+    <template>
+      <style>
+        :host([theme~="custom-icon"]) [part="toggle-button"]::before {
+          background-image: url(icon.svg);
         }
       </style>
     </template>
@@ -40,8 +51,8 @@
     <template>
       <style>
         :host([theme~="custom-overlay-style"]) [part="overlay"] {
-          border: 0.5em solid black;
-          background-color: white;
+          border: 1px solid black;
+          background-color: rgb(171, 172, 138);
         }
       </style>
     </template>
