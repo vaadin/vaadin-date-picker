@@ -83,6 +83,11 @@ This program is available under Apache License Version 2.0, available at https:/
         },
 
         /**
+         * Set true to prevent the overlay from opening automatically.
+         */
+        autoOpenDisabled: Boolean,
+
+        /**
          * Set true to display ISO-8601 week numbers in the calendar. Notice that
          * displaying week numbers is only supported when `i18n.firstDayOfWeek`
          * is 1 (Monday).
@@ -328,7 +333,7 @@ This program is available under Apache License Version 2.0, available at https:/
         // then the following composedPath check could be simplified down
         // to `if (!e.defaultPrevented)`.
         // https://github.com/vaadin/vaadin-text-field/issues/352
-        if (!isClearButton(e)) {
+        if (!isClearButton(e) && !this.autoOpenDisabled) {
           this.open();
         }
       });
@@ -853,7 +858,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _onUserInput(e) {
-      if (!this.opened && this._inputElement.value) {
+      if (!this.opened && this._inputElement.value && !this.autoOpenDisabled) {
         this.open();
       }
       this._userInputValueChanged();
