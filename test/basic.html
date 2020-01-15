@@ -148,6 +148,12 @@
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
 
+      it('should not open on input tap when autoOpenDisabled is true', () => {
+        datepicker.autoOpenDisabled = true;
+        tap(datepicker.$.input);
+        expect(datepicker.opened).not.to.be.true;
+      });
+
       it('should pass the placeholder attribute to the input tag', () => {
         var placeholder = 'Pick a date';
         datepicker.set('placeholder', placeholder);
@@ -236,6 +242,12 @@
       });
 
       it('should open by tapping the calendar icon', done => {
+        tap(toggleButton);
+        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
+      });
+
+      it('should open by tapping the calendar icon even if autoOpenDisabled is true', done => {
+        this.autoOpenDisabled = true;
         tap(toggleButton);
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });

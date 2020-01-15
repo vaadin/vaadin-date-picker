@@ -84,6 +84,12 @@
           expect(datepicker.opened).to.be.true;
         });
 
+        it('should not open overlay on input if autoOpenDisabled is true', () => {
+          datepicker.autoOpenDisabled = true;
+          inputChar('j');
+          expect(datepicker.opened).not.to.be.true;
+        });
+
         it('should not focus with unparseable date', () => {
           inputChar('j');
 
