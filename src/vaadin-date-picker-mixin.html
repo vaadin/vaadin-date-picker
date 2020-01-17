@@ -333,7 +333,7 @@ This program is available under Apache License Version 2.0, available at https:/
         // then the following composedPath check could be simplified down
         // to `if (!e.defaultPrevented)`.
         // https://github.com/vaadin/vaadin-text-field/issues/352
-        if (!isClearButton(e) && !this.autoOpenDisabled) {
+        if (!isClearButton(e) && (!this.autoOpenDisabled || this._noInput)) {
           this.open();
         }
       });

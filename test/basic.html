@@ -148,10 +148,14 @@
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
 
-      it('should not open on input tap when autoOpenDisabled is true', () => {
+      it('should not open on input tap when autoOpenDisabled is true and not on mobile', () => {
         datepicker.autoOpenDisabled = true;
         tap(datepicker.$.input);
-        expect(datepicker.opened).not.to.be.true;
+        if (!datepicker._noInput) {
+          expect(datepicker.opened).not.to.be.true;
+        } else {
+          expect(datepicker.opened).to.be.true;
+        }
       });
 
       it('should pass the placeholder attribute to the input tag', () => {
