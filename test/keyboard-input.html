@@ -90,6 +90,20 @@
           expect(datepicker.opened).not.to.be.true;
         });
 
+        it('should set datepicker value on blur if autoOpenDisabled is true', () => {
+          datepicker.autoOpenDisabled = true;
+          inputChar('1/1/2000');
+          datepicker.dispatchEvent(new Event('blur'));
+          expect(datepicker.value).to.equal('2000-01-01');
+        });
+
+        it('should not be invalid on blur if valid date is enetered and autoOpenDisabled is true', () => {
+          datepicker.autoOpenDisabled = true;
+          inputChar('1/1/2000');
+          datepicker.dispatchEvent(new Event('blur'));
+          expect(datepicker.invalid).not.to.be.true;
+        });
+
         it('should not focus with unparseable date', () => {
           inputChar('j');
 
