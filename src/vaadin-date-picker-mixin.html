@@ -413,7 +413,7 @@ This program is available under Apache License Version 2.0, available at https:/
      * Closes the dropdown.
      */
     close() {
-      if (this._overlayInitialized) {
+      if (this._overlayInitialized || this.autoOpenDisabled) {
         this.$.overlay.close();
       }
     }
@@ -868,7 +868,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     _userInputValueChanged(value) {
-      if (this.opened && this._inputValue) {
+      if ((this.opened || this.autoOpenDisabled) && this._inputValue) {
         const dateObject = this.i18n.parseDate && this.i18n.parseDate(this._inputValue);
         const parsedDate = dateObject &&
           this._parseDate(`${dateObject.year}-${dateObject.month + 1}-${dateObject.day}`);
