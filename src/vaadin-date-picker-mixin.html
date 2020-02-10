@@ -700,10 +700,10 @@ This program is available under Apache License Version 2.0, available at https:/
      * @return {boolean} True if the value is valid and sets the `invalid` flag appropriately
      */
     validate() {
-      // Note (Yuriy): Workaround `this.value` is used in order
+      // Note (Yuriy): Workaround `this._inputValue` is used in order
       // to avoid breaking change on custom `checkValidity`.
       // Can be removed with next major.
-      return !(this.invalid = !this.checkValidity(this.value));
+      return !(this.invalid = !this.checkValidity(this._inputValue));
     }
 
     /**
