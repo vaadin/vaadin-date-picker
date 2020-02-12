@@ -690,6 +690,8 @@ This program is available under Apache License Version 2.0, available at https:/
       if (this._nativeInput && this._nativeInput.selectionStart) {
         this._nativeInput.selectionStart = this._nativeInput.selectionEnd;
       }
+      // No need to revalidate the value after `_selectedDateChanged`
+      // Needed in case the value was not changed: open and close dropdown.
       !this.value && this.validate();
     }
 
