@@ -723,6 +723,14 @@
             expect(datepicker.invalid).not.to.be.true;
           });
 
+          it('should validate on blur only once', () => {
+            inputText('foo');
+            const spy = sinon.spy(datepicker, 'validate');
+            datepicker.dispatchEvent(new Event('blur'));
+            expect(spy).to.be.calledOnce;
+            expect(datepicker.invalid).to.be.true;
+          });
+
           it('should revert input value on esc when overlay not initialized', () => {
             inputText('1/1/2000');
             esc();
