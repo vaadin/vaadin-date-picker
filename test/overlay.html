@@ -378,14 +378,11 @@
 
         datePicker.addEventListener('opened-changed', () => {
           Polymer.RenderStatus.afterNextRender(datePicker, () => {
-    
-            const spy = sinon.spy(datePickerOverlay, 'bringToFront');
             datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
 
             requestAnimationFrame(() => {
               const elementFromPoint = document.elementFromPoint(datePickerPosition.right, datePickerPosition.bottom);
               expect(datePickerOverlay).to.equal(elementFromPoint);
-              expect(spy).to.be.calledOnce;
               done();
             });
           });
