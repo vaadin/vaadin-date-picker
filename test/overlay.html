@@ -370,14 +370,14 @@
         const event = new CustomEvent('touchstart', {bubbles: true, cancelable: true});
     
         const nodeRect = node.getBoundingClientRect();
-        const clientX = nodeRect.left + nodeRect.width / 2;
-        const clientY = nodeRect.top + nodeRect.height / 2;
+        const clientX = nodeRect.left;
+        const clientY = nodeRect.top;
 
         event.touches = event.changedTouches = event.targetTouches = [{clientX, clientY}];
         node.dispatchEvent(event);
       }
       function getElementFromPoint(nodePostion) {
-        return document.elementFromPoint(nodePostion.left + nodePostion.width / 2, nodePostion.top);
+        return document.elementFromPoint(nodePostion.left, nodePostion.top);
       }
 
       it('should not end up behind the dialog overlay on mousedown', (done) => {

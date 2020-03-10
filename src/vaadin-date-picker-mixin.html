@@ -362,7 +362,7 @@ This program is available under Apache License Version 2.0, available at https:/
       const bringToFrontListener = (e) => {
         if (typeof this.$.overlay.bringToFront === 'function') {
           requestAnimationFrame(() => {
-            this.$.overlay.bringToFront();
+            this.$.overlay.bringToFront && this.$.overlay.bringToFront();
           });
         }
       };
