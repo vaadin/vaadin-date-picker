@@ -383,17 +383,15 @@
         const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
         const datePickerOverlay = datePicker.$.overlay;
     
-        datePicker.addEventListener('opened-changed', () => {
-          Polymer.RenderStatus.afterNextRender(datePicker, () => {
-            datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
-            requestAnimationFrame(() => {
-              expect(datePickerOverlay._last).to.be.true;
-              done();
-            });
+        datePicker.opened = true;
+    
+        Polymer.RenderStatus.afterNextRender(datePicker, () => {
+          datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
+          requestAnimationFrame(() => {
+            expect(datePickerOverlay._last).to.be.true;
+            done();
           });
         });
-
-        datePicker.opened = true;
       });
 
       it('should not end up behind the dialog overlay on touchstart', (done) => {
@@ -401,18 +399,16 @@
         const dialogOverlay = dialog.$.overlay;
         const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
         const datePickerOverlay = datePicker.$.overlay;
-    
-        datePicker.addEventListener('opened-changed', () => {
-          Polymer.RenderStatus.afterNextRender(datePicker, () => {
-            touchstart(datePicker);
-            requestAnimationFrame(() => {
-              expect(datePickerOverlay._last).to.be.true;
-              done();
-            });
-          });
-        });
 
         datePicker.opened = true;
+
+        Polymer.RenderStatus.afterNextRender(datePicker, () => {
+          touchstart(datePicker);
+          requestAnimationFrame(() => {
+            expect(datePickerOverlay._last).to.be.true;
+            done();
+          });
+        });
       });
     });
   </script>
