@@ -23,14 +23,13 @@
     </template>
   </test-fixture>
 
-  <test-fixture id="front-most">
+  <test-fixture id="in-modeless-dialog">
     <template>
       <vaadin-dialog modeless>
         <template>
           <vaadin-date-picker></vaadin-date-picker>
         </template>
       </vaadin-dialog>
-      
     </template>
   </test-fixture>
 
@@ -364,29 +363,63 @@
     describe('frontmost', () => {
       var dialog;
       beforeEach(() => {
-        dialog = fixture('front-most');
+        dialog = fixture('in-modeless-dialog');
       });
 
-      it('should bring to frontmost on mousedown', (done) => {
+      function touchstart(node) {
+        const event = new CustomEvent('touchstart', {bubbles: true, cancelable: true});
+    
+        const nodeRect = node.getBoundingClientRect();
+        const clientX = nodeRect.left + nodeRect.width / 2;
+        const clientY = nodeRect.top + nodeRect.height / 2;
+
+        event.touches = event.changedTouches = event.targetTouches = [{clientX, clientY}];
+        node.dispatchEvent(event);
+      }
+      function getElementFromPoint(nodePostion) {
+        return document.elementFromPoint(nodePostion.left + nodePostion.width / 2, nodePostion.top);
+      }
+
+      it('should not end up behind the dialog overlay on mousedown', (done) => {
         dialog.opened = true;
         const dialogOverlay = dialog.$.overlay;
         const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
-    
-        const datePickerPosition = datePicker.getBoundingClientRect();
         const datePickerOverlay = datePicker.$.overlay;
-
+    
         datePicker.addEventListener('opened-changed', () => {
           Polymer.RenderStatus.afterNextRender(datePicker, () => {
             datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
+            const datePickerOverlayPosition = datePickerOverlay.$.overlay.getBoundingClientRect();
             requestAnimationFrame(() => {
-              const elementFromPoint = document.elementFromPoint(datePickerPosition.right, datePickerPosition.bottom);
+              const elementFromPoint = getElementFromPoint(datePickerOverlayPosition);
               expect(datePickerOverlay).to.equal(elementFromPoint);
               done();
             });
           });
         });
 
-        MockInteractions.tap(datePicker);
+        datePicker.opened = true;
+      });
+
+      it('should not end up behind the dialog overlay on touchstart', (done) => {
+        dialog.opened = true;
+        const dialogOverlay = dialog.$.overlay;
+        const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
+        const datePickerOverlay = datePicker.$.overlay;
+    
+        datePicker.addEventListener('opened-changed', () => {
+          Polymer.RenderStatus.afterNextRender(datePicker, () => {
+            touchstart(datePicker);
+            requestAnimationFrame(() => {
+              const datePickerOverlayPosition = datePickerOverlay.$.overlay.getBoundingClientRect();
+              const elementFromPoint = getElementFromPoint(datePickerOverlayPosition);
+              expect(datePickerOverlay).to.equal(elementFromPoint);
+              done();
+            });
+          });
+        });
+
+        datePicker.opened = true;
       });
     });
   </script>
