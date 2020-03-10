@@ -376,9 +376,6 @@
         event.touches = event.changedTouches = event.targetTouches = [{clientX, clientY}];
         node.dispatchEvent(event);
       }
-      function getElementFromPoint(nodePostion) {
-        return document.elementFromPoint(nodePostion.left, nodePostion.top);
-      }
 
       it('should not end up behind the dialog overlay on mousedown', (done) => {
         dialog.opened = true;
@@ -389,10 +386,8 @@
         datePicker.addEventListener('opened-changed', () => {
           Polymer.RenderStatus.afterNextRender(datePicker, () => {
             datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
-            const datePickerOverlayPosition = datePickerOverlay.$.overlay.getBoundingClientRect();
             requestAnimationFrame(() => {
-              const elementFromPoint = getElementFromPoint(datePickerOverlayPosition);
-              expect(datePickerOverlay).to.equal(elementFromPoint);
+              expect(datePickerOverlay._last).to.be.true;
               done();
             });
           });
@@ -411,9 +406,7 @@
           Polymer.RenderStatus.afterNextRender(datePicker, () => {
             touchstart(datePicker);
             requestAnimationFrame(() => {
-              const datePickerOverlayPosition = datePickerOverlay.$.overlay.getBoundingClientRect();
-              const elementFromPoint = getElementFromPoint(datePickerOverlayPosition);
-              expect(datePickerOverlay).to.equal(elementFromPoint);
+              expect(datePickerOverlay._last).to.be.true;
               done();
             });
           });
