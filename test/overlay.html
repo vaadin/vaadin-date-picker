@@ -385,12 +385,10 @@
     
         datePicker.opened = true;
     
-        Polymer.RenderStatus.afterNextRender(datePicker, () => {
-          datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
-          requestAnimationFrame(() => {
-            expect(datePickerOverlay._last).to.be.true;
-            done();
-          });
+        datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
+        requestAnimationFrame(() => {
+          expect(datePickerOverlay._last).to.be.true;
+          done();
         });
       });
 
@@ -402,12 +400,10 @@
 
         datePicker.opened = true;
 
-        Polymer.RenderStatus.afterNextRender(datePicker, () => {
-          touchstart(datePicker);
-          requestAnimationFrame(() => {
-            expect(datePickerOverlay._last).to.be.true;
-            done();
-          });
+        touchstart(datePicker);
+        requestAnimationFrame(() => {
+          expect(datePickerOverlay._last).to.be.true;
+          done();
         });
       });
     });
