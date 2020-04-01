@@ -347,7 +347,16 @@ This program is available under Apache License Version 2.0, available at https:/
       this.addEventListener('input', this._onUserInput.bind(this));
       this.addEventListener('focus', e => this._noInput && e.target.blur());
       this.addEventListener('blur', e => {
-        this.autoOpenDisabled ? this._selectAndValidateInput() : !this.opened && this.validate();
+        if (!this.opened) {
+          if (this.autoOpenDisabled) {
+            const parsedDate = this._getParsedDate();
+            if (this._isValidDate(parsedDate)) {
+              this._selectedDate = parsedDate;
+            }
+          }
+
+          this.validate();
+        }
       });
     }
 
@@ -373,7 +382,7 @@ This program is available under Apache License Version 2.0, available at https:/
           });
         }
       };
-  
+
       this.addEventListener('mousedown', bringToFrontListener);
       this.addEventListener('touchstart', bringToFrontListener);
     }
@@ -493,9 +502,8 @@ This program is available under Apache License Version 2.0, available at https:/
       if (this.__userInputOccurred) {
         this.__dispatchChange = true;
       }
-      const inputValue = selectedDate && formatDate(Vaadin.DatePickerHelper._extractDateParts(selectedDate));
       const value = this._formatISO(selectedDate);
-      this._inputValue = selectedDate ? inputValue : '';
+      this._applyInputValue(selectedDate);
       if (value !== this.value) {
         this.validate();
         this.value = value;
@@ -513,7 +521,7 @@ This program is available under Apache License Version 2.0, available at https:/
       }
       this.__userInputOccurred = true;
       if (!this._ignoreFocusedDateChange && !this._noInput) {
-        this._inputValue = focusedDate ? formatDate(Vaadin.DatePickerHelper._extractDateParts(focusedDate)) : '';
+        this._applyInputValue(focusedDate);
       }
     }
 
@@ -734,7 +742,7 @@ This program is available under Apache License Version 2.0, available at https:/
      */
     checkValidity() {
       const inputValid = !this._inputValue ||
-        (this._selectedDate && this._inputValue === this.i18n.formatDate(Vaadin.DatePickerHelper._extractDateParts(this._selectedDate)));
+        (this._selectedDate && this._inputValue === this._getFormattedDate(this.i18n.formatDate, this._selectedDate));
       const minMaxValid = !this._selectedDate ||
         Vaadin.DatePickerHelper._dateAllowed(this._selectedDate, this._minDate, this._maxDate);
 
@@ -771,6 +779,14 @@ This program is available under Apache License Version 2.0, available at https:/
     _focusAndSelect() {
       this._focus();
       this._setSelectionRange(0, this._inputValue.length);
+    }
+
+    _applyInputValue(date) {
+      this._inputValue = date ? this._getFormattedDate(this.i18n.formatDate, date) : '';
+    }
+
+    _getFormattedDate(formatDate, date) {
+      return formatDate(Vaadin.DatePickerHelper._extractDateParts(date));
     }
 
     _setSelectionRange(a, b) {
@@ -810,6 +826,8 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
+      const isAutoOpenDisabled = this.autoOpenDisabled && !this.opened;
+
       switch (this._eventKey(e)) {
         case 'down':
         case 'up':
@@ -826,11 +844,15 @@ This program is available under Apache License Version 2.0, available at https:/
 
           break;
         case 'enter': {
-          if (this.autoOpenDisabled) {
-            this._selectAndValidateInput();
+          const parsedDate = this._getParsedDate();
+          const isValidDate = this._isValidDate(parsedDate);
+          if (isAutoOpenDisabled) {
+            if (isValidDate) {
+              this._selectedDate = parsedDate;
+            }
+            this.validate();
           } else {
-            const parsedDate = this._getParsedDate();
-            if (this._overlayInitialized && this._overlayContent.focusedDate && this._isValidDate(parsedDate)) {
+            if (this._overlayInitialized && this._overlayContent.focusedDate && isValidDate) {
               this._selectedDate = this._overlayContent.focusedDate;
             }
             this.close();
@@ -838,8 +860,12 @@ This program is available under Apache License Version 2.0, available at https:/
           break;
         }
         case 'esc':
-          if (this.autoOpenDisabled) {
-            this._inputElement.value = this.value;
+          if (isAutoOpenDisabled) {
+            // Do not restore selected date if Esc was pressed after clearing input field
+            if (this._inputElement.value === '') {
+              this._selectedDate = null;
+            }
+            this._applyInputValue(this._selectedDate);
           } else {
             this._focusedDate = this._selectedDate;
             this._close();
@@ -860,14 +886,6 @@ This program is available under Apache License Version 2.0, available at https:/
           }
           break;
       }
-    }
-
-    _selectAndValidateInput() {
-      const parsedDate = this._getParsedDate();
-      if (this._isValidDate(parsedDate)) {
-        this._selectedDate = parsedDate;
-      }
-      this.validate();
     }
 
     _getParsedDate(inputValue = this._inputValue) {

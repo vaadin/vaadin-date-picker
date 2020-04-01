@@ -743,7 +743,15 @@
             datepicker.close();
             inputText('1/1/2000');
             esc();
-            expect(datepicker._inputValue).to.equal('');
+            expect(datepicker.value).to.equal('');
+          });
+
+          it('should not revert input value on esc after selected value is removed', () => {
+            datepicker.open();
+            inputText('1/1/2000');
+            datepicker.close();
+            target.value = '';
+            esc();
             expect(datepicker.value).to.equal('');
           });
 
