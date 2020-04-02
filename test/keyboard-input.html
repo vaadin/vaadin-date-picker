@@ -776,6 +776,202 @@
             expect(datepicker.invalid).to.be.true;
           });
         });
+
+        describe('change and validate sequence', () => {
+          let validateSpy;
+          let changeSpy;
+
+          beforeEach(() => {
+            validateSpy = sinon.spy(datepicker, 'validate');
+            changeSpy = sinon.spy();
+            datepicker.addEventListener('change', changeSpy);
+          });
+
+          describe('overlay is open and value selected', () => {
+            beforeEach(done => {
+              open(datepicker, () => {
+                inputText('01/02/20');
+                done();
+              });
+            });
+
+            it('should validate without change on Esc', done => {
+              datepicker.$.overlay.addEventListener('vaadin-overlay-close', () => {
+                // wait for overlay to finish closing
+                Polymer.RenderStatus.afterNextRender(datepicker, () => {
+                  expect(validateSpy).to.be.calledOnce;
+                  expect(changeSpy).to.not.be.called;
+                  done();
+                });
+              });
+
+              esc();
+            });
+
+            it('should change after validate on overlay close', done => {
+              datepicker.$.overlay.addEventListener('vaadin-overlay-close', () => {
+                // wait for overlay to finish closing
+                Polymer.RenderStatus.afterNextRender(datepicker, () => {
+                  expect(validateSpy).to.be.calledOnce;
+                  expect(changeSpy).to.be.calledOnce;
+                  expect(changeSpy).to.be.calledAfter(validateSpy);
+                  done();
+                });
+              });
+
+              datepicker.close();
+            });
+
+            it('should change after validate on Enter', done => {
+              datepicker.$.overlay.addEventListener('vaadin-overlay-close', () => {
+                // wait for overlay to finish closing
+                Polymer.RenderStatus.afterNextRender(datepicker, () => {
+                  expect(validateSpy).to.be.calledOnce;
+                  expect(changeSpy).to.be.calledOnce;
+                  expect(changeSpy).to.be.calledAfter(validateSpy);
+                  done();
+                });
+              });
+
+              enter();
+            });
+          });
+
+          describe('overlay is closed, value is set', () => {
+            beforeEach(done => {
+              open(datepicker, () => {
+                inputText('01/02/20');
+                datepicker.$.overlay.addEventListener('vaadin-overlay-close', () => {
+                  // wait for overlay to finish closing
+                  Polymer.RenderStatus.afterNextRender(datepicker, () => {
+                    datepicker._focus();
+                    done();
+                  });
+                });
+
+                datepicker.close();
+                validateSpy.reset();
+                changeSpy.reset();
+              });
+            });
+
+            it('should change after validate on clear button click', () => {
+              datepicker.clearButtonVisible = true;
+              click(target.shadowRoot.querySelector('[part="clear-button"]'));
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledAfter(validateSpy);
+            });
+
+            it('should change after validate on Esc with clear button', () => {
+              datepicker.clearButtonVisible = true;
+              esc();
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledAfter(validateSpy);
+            });
+
+            it('should neither change nor validate on Esc without clear button', () => {
+              esc();
+              expect(validateSpy).to.not.be.called;
+              expect(changeSpy).to.not.be.called;
+            });
+
+            it('should change after validate on Backspace & Enter', () => {
+              target.value = '';
+              target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+              enter();
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledAfter(validateSpy);
+            });
+
+            it('should change after validate on Backspace & Esc', () => {
+              target.value = '';
+              target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+              esc();
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledAfter(validateSpy);
+            });
+          });
+
+          describe('autoOpenDisabled true', () => {
+            beforeEach(() => {
+              datepicker.autoOpenDisabled = true;
+            });
+
+            it('should change after validate on Enter', () => {
+              inputText('01/02/20');
+              enter();
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledOnce;
+              expect(changeSpy).to.be.calledAfter(validateSpy);
+            });
+
+            it('should validate on Enter when value is the same', () => {
+              enter();
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.not.be.called;
+            });
+
+            it('should validate on Enter when invalid', () => {
+              inputText('foo');
+              enter();
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.not.be.called;
+            });
+
+            it('should neither change nor validate on Esc', () => {
+              inputText('01/02/20');
+              esc();
+              expect(validateSpy).to.not.be.called;
+              expect(changeSpy).to.not.be.called;
+            });
+
+            describe('value is set', () => {
+              beforeEach(() => {
+                inputText('01/02/20');
+                enter();
+                validateSpy.reset();
+                changeSpy.reset();
+                datepicker._focusAndSelect();
+              });
+
+              it('should change after validate on Esc with clear button', () => {
+                datepicker.clearButtonVisible = true;
+                esc();
+                expect(validateSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledAfter(validateSpy);
+              });
+
+              it('should neither change nor validate on Esc without clear button', () => {
+                esc();
+                expect(validateSpy).to.not.be.called;
+                expect(changeSpy).to.not.be.called;
+              });
+
+              it('should change after validate on Backspace & Enter', () => {
+                target.value = '';
+                target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+                enter();
+                expect(validateSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledAfter(validateSpy);
+              });
+
+              it('should change after validate on Backspace & Esc', () => {
+                target.value = '';
+                target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+                esc();
+                expect(validateSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledAfter(validateSpy);
+              });
+            });
+          });
+        });
       });
     }
   </script>

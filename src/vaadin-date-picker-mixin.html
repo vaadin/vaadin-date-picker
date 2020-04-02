@@ -355,7 +355,13 @@ This program is available under Apache License Version 2.0, available at https:/
             }
           }
 
-          this.validate();
+          if (this._inputElement.value === '' && this.__dispatchChange) {
+            this.validate();
+            this.value = '';
+            this.__dispatchChange = false;
+          } else {
+            this.validate();
+          }
         }
       });
     }
@@ -680,20 +686,7 @@ This program is available under Apache License Version 2.0, available at https:/
       return result;
     }
 
-    _onOverlayClosed() {
-      this._ignoreAnnounce = true;
-
-      window.removeEventListener('scroll', this._boundOnScroll, true);
-      this.removeEventListener('iron-resize', this._boundUpdateAlignmentAndPosition);
-
-      if (this._touchPrevented) {
-        this._touchPrevented.forEach(prevented =>
-          prevented.element.style.webkitOverflowScrolling = prevented.oldInlineValue);
-        this._touchPrevented = [];
-      }
-
-      this.updateStyles();
-
+    _selectParsedOrFocusedDate() {
       // Select the parsed input or focused date
       this._ignoreFocusedDateChange = true;
       if (this.i18n.parseDate) {
@@ -710,13 +703,32 @@ This program is available under Apache License Version 2.0, available at https:/
         this._selectedDate = this._focusedDate;
       }
       this._ignoreFocusedDateChange = false;
+    }
+
+    _onOverlayClosed() {
+      this._ignoreAnnounce = true;
+
+      window.removeEventListener('scroll', this._boundOnScroll, true);
+      this.removeEventListener('iron-resize', this._boundUpdateAlignmentAndPosition);
+
+      if (this._touchPrevented) {
+        this._touchPrevented.forEach(prevented =>
+          prevented.element.style.webkitOverflowScrolling = prevented.oldInlineValue);
+        this._touchPrevented = [];
+      }
+
+      this.updateStyles();
+
+      this._selectParsedOrFocusedDate();
 
       if (this._nativeInput && this._nativeInput.selectionStart) {
         this._nativeInput.selectionStart = this._nativeInput.selectionEnd;
       }
       // No need to revalidate the value after `_selectedDateChanged`
       // Needed in case the value was not changed: open and close dropdown.
-      !this.value && this.validate();
+      if (!this.value) {
+        this.validate();
+      }
     }
 
     /**
@@ -826,8 +838,6 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      const isAutoOpenDisabled = this.autoOpenDisabled && !this.opened;
-
       switch (this._eventKey(e)) {
         case 'down':
         case 'up':
@@ -846,21 +856,29 @@ This program is available under Apache License Version 2.0, available at https:/
         case 'enter': {
           const parsedDate = this._getParsedDate();
           const isValidDate = this._isValidDate(parsedDate);
-          if (isAutoOpenDisabled) {
-            if (isValidDate) {
-              this._selectedDate = parsedDate;
-            }
-            this.validate();
-          } else {
+          if (this.opened) {
             if (this._overlayInitialized && this._overlayContent.focusedDate && isValidDate) {
               this._selectedDate = this._overlayContent.focusedDate;
             }
             this.close();
+          } else {
+            if (!isValidDate && this._inputElement.value !== '') {
+              this.validate();
+            } else {
+              const oldValue = this.value;
+              this._selectParsedOrFocusedDate();
+              if (oldValue === this.value) {
+                this.validate();
+              }
+            }
           }
           break;
         }
         case 'esc':
-          if (isAutoOpenDisabled) {
+          if (this.opened) {
+            this._focusedDate = this._selectedDate;
+            this._close();
+          } else if (this.autoOpenDisabled) {
             // Do not restore selected date if Esc was pressed after clearing input field
             if (this._inputElement.value === '') {
               this._selectedDate = null;
@@ -868,7 +886,7 @@ This program is available under Apache License Version 2.0, available at https:/
             this._applyInputValue(this._selectedDate);
           } else {
             this._focusedDate = this._selectedDate;
-            this._close();
+            this._selectParsedOrFocusedDate();
           }
           break;
         case 'tab':
@@ -900,6 +918,13 @@ This program is available under Apache License Version 2.0, available at https:/
         this.open();
       }
       this._userInputValueChanged();
+
+      if (e.__fromClearButton) {
+        this.validate();
+        this.__dispatchChange = true;
+        this.value = '';
+        this.__dispatchChange = false;
+      }
     }
 
     _userInputValueChanged(value) {
