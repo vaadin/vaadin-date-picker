@@ -188,7 +188,7 @@
           });
 
           ['ltr', 'rtl'].forEach(direction => {
-            const suite = describe(`[dir="${direction}"]`, () => {
+            describe(`[dir="${direction}"]`, () => {
               const isRTL = direction === 'rtl';
               before(() => {
                 document.documentElement.setAttribute('dir', direction);
