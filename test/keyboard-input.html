@@ -922,6 +922,12 @@
               expect(changeSpy).to.not.be.called;
             });
 
+            it('should validate on blur', () => {
+              datepicker.dispatchEvent(new Event('blur'));
+              expect(validateSpy).to.be.calledOnce;
+              expect(changeSpy).to.not.be.called;
+            });
+
             it('should neither change nor validate on Esc', () => {
               inputText('01/02/20');
               esc();
@@ -965,6 +971,15 @@
                 target.value = '';
                 target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
                 esc();
+                expect(validateSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledOnce;
+                expect(changeSpy).to.be.calledAfter(validateSpy);
+              });
+
+              it('should change after validate on Backspace & blur', () => {
+                target.value = '';
+                target.dispatchEvent(new CustomEvent('change', {bubbles: true}));
+                datepicker.dispatchEvent(new Event('blur'));
                 expect(validateSpy).to.be.calledOnce;
                 expect(changeSpy).to.be.calledOnce;
                 expect(changeSpy).to.be.calledAfter(validateSpy);
