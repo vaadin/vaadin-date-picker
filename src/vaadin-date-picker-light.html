@@ -125,12 +125,17 @@ This program is available under Apache License Version 2.0, available at https:/
             /**
              * Name of the two-way data-bindable property representing the
              * value of the custom input field.
+             * @type {string}
              */
             attrForValue: {
               type: String,
               value: 'bind-value'
             },
 
+            /**
+             * @type {boolean}
+             * @protected
+             */
             _overlayInitialized: {
               type: Boolean,
               value: true
@@ -138,6 +143,10 @@ This program is available under Apache License Version 2.0, available at https:/
           };
         }
 
+        /**
+         * @return {HTMLElement}
+         * @protected
+         */
         _input() {
           // Using the same selector than in combo-box.
           // TODO: revisit this to decide the selector and document conveniently.
@@ -150,6 +159,7 @@ This program is available under Apache License Version 2.0, available at https:/
           }
         }
 
+        /** @return {string | undefined} */
         get _inputValue() {
           return this._inputElement && this._inputElement[Polymer.CaseMap.dashToCamelCase(this.attrForValue)];
         }
