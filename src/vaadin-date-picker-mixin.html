@@ -22,13 +22,17 @@ This program is available under Apache License Version 2.0, available at https:/
       return {
         /**
          * The current selected date.
-         * @private
+         * @type {Date | undefined}
+         * @protected
          */
         _selectedDate: {
           type: Date
         },
 
-        /** @private */
+        /**
+         * @type {Date | undefined}
+         * @protected
+         */
         _focusedDate: Date,
 
         /**
@@ -99,13 +103,19 @@ This program is available under Apache License Version 2.0, available at https:/
           type: Boolean
         },
 
-        /** @private */
+        /**
+         * @type {boolean}
+         * @protected
+         */
         _fullscreen: {
           value: false,
           observer: '_fullscreenChanged'
         },
 
-        /** @private */
+        /**
+         * @type {string}
+         * @protected
+         */
         _fullscreenMediaQuery: {
           value: '(max-width: 420px), (max-height: 420px)'
         },
@@ -273,8 +283,8 @@ This program is available under Apache License Version 2.0, available at https:/
 
         /**
          * The earliest date that can be selected. All earlier dates will be disabled.
-         * @type {string}
-         * @private
+         * @type {Date | string}
+         * @protected
          */
         _minDate: {
           type: Date,
@@ -284,7 +294,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
         /**
          * The latest date that can be selected. All later dates will be disabled.
-         * @private
+         * @type {Date | string}
          * @protected
          */
         _maxDate: {
@@ -662,7 +672,7 @@ This program is available under Apache License Version 2.0, available at https:/
       }
     }
 
-    /** @private */
+    /** @protected */
     _onOverlayOpened() {
       this._openedWithFocusRing = this.hasAttribute('focus-ring') || (this.focusElement && this.focusElement.hasAttribute('focus-ring'));
 
@@ -748,7 +758,7 @@ This program is available under Apache License Version 2.0, available at https:/
       this._ignoreFocusedDateChange = false;
     }
 
-    /** @private */
+    /** @protected */
     _onOverlayClosed() {
       this._ignoreAnnounce = true;
 
@@ -778,7 +788,7 @@ This program is available under Apache License Version 2.0, available at https:/
     /**
      * Returns true if `value` is valid, and sets the `invalid` flag appropriately.
      *
-     * @param {string} value Value to validate. Optional, defaults to user's input value.
+     * @param {string=} value Value to validate. Optional, defaults to user's input value.
      * @return {boolean} True if the value is valid and sets the `invalid` flag appropriately
      */
     validate() {
@@ -793,7 +803,7 @@ This program is available under Apache License Version 2.0, available at https:/
      *
      * Override the `checkValidity` method for custom validations.
      *
-     * @param {string} value Value to validate. Optional, defaults to the selected date.
+     * @param {string=} value Value to validate. Optional, defaults to the selected date.
      * @return {boolean} True if the value is valid
      */
     checkValidity() {
