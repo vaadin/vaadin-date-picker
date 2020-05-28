@@ -53,9 +53,11 @@ This program is available under Apache License Version 2.0, available at https:/
         clear-button-visible="[[clearButtonVisible]]"
         aria-label$="[[label]]"
         part="text-field"
+        helper-text="[[helperText]]"
         theme$="[[theme]]"
       >
       <slot name="prefix" slot="prefix"></slot>
+      <slot name="helper" slot="helper">[[helperText]]</slot>
       <div part="toggle-button" slot="suffix" on-tap="_toggle" role="button" aria-label$="[[i18n.calendar]]" aria-expanded$="[[_getAriaExpanded(opened)]]"></div>
     </vaadin-date-picker-text-field>
 
@@ -146,6 +148,8 @@ This program is available under Apache License Version 2.0, available at https:/
        * `opened` | Set when the date selector overlay is opened | :host
        * `readonly` | Set when the element is readonly | :host
        * `disabled` | Set when the element is disabled | :host
+       * `has-helper` | Set when the element has helper text | :host
+       * `has-error-message` | Set when the element has an error message | :host
        * `today` | Set on the date corresponding to the current day | date
        * `focused` | Set on the focused date | date
        * `disabled` | Set on the date out of the allowed range | date
@@ -212,12 +216,25 @@ This program is available under Apache License Version 2.0, available at https:/
             /**
              * The error message to display when the input is invalid.
              */
-            errorMessage: String,
+            errorMessage: {
+              type: String,
+              value: '',
+              observer: '_errorMessageChanged'
+            },
 
             /**
              * A placeholder string in addition to the label. If this is set, the label will always float.
              */
             placeholder: String,
+
+            /**
+             * String used for the helper text.
+             */
+            helperText: {
+              type: String,
+              value: '',
+              observer: '_helperTextChanged'
+            },
 
             /**
              * Set to true to make this element read-only.
@@ -252,6 +269,40 @@ This program is available under Apache License Version 2.0, available at https:/
           ];
         }
 
+        _helperTextChanged(helperText) {
+          this._setOrToggleAttribute('has-helper', helperText === 0 || !!helperText, this);
+        }
+
+        _errorMessageChanged(errorMessage) {
+          this._setOrToggleAttribute('has-error-message', errorMessage === 0 || !!errorMessage, this);
+        }
+
+        _onHelperSlotChange() {
+          const slottedNodes = this.shadowRoot.querySelector(`[name="helper"]`).assignedNodes();
+          // Only has slotted helper if not a text node
+          // Text nodes are added by the helperText prop and not the helper slot
+          // The filter is added due to shady DOM triggering this slotchange event on helperText prop change
+          this._hasSlottedHelper = slottedNodes.filter(node => node.nodeType !== 3).length;
+
+          if (this._hasSlottedHelper) {
+            this.setAttribute('has-helper', 'slotted');
+          } else if (this.helperText === '' || this.helperText === null) {
+            this.removeAttribute('has-helper');
+          }
+        }
+
+        _setOrToggleAttribute(name, value, node) {
+          if (!name || !node) {
+            return;
+          }
+
+          if (value) {
+            node.setAttribute(name, (typeof value === 'boolean') ? '' : value);
+          } else {
+            node.removeAttribute(name);
+          }
+        }
+
         /** @protected */
         ready() {
           super.ready();
@@ -266,6 +317,9 @@ This program is available under Apache License Version 2.0, available at https:/
               this.__dispatchChange = true;
             }
           });
+
+          this._onHelperSlotChange();
+          this.shadowRoot.querySelector('[name="helper"]').addEventListener('slotchange', this._onHelperSlotChange.bind(this));
         }
 
         /** @private */
