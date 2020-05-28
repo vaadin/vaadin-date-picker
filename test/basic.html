@@ -668,13 +668,11 @@
         const datepicker = fixture(`datepicker-with-slotted-helper`);
         const evt = new CustomEvent('slotchange');
         datepicker.shadowRoot.querySelector('[name="helper"]').dispatchEvent(evt);
-        expect(datepicker.getAttribute('has-helper')).to.eql('slotted');
         expect(datepicker._inputElement.querySelector('[slot="helper"]').assignedNodes()[0].textContent).to.eql('foo');
       });
 
       it('should display the helper text when provided', () => {
         datepicker.helperText = 'Foo';
-        expect(datepicker.hasAttribute('has-helper')).to.be.true;
         expect(datepicker._inputElement.helperText).to.equal(datepicker.helperText);
       });
     });
