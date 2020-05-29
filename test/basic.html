@@ -664,7 +664,7 @@
         });
       });
 
-      it('should have has-helper attribute when slotted helper available', () => {
+      it('should display the helper text when slotted helper available', () => {
         const datepicker = fixture(`datepicker-with-slotted-helper`);
         const evt = new CustomEvent('slotchange');
         datepicker.shadowRoot.querySelector('[name="helper"]').dispatchEvent(evt);
