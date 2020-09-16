@@ -1,27 +1,22 @@
 {
-<<<<<<< HEAD
   "name": "@vaadin/vaadin-date-picker",
   "version": "4.4.1",
-=======
->>>>>>> Convert to Polymer 3 with magi-cli [skip ci]
-  "description": "Polymer element providing a date selection field with scrollable month calendar",
+  "description": "Web component providing a date selection field with scrollable month calendar",
+  "main": "vaadin-date-picker.js",
+  "module": "vaadin-date-picker.js",
+  "repository": "vaadin/vaadin-date-picker",
   "keywords": [
     "Vaadin",
     "date-picker",
     "web-components",
-    "web-component",
-    "polymer"
+    "web-component"
   ],
-  "repository": "vaadin/vaadin-date-picker",
-  "homepage": "https://vaadin.com/components",
-  "name": "@vaadin/vaadin-date-picker",
-  "version": "4.4.0",
-  "main": "vaadin-date-picker.js",
   "author": "Vaadin Ltd",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/vaadin/vaadin-date-picker/issues"
   },
+  "homepage": "https://vaadin.com/components",
   "files": [
     "vaadin-*.d.ts",
     "vaadin-*.js",
@@ -29,14 +24,6 @@
     "src",
     "theme"
   ],
-  "resolutions": {
-    "es-abstract": "1.17.6",
-    "@types/doctrine": "0.0.3",
-    "inherits": "2.0.3",
-    "samsam": "1.1.3",
-    "supports-color": "3.1.2",
-    "type-detect": "1.0.0"
-  },
   "dependencies": {
     "@polymer/iron-a11y-announcer": "^3.0.0",
     "@polymer/iron-a11y-keys-behavior": "^3.0.0",
@@ -44,13 +31,13 @@
     "@polymer/iron-resizable-behavior": "^3.0.0",
     "@polymer/polymer": "^3.0.0",
     "@vaadin/vaadin-button": "^2.4.0",
-    "@vaadin/vaadin-text-field": "^2.8.0",
-    "@vaadin/vaadin-themable-mixin": "^1.6.1",
     "@vaadin/vaadin-control-state-mixin": "^2.2.2",
-    "@vaadin/vaadin-overlay": "^3.5.0",
+    "@vaadin/vaadin-element-mixin": "^2.4.1",
     "@vaadin/vaadin-lumo-styles": "^1.6.0",
     "@vaadin/vaadin-material-styles": "^1.3.2",
-    "@vaadin/vaadin-element-mixin": "^2.4.1"
+    "@vaadin/vaadin-overlay": "^3.5.0",
+    "@vaadin/vaadin-text-field": "^2.8.0",
+    "@vaadin/vaadin-themable-mixin": "^1.6.1"
   },
   "scripts": {
     "generate-typings": "gen-typescript-declarations --outDir . --verify"
@@ -61,7 +48,7 @@
     "@polymer/iron-form": "^3.0.0",
     "@polymer/iron-input": "^3.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
-    "wct-browser-legacy": "^1.0.1",
-    "@vaadin/vaadin-dialog": "^2.2.1"
+    "@vaadin/vaadin-dialog": "^2.2.1",
+    "wct-browser-legacy": "^1.0.1"
   }
 }
