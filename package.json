@@ -58,14 +58,9 @@
   "devDependencies": {
     "@polymer/iron-component-page": "^4.0.0",
     "@polymer/iron-form": "^3.0.0",
-    "@polymer/iron-icon": "^3.0.0",
-    "@polymer/iron-icons": "^3.0.0",
     "@polymer/iron-input": "^3.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
-    "sugar": "^2.0.0",
     "wct-browser-legacy": "^1.0.1",
-    "@vaadin/vaadin-demo-helpers": "^3.1.0",
-    "@vaadin/vaadin-custom-field": "^1.0.0",
     "@vaadin/vaadin-dialog": "^2.2.1"
   }
 }
