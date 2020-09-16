@@ -1,9 +1,10 @@
 {
+<<<<<<< HEAD
   "name": "@vaadin/vaadin-date-picker",
   "version": "4.4.1",
+=======
+>>>>>>> Convert to Polymer 3 with magi-cli [skip ci]
   "description": "Polymer element providing a date selection field with scrollable month calendar",
-  "main": "vaadin-date-picker.html",
-  "repository": "vaadin/vaadin-date-picker",
   "keywords": [
     "Vaadin",
     "date-picker",
@@ -11,12 +12,16 @@
     "web-component",
     "polymer"
   ],
+  "repository": "vaadin/vaadin-date-picker",
+  "homepage": "https://vaadin.com/components",
+  "name": "@vaadin/vaadin-date-picker",
+  "version": "4.4.0",
+  "main": "vaadin-date-picker.js",
   "author": "Vaadin Ltd",
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/vaadin/vaadin-date-picker/issues"
   },
-  "homepage": "https://vaadin.com/components",
   "files": [
     "vaadin-*.d.ts",
     "vaadin-*.js",
@@ -24,26 +29,43 @@
     "src",
     "theme"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
+  "resolutions": {
+    "es-abstract": "1.17.6",
+    "@types/doctrine": "0.0.3",
+    "inherits": "2.0.3",
+    "samsam": "1.1.3",
+    "supports-color": "3.1.2",
+    "type-detect": "1.0.0"
+  },
+  "dependencies": {
+    "@polymer/iron-a11y-announcer": "^3.0.0",
+    "@polymer/iron-a11y-keys-behavior": "^3.0.0",
+    "@polymer/iron-media-query": "^3.0.0",
+    "@polymer/iron-resizable-behavior": "^3.0.0",
+    "@polymer/polymer": "^3.0.0",
+    "@vaadin/vaadin-button": "^2.4.0",
+    "@vaadin/vaadin-text-field": "^2.8.0",
+    "@vaadin/vaadin-themable-mixin": "^1.6.1",
+    "@vaadin/vaadin-control-state-mixin": "^2.2.2",
+    "@vaadin/vaadin-overlay": "^3.5.0",
+    "@vaadin/vaadin-lumo-styles": "^1.6.0",
+    "@vaadin/vaadin-material-styles": "^1.3.2",
+    "@vaadin/vaadin-element-mixin": "^2.4.1"
   },
   "scripts": {
-    "test": "wct",
-    "check": "npm-run-all --parallel check:*",
-    "check:bower": "magi check-bower",
-    "check:version": "magi check-version",
-    "lint": "npm-run-all --parallel lint:*",
-    "lint:css": "stylelint *.html src/*.html demo/*.html theme/**/*.html test/*html",
-    "lint:html": "eslint *.html src demo test --ext .html",
-    "lint:js": "eslint *.js test",
-    "lint:polymer": "polymer lint --rules polymer-2 --input ./src/*.html ./theme/**/*.html",
-    "prestart": "polymer analyze vaadin-* > analysis.json",
-    "start": "polymer serve --port 3000 --open",
-    "preversion": "magi update-version"
+    "generate-typings": "gen-typescript-declarations --outDir . --verify"
   },
   "devDependencies": {
-    "@vaadin/vaadin-component-dev-dependencies": "^3.0.0"
+    "@polymer/iron-component-page": "^4.0.0",
+    "@polymer/iron-form": "^3.0.0",
+    "@polymer/iron-icon": "^3.0.0",
+    "@polymer/iron-icons": "^3.0.0",
+    "@polymer/iron-input": "^3.0.0",
+    "@polymer/iron-test-helpers": "^3.0.0",
+    "sugar": "^2.0.0",
+    "wct-browser-legacy": "^1.0.1",
+    "@vaadin/vaadin-demo-helpers": "^3.1.0",
+    "@vaadin/vaadin-custom-field": "^1.0.0",
+    "@vaadin/vaadin-dialog": "^2.2.1"
   }
 }
