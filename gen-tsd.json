@@ -2,6 +2,8 @@
   "excludeFiles": [
     "wct.conf.js",
     "index.html",
+    "vaadin-date-picker.js",
+    "vaadin-date-picker-light.js",
     "src/vaadin-date-picker-helper.js",
     "src/vaadin-date-picker-overlay-content.js",
     "src/vaadin-date-picker-overlay.js",
