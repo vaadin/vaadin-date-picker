@@ -1,178 +1,176 @@
+import { registerStyles, css } from '@vaadin/vaadin-themable-mixin/register-styles.js';
 import '@vaadin/vaadin-material-styles/color.js';
 import '@vaadin/vaadin-material-styles/font-icons.js';
 import '@vaadin/vaadin-material-styles/typography.js';
 import '@vaadin/vaadin-material-styles/shadow.js';
 import '@vaadin/vaadin-button/theme/material/vaadin-button.js';
-import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 
-const $_documentContainer = html`<dom-module id="material-date-picker-overlay-content" theme-for="vaadin-date-picker-overlay-content">
-  <template>
-    <style>
-      :host {
-        font-family: var(--material-font-family);
-        font-size: var(--material-body-font-size);
-        -webkit-text-size-adjust: 100%;
-        line-height: 1.4;
-
-        /* FIXME(platosha): fix the core styles and remove this override. */
-        background: transparent;
-      }
-
-      :host([fullscreen]) {
-        position: absolute;
-      }
-
-      /* Fullscreen Toolbar */
-
-      [part="overlay-header"] {
-        display: flex;
-        align-items: baseline;
-        position: relative;
-        z-index: 2;
-        color: var(--material-body-text-color);
-        background: var(--material-secondary-background-color);
-        border-bottom: 2px solid var(--material-primary-color);
-        padding: 8px;
-        box-shadow: var(--material-shadow-elevation-4dp);
-      }
+registerStyles(
+  'vaadin-date-picker-overlay-content',
+  css`
+    :host {
+      font-family: var(--material-font-family);
+      font-size: var(--material-body-font-size);
+      -webkit-text-size-adjust: 100%;
+      line-height: 1.4;
 
       /* FIXME(platosha): fix the core styles and remove this override. */
-      [part="overlay-header"]:not([desktop]) {
-        padding-bottom: 8px;
-      }
+      background: transparent;
+    }
 
-      [part="label"] {
-        padding: 0 8px;
-        flex: auto;
-      }
+    :host([fullscreen]) {
+      position: absolute;
+    }
 
-      [part="clear-button"],
-      [part="toggle-button"] {
-        font-family: 'material-icons';
-        font-size: var(--material-icon-font-size);
-        line-height: 24px;
-        width: 24px;
-        height: 24px;
-        text-align: center;
-      }
+    /* Fullscreen Toolbar */
 
-      [part="clear-button"],
-      [part="toggle-button"],
-      [part="years-toggle-button"] {
-        padding: 8px;
-        color: var(--material-secondary-text-color);
-      }
+    [part='overlay-header'] {
+      display: flex;
+      align-items: baseline;
+      position: relative;
+      z-index: 2;
+      color: var(--material-body-text-color);
+      background: var(--material-secondary-background-color);
+      border-bottom: 2px solid var(--material-primary-color);
+      padding: 8px;
+      box-shadow: var(--material-shadow-elevation-4dp);
+    }
 
-      [part="clear-button"]:hover,
-      [part="toggle-button"]:hover,
-      [part="years-toggle-button"]:hover {
-        color: inherit;
-      }
+    /* FIXME(platosha): fix the core styles and remove this override. */
+    [part='overlay-header']:not([desktop]) {
+      padding-bottom: 8px;
+    }
 
-      [part="clear-button"]::before {
-        content: var(--material-icons-clear);
-      }
+    [part='label'] {
+      padding: 0 8px;
+      flex: auto;
+    }
 
-      [part="toggle-button"]::before {
-        content: var(--material-icons-calendar);
-      }
+    [part='clear-button'],
+    [part='toggle-button'] {
+      font-family: 'material-icons';
+      font-size: var(--material-icon-font-size);
+      line-height: 24px;
+      width: 24px;
+      height: 24px;
+      text-align: center;
+    }
 
-      [part="years-toggle-button"] {
-        position: static;
-        padding: 4px 8px;
-        font-size: var(--material-body-font-size);
-        font-weight: 500;
-        line-height: 24px;
-        letter-spacing: 0.05em;
-        color: var(--material-secondary-text-color);
-      }
+    [part='clear-button'],
+    [part='toggle-button'],
+    [part='years-toggle-button'] {
+      padding: 8px;
+      color: var(--material-secondary-text-color);
+    }
 
-      [part="years-toggle-button"]::before {
-        content: '';
-        display: none;
-      }
+    [part='clear-button']:hover,
+    [part='toggle-button']:hover,
+    [part='years-toggle-button']:hover {
+      color: inherit;
+    }
 
-      [part="years-toggle-button"]::after {
-        content: var(--material-icons-play);
-        display: inline-block;
-        width: 24px;
-        font-family: 'material-icons';
-        font-size: var(--material-icon-font-size);
-        line-height: 24px;
-        text-align: center;
-        transition: transform 100ms cubic-bezier(.4, 0, .2, 1);
-      }
+    [part='clear-button']::before {
+      content: var(--material-icons-clear);
+    }
 
-      :host([years-visible]) [part="years-toggle-button"]::after {
-        transform: rotate(90deg);
-      }
+    [part='toggle-button']::before {
+      content: var(--material-icons-calendar);
+    }
 
-      /* Month scroller */
+    [part='years-toggle-button'] {
+      position: static;
+      padding: 4px 8px;
+      font-size: var(--material-body-font-size);
+      font-weight: 500;
+      line-height: 24px;
+      letter-spacing: 0.05em;
+      color: var(--material-secondary-text-color);
+    }
 
-      [part="months"] {
-        --vaadin-infinite-scroller-item-height: 320px;
-        text-align: center;
-      }
+    [part='years-toggle-button']::before {
+      content: '';
+      display: none;
+    }
 
-      /* Year scroller */
+    [part='years-toggle-button']::after {
+      content: var(--material-icons-play);
+      display: inline-block;
+      width: 24px;
+      font-family: 'material-icons';
+      font-size: var(--material-icon-font-size);
+      line-height: 24px;
+      text-align: center;
+      transition: transform 100ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-      [part="years"] {
-        z-index: 1;
-        background: var(--material-secondary-text-color);
-        color: var(--material-background-color);
-        text-align: center;
-      }
+    :host([years-visible]) [part='years-toggle-button']::after {
+      transform: rotate(90deg);
+    }
 
-      [part="years"]::before {
-        z-index: 2;
-        border: 0;
-        width: 8px;
-        height: 8px;
-        transform: translateX(-50%) rotate(-45deg);
-        background: var(--material-background-color);
-      }
+    /* Month scroller */
 
-      :host([years-visible]) [part="years"]::after {
-        top: calc(20px + 16px);
-        height: calc(100% - 20px - 16px);
-      }
+    [part='months'] {
+      --vaadin-infinite-scroller-item-height: 320px;
+      text-align: center;
+    }
 
-      [part="year-number"] {
-        font-size: var(--material-small-font-size);
-        line-height: 10px; /* NOTE(platosha): chosen to align years to months */
-      }
+    /* Year scroller */
 
-      [part="year-separator"] {
-        background-color: currentColor;
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        margin: calc(0.5 * var(--vaadin-infinite-scroller-item-height, 80px) - 0.5 * 10px - 0.5 * 4px) auto;
-      }
+    [part='years'] {
+      z-index: 1;
+      background: var(--material-secondary-text-color);
+      color: var(--material-background-color);
+      text-align: center;
+    }
 
-      /* Bottom Bar */
+    [part='years']::before {
+      z-index: 2;
+      border: 0;
+      width: 8px;
+      height: 8px;
+      transform: translateX(-50%) rotate(-45deg);
+      background: var(--material-background-color);
+    }
 
-      [part="toolbar"] {
-        display: flex;
-        justify-content: flex-end;
-        padding: 8px 4px;
-        border-top: 1px solid var(--material-divider-color);
-      }
+    :host([years-visible]) [part='years']::after {
+      top: calc(20px + 16px);
+      height: calc(100% - 20px - 16px);
+    }
 
-      [part="cancel-button"] {
-        order: 1;
-      }
+    [part='year-number'] {
+      font-size: var(--material-small-font-size);
+      line-height: 10px; /* NOTE(platosha): chosen to align years to months */
+    }
 
-      [part="today-button"] {
-        order: 2;
-      }
+    [part='year-separator'] {
+      background-color: currentColor;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      margin: calc(0.5 * var(--vaadin-infinite-scroller-item-height, 80px) - 0.5 * 10px - 0.5 * 4px) auto;
+    }
 
-      [part="today-button"],
-      [part="cancel-button"] {
-        margin: 0 4px;
-      }
-    </style>
-  </template>
-</dom-module>`;
+    /* Bottom Bar */
 
-document.head.appendChild($_documentContainer.content);
+    [part='toolbar'] {
+      display: flex;
+      justify-content: flex-end;
+      padding: 8px 4px;
+      border-top: 1px solid var(--material-divider-color);
+    }
+
+    [part='cancel-button'] {
+      order: 1;
+    }
+
+    [part='today-button'] {
+      order: 2;
+    }
+
+    [part='today-button'],
+    [part='cancel-button'] {
+      margin: 0 4px;
+    }
+  `,
+  { moduleId: 'material-date-picker-overlay-content' }
+);
