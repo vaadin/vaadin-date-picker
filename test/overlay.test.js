@@ -1,44 +1,11 @@
-<!doctype html>
-<html>
-
-<head>
-  <meta charset="utf-8">
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script src="../../../@polymer/iron-test-helpers/mock-interactions.js" type="module"></script>
-  <script src="./common.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-
-  <script type="module" src="../src/vaadin-date-picker-overlay-content.js"></script>
-  <script type="module" src="../src/vaadin-date-picker.js"></script>
-  <script type="module" src="../../../@vaadin/vaadin-dialog/src/vaadin-dialog.js"></script>
-  <script type="module" src="../../../@polymer/polymer/lib/utils/render-status.js"></script>
-</head>
-
-<body>
-
-  <test-fixture id="overlay">
-    <template>
-      <vaadin-date-picker-overlay-content></vaadin-date-picker-overlay-content>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="in-modeless-dialog">
-    <template>
-      <vaadin-dialog modeless>
-        <template>
-          <vaadin-date-picker></vaadin-date-picker>
-        </template>
-      </vaadin-dialog>
-    </template>
-  </test-fixture>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '../src/vaadin-date-picker-overlay-content.js';
-import '../src/vaadin-date-picker.js';
-import '@vaadin/vaadin-dialog/src/vaadin-dialog.js';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { fixtureSync } from '@open-wc/testing-helpers';
+import { tap } from '@polymer/iron-test-helpers/mock-interactions.js';
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import '../src/vaadin-date-picker-overlay-content.js';
+import { click, getDefaultI18n, getFirstVisibleItem, listenForEvent, monthsEqual } from './common.js';
+
 function waitUntilScrolledTo(overlay, date, callback) {
   if (overlay.$.monthScroller.position) {
     overlay._onMonthScroll();
@@ -52,25 +19,26 @@ function waitUntilScrolledTo(overlay, date, callback) {
 }
 
 describe('vaadin-date-picker-overlay', () => {
-  var overlay;
+  let overlay;
 
-  beforeEach(done => {
-    overlay = fixture('overlay');
+  beforeEach((done) => {
+    overlay = fixtureSync(`
+      <vaadin-date-picker-overlay-content
+        style="position: absolute; top: 0"
+      ></vaadin-date-picker-overlay-content>`);
     overlay.i18n = getDefaultI18n();
     overlay.$.monthScroller.bufferSize = 1;
     overlay.$.yearScroller.bufferSize = 1;
-
     overlay.initialPosition = new Date();
-    afterNextRender(overlay.$.monthScroller,
-      () => waitUntilScrolledTo(overlay, new Date(), done));
+    afterNextRender(overlay.$.monthScroller, () => waitUntilScrolledTo(overlay, new Date(), done));
   });
 
   it('should stop tap events from bubbling outside the overlay', () => {
-    var tapSpy = sinon.spy();
+    const tapSpy = sinon.spy();
     document.addEventListener('tap', tapSpy);
-    overlay.$.monthScroller.dispatchEvent(new CustomEvent('tap', {bubbles: true}));
+    overlay.$.monthScroller.dispatchEvent(new CustomEvent('tap', { bubbles: true }));
     document.removeEventListener('tap', tapSpy);
-    expect(tapSpy.called).not.to.be.true;
+    expect(tapSpy.called).to.be.false;
   });
 
   it('should return correct month', () => {
@@ -78,8 +46,8 @@ describe('vaadin-date-picker-overlay', () => {
     expect(overlay._dateAfterXMonths(11).getMonth()).to.equal(1);
   });
 
-  it('should reflect the year of currently visible month on the toolbar', done => {
-    var date = new Date(2000, 1, 1);
+  it('should reflect the year of currently visible month on the toolbar', (done) => {
+    const date = new Date(2000, 1, 1);
     overlay.scrollToDate(date);
     waitUntilScrolledTo(overlay, date, () => {
       expect(parseInt(overlay.root.querySelector('[part="years-toggle-button"]').textContent)).to.equal(2000);
@@ -87,8 +55,8 @@ describe('vaadin-date-picker-overlay', () => {
     });
   });
 
-  it('should scroll to the given date', done => {
-    var date = new Date(2000, 1, 1);
+  it('should scroll to the given date', (done) => {
+    const date = new Date(2000, 1, 1);
     overlay.scrollToDate(date);
     waitUntilScrolledTo(overlay, date, () => {
       expect(monthsEqual(getFirstVisibleItem(overlay.$.monthScroller, 0).firstElementChild.month, date)).to.be.true;
@@ -96,8 +64,8 @@ describe('vaadin-date-picker-overlay', () => {
     });
   });
 
-  it('should scroll to the given year', done => {
-    var date = new Date(2000, 1, 1);
+  it('should scroll to the given year', (done) => {
+    const date = new Date(2000, 1, 1);
     overlay.scrollToDate(date);
     waitUntilScrolledTo(overlay, date, () => {
       var offset = overlay.$.yearScroller.clientHeight / 2;
@@ -110,8 +78,8 @@ describe('vaadin-date-picker-overlay', () => {
   it('should mark current year', () => {
     const yearScroller = overlay.$.yearScroller;
 
-    yearScroller._buffers.forEach(buffer => {
-      [].forEach.call(buffer.children, insertionPoint => {
+    yearScroller._buffers.forEach((buffer) => {
+      Array.from(buffer.children).forEach((insertionPoint) => {
         const year = insertionPoint._itemWrapper.firstElementChild;
         const isCurrent = year.textContent.indexOf(new Date().getFullYear()) > -1;
         expect(year.hasAttribute('current')).to.equal(isCurrent);
@@ -123,8 +91,8 @@ describe('vaadin-date-picker-overlay', () => {
     const yearScroller = overlay.$.yearScroller;
     overlay.selectedDate = new Date();
 
-    yearScroller._buffers.forEach(buffer => {
-      [].forEach.call(buffer.children, insertionPoint => {
+    yearScroller._buffers.forEach((buffer) => {
+      Array.from(buffer.children).forEach((insertionPoint) => {
         const year = insertionPoint._itemWrapper.firstElementChild;
         const isCurrent = year.textContent.indexOf(new Date().getFullYear()) > -1;
         expect(year.hasAttribute('selected')).to.equal(isCurrent);
@@ -133,15 +101,14 @@ describe('vaadin-date-picker-overlay', () => {
   });
 
   describe('taps', () => {
-
-    beforeEach(done => {
+    beforeEach((done) => {
       // Wait for ignoreTaps to settle after initial scroll event
       listenForEvent(overlay.$.monthScroller.$.scroller, 'scroll', () => setTimeout(done, 350));
 
       overlay.$.monthScroller.$.scroller.scrollTop += 1;
     });
 
-    it('should set ignoreTaps to calendar on scroll', done => {
+    it('should set ignoreTaps to calendar on scroll', (done) => {
       listenForEvent(overlay.$.monthScroller.$.scroller, 'scroll', () => {
         expect(overlay.$.monthScroller.querySelector('vaadin-month-calendar').ignoreTaps).to.be.true;
         done();
@@ -150,8 +117,8 @@ describe('vaadin-date-picker-overlay', () => {
       overlay.$.monthScroller.$.scroller.scrollTop += 1;
     });
 
-    it('should not react to year tap after scroll', done => {
-      var spy = sinon.spy(overlay, '_scrollToPosition');
+    it('should not react to year tap after scroll', (done) => {
+      const spy = sinon.spy(overlay, '_scrollToPosition');
 
       listenForEvent(overlay.$.monthScroller.$.scroller, 'scroll', () => {
         tap(overlay.$.yearScroller);
@@ -162,8 +129,8 @@ describe('vaadin-date-picker-overlay', () => {
       overlay.$.monthScroller.$.scroller.scrollTop += 1;
     });
 
-    it('should react to year tap after 300ms elapsed after scroll', done => {
-      var spy = sinon.spy(overlay, '_scrollToPosition');
+    it('should react to year tap after 300ms elapsed after scroll', (done) => {
+      const spy = sinon.spy(overlay, '_scrollToPosition');
 
       listenForEvent(overlay.$.monthScroller.$.scroller, 'scroll', () => {
         setTimeout(() => {
@@ -176,9 +143,10 @@ describe('vaadin-date-picker-overlay', () => {
       overlay.$.monthScroller.$.scroller.scrollTop += 1;
     });
 
-    it('should not react if the tap takes more than 300ms', done => {
-      var spy = sinon.spy(overlay, '_scrollToPosition');
+    it('should not react if the tap takes more than 300ms', (done) => {
+      const spy = sinon.spy(overlay, '_scrollToPosition');
       overlay._onYearScrollTouchStart();
+
       setTimeout(() => {
         tap(overlay.$.yearScroller);
         expect(spy.called).to.be.false;
@@ -188,18 +156,15 @@ describe('vaadin-date-picker-overlay', () => {
   });
 
   describe('header', () => {
-    var header, clearButton;
+    let header, clearButton;
 
     beforeEach(() => {
-      header = overlay.root.querySelector('[part="overlay-header"]');
-      clearButton = overlay.root.querySelector('[part="clear-button"]');
+      header = overlay.shadowRoot.querySelector('[part="overlay-header"]');
+      clearButton = overlay.shadowRoot.querySelector('[part="clear-button"]');
     });
 
     it('should be visible', () => {
       overlay.setAttribute('fullscreen', '');
-      // No idea why but IE requires these in order to repaint the header
-      header.setAttribute('style', '');
-      header.removeAttribute('style');
       expect(window.getComputedStyle(header).display).to.equal('flex');
     });
 
@@ -208,10 +173,7 @@ describe('vaadin-date-picker-overlay', () => {
     });
 
     it('should reflect value in label', () => {
-      overlay.i18n.formatDate = date => {
-        return (date.month + 1) + '/' + date.day + '/' + date.year;
-      };
-
+      overlay.i18n.formatDate = (date) => date.month + 1 + '/' + date.day + '/' + date.year;
       overlay.selectedDate = new Date(2000, 1, 1);
       expect(overlay.root.querySelector('[part="label"]').textContent.trim()).to.equal('2/1/2000');
     });
@@ -227,25 +189,22 @@ describe('vaadin-date-picker-overlay', () => {
 
     it('should clear the value', () => {
       overlay.selectedDate = new Date();
-
       click(clearButton);
-
       expect(overlay.selectedDate).to.equal('');
     });
-
   });
 
   describe('footer', () => {
     it('should fire close on cancel click', () => {
-      var spy = sinon.spy();
+      const spy = sinon.spy();
       overlay.addEventListener('close', spy);
       tap(overlay.$.cancelButton);
       expect(spy.calledOnce).to.be.true;
     });
 
     describe('today button', () => {
-      it('should scroll to current date', done => {
-        var date = new Date(2000, 1, 1);
+      it('should scroll to current date', (done) => {
+        const date = new Date(2000, 1, 1);
         overlay.scrollToDate(date);
         waitUntilScrolledTo(overlay, date, () => {
           tap(overlay.$.todayButton);
@@ -255,10 +214,10 @@ describe('vaadin-date-picker-overlay', () => {
         });
       });
 
-      it('should close the overlay and select today if on current month', done => {
-        var today = new Date();
+      it('should close the overlay and select today if on current month', (done) => {
+        const today = new Date();
         overlay.scrollToDate(today);
-        var spy = sinon.spy();
+        const spy = sinon.spy();
         overlay.addEventListener('close', spy);
 
         waitUntilScrolledTo(overlay, today, () => {
@@ -272,10 +231,10 @@ describe('vaadin-date-picker-overlay', () => {
         });
       });
 
-      it('should not close the overlay and not select today if not on current month', done => {
-        var today = new Date();
+      it('should not close the overlay and not select today if not on current month', (done) => {
+        const today = new Date();
         overlay.scrollToDate(today);
-        var spy = sinon.spy();
+        const spy = sinon.spy();
         overlay.addEventListener('close', spy);
 
         waitUntilScrolledTo(overlay, today, () => {
@@ -288,18 +247,18 @@ describe('vaadin-date-picker-overlay', () => {
         });
       });
 
-      it('should do nothing if disabled', done => {
+      it('should do nothing if disabled', (done) => {
         var initialDate = new Date(2000, 1, 1);
         overlay.scrollToDate(initialDate);
         var closeSpy = sinon.spy();
         overlay.addEventListener('close', closeSpy);
-        var scrollSpy = sinon.spy(overlay, 'scrollToDate');
+        const scrollSpy = sinon.spy(overlay, 'scrollToDate');
 
         overlay.$.todayButton.disabled = true;
 
         waitUntilScrolledTo(overlay, initialDate, () => {
-          var lastScrollPos = overlay.$.monthScroller.position;
-          MockInteractions.tap(overlay.$.todayButton);
+          const lastScrollPos = overlay.$.monthScroller.position;
+          tap(overlay.$.todayButton);
 
           expect(overlay.$.monthScroller.position).to.equal(lastScrollPos);
           // FIXME: fails in FF + Polymer 1.x
@@ -310,18 +269,18 @@ describe('vaadin-date-picker-overlay', () => {
       });
 
       describe('date limits', () => {
-        var todayMidnight, yesterdayMidnight, tommorrowMidnight;
+        let todayMidnight, yesterdayMidnight, tomorrowMidnight;
 
         beforeEach(() => {
-          var today = new Date();
+          const today = new Date();
           todayMidnight = new Date(0, 0);
           todayMidnight.setFullYear(today.getFullYear());
           todayMidnight.setMonth(today.getMonth());
           todayMidnight.setDate(today.getDate());
           yesterdayMidnight = new Date(todayMidnight.getTime());
           yesterdayMidnight.setDate(todayMidnight.getDate() - 1);
-          tommorrowMidnight = new Date(todayMidnight.getTime());
-          tommorrowMidnight.setDate(todayMidnight.getDate() + 1);
+          tomorrowMidnight = new Date(todayMidnight.getTime());
+          tomorrowMidnight.setDate(todayMidnight.getDate() + 1);
           overlay.minDate = null;
           overlay.maxDate = null;
         });
@@ -332,88 +291,30 @@ describe('vaadin-date-picker-overlay', () => {
 
         it('should not be disabled if today is inside the limits', () => {
           overlay.minDate = yesterdayMidnight;
-          overlay.maxDate = tommorrowMidnight;
-
+          overlay.maxDate = tomorrowMidnight;
           expect(overlay.$.todayButton.disabled).to.be.false;
         });
 
         it('should not be disabled if today is min', () => {
           overlay.minDate = todayMidnight;
-
           expect(overlay.$.todayButton.disabled).to.be.false;
         });
 
         it('should not be disabled if today is max', () => {
           overlay.maxDate = todayMidnight;
-
           expect(overlay.$.todayButton.disabled).to.be.false;
         });
 
         it('should be disabled if the limits are in past', () => {
           overlay.maxDate = yesterdayMidnight;
-
           expect(overlay.$.todayButton.disabled).to.be.true;
         });
 
         it('should be disabled if the limits are in future', () => {
-          overlay.minDate = tommorrowMidnight;
-
+          overlay.minDate = tomorrowMidnight;
           expect(overlay.$.todayButton.disabled).to.be.true;
         });
       });
     });
   });
 });
-
-describe('frontmost', () => {
-  var dialog;
-  beforeEach(() => {
-    dialog = fixture('in-modeless-dialog');
-  });
-
-  function touchstart(node) {
-    const event = new CustomEvent('touchstart', {bubbles: true, cancelable: true});
-
-    const nodeRect = node.getBoundingClientRect();
-    const clientX = nodeRect.left;
-    const clientY = nodeRect.top;
-
-    event.touches = event.changedTouches = event.targetTouches = [{clientX, clientY}];
-    node.dispatchEvent(event);
-  }
-
-  it('should not end up behind the dialog overlay on mousedown', (done) => {
-    dialog.opened = true;
-    const dialogOverlay = dialog.$.overlay;
-    const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
-    const datePickerOverlay = datePicker.$.overlay;
-
-    datePicker.opened = true;
-
-    datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
-    requestAnimationFrame(() => {
-      expect(datePickerOverlay._last).to.be.true;
-      done();
-    });
-  });
-
-  it('should not end up behind the dialog overlay on touchstart', (done) => {
-    dialog.opened = true;
-    const dialogOverlay = dialog.$.overlay;
-    const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
-    const datePickerOverlay = datePicker.$.overlay;
-
-    datePicker.opened = true;
-
-    touchstart(datePicker);
-    requestAnimationFrame(() => {
-      expect(datePickerOverlay._last).to.be.true;
-      done();
-    });
-  });
-});
-</script>
-
-</body>
-
-</html>

@@ -1,68 +1,17 @@
-<!doctype html>
-<html>
-
-<head>
-  <meta charset="utf-8">
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-
-  <script type="module" src="../vaadin-date-picker.js"></script>
-  <script type="module" src="../vaadin-date-picker-light.js"></script>
-  <script type="module" src="../src/vaadin-date-picker-overlay.js"></script>
-  <script type="module" src="../src/vaadin-date-picker-overlay-content.js"></script>
-  <script type="module" src="../src/vaadin-month-calendar.js"></script>
-  <script type="module" src="./not-animated-styles.js"></script>
-  <script src="./common.js"></script>
-</head>
-
-<body>
-
-  <test-fixture id="datepicker">
-    <template>
-      <vaadin-date-picker label="ariatest"></vaadin-date-picker>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="datepickerLight">
-    <template>
-      <vaadin-date-picker-light>
-        <input>
-      </vaadin-date-picker-light>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="overlay">
-    <template>
-      <vaadin-date-picker-overlay-content></vaadin-date-picker-overlay-content>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="month-calendar">
-    <template>
-      <vaadin-month-calendar></vaadin-month-calendar>
-    </template>
-  </test-fixture>
-
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '../vaadin-date-picker.js';
-import '../vaadin-date-picker-light.js';
-import '../src/vaadin-date-picker-overlay.js';
-import '../src/vaadin-date-picker-overlay-content.js';
-import '../src/vaadin-month-calendar.js';
-import './not-animated-styles.js';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { aTimeout, fixture, html, nextFrame } from '@open-wc/testing-helpers';
 import { IronA11yAnnouncer } from '@polymer/iron-a11y-announcer/iron-a11y-announcer.js';
+import '../vaadin-date-picker.js';
+import { ios, getDefaultI18n, open } from './common.js';
+
 describe('WAI-ARIA', () => {
-
   describe('date picker', () => {
-    var datepicker, toggleButton;
+    let datepicker, toggleButton;
 
-    beforeEach(() => {
-      datepicker = fixture('datepicker');
-      toggleButton = datepicker.root.querySelector('[part="toggle-button"]');
+    beforeEach(async () => {
+      datepicker = await fixture(html`<vaadin-date-picker label="ariatest"></vaadin-date-picker>`);
+      toggleButton = datepicker.shadowRoot.querySelector('[part="toggle-button"]');
     });
 
     it('should have application role on input container', () => {
@@ -87,7 +36,7 @@ describe('WAI-ARIA', () => {
     });
 
     it('should have expanded state false on calendar button', () => {
-      // Indicate that there is a collabsible calendar, closed by default.
+      // Indicate that there is a collapsible calendar, closed by default.
       expect(toggleButton.getAttribute('aria-expanded')).not.to.be.ok;
     });
 
@@ -105,23 +54,18 @@ describe('WAI-ARIA', () => {
   describe('overlay contents', () => {
     var overlay;
 
-    beforeEach(done => {
-      overlay = fixture('overlay');
+    beforeEach(async () => {
+      overlay = await fixture(html`<vaadin-date-picker-overlay-content></vaadin-date-picker-overlay-content>`);
       overlay.$.monthScroller.bufferSize = 0;
       overlay.$.yearScroller.bufferSize = 1;
       overlay.i18n = getDefaultI18n();
-      setTimeout(done);
+      await nextFrame();
     });
 
     describe('title announcer', () => {
-
-      beforeEach(done => {
-        afterNextRender(overlay.$.scroller, () => {
-          setTimeout(() => {
-            done();
-          }, 1);
-        });
+      beforeEach(async () => {
         overlay.initialPosition = new Date();
+        await nextFrame();
       });
 
       // Title announcer notifies the user when the overlay opens with
@@ -133,7 +77,7 @@ describe('WAI-ARIA', () => {
 
       it('should be the first child of the overlay', () => {
         // Always introduce calendar contents with “Calendar”.
-        expect(overlay.root.querySelector(':not(style):not(:empty)')).to.equal(overlay.$.announcer);
+        expect(overlay.shadowRoot.querySelector(':not(style):not(:empty)')).to.equal(overlay.$.announcer);
       });
 
       it('should not have hidden state', () => {
@@ -167,43 +111,33 @@ describe('WAI-ARIA', () => {
     });
 
     describe('year scroller contents', () => {
-      var yearScrollerContents;
+      let yearScrollerContents;
 
-      beforeEach(done => {
-        var scroller = overlay.$.yearScroller;
+      beforeEach(async () => {
+        let scroller = overlay.$.yearScroller;
         scroller.active = true;
         scroller._reset();
-
-        afterNextRender(scroller, () => {
-          animationFrameFlush(function() {
-            scroller._debouncerUpdateClones.flush();
-            yearScrollerContents = overlay.$.yearScroller
-              .querySelectorAll('div > [part="year-number"]');
-            done();
-          });
-        });
+        await nextFrame();
+        scroller._debouncerUpdateClones.flush();
+        yearScrollerContents = overlay.$.yearScroller.querySelectorAll('div > [part="year-number"]');
       });
 
       it('should contain button role for years', () => {
         // Indicate years as clickable.
-
-        var years = Array.prototype.filter.call(yearScrollerContents, el => {
-          return /\d+/.test(el.textContent);
-        });
+        const years = Array.from(yearScrollerContents).filter((el) => /\d+/.test(el.textContent));
 
         expect(years).to.not.be.empty;
-        years.forEach(year => {
+        years.forEach((year) => {
           expect(year.getAttribute('role')).to.equal('button');
         });
       });
 
       it('should have hidden state for dots', () => {
         // Do not speak dots between years.
-        var dots = Array.prototype.slice.call(yearScrollerContents)
-          .map(el => el.nextElementSibling);
+        const dots = Array.from(yearScrollerContents).map((el) => el.nextElementSibling);
 
         expect(dots).to.not.be.empty;
-        dots.forEach(dot => {
+        dots.forEach((dot) => {
           expect(dot.getAttribute('aria-hidden')).to.equal('true');
         });
       });
@@ -213,45 +147,41 @@ describe('WAI-ARIA', () => {
   describe('month calendar contents', () => {
     let monthCalendar;
 
-    beforeEach(done => {
-      monthCalendar = fixture('month-calendar');
+    beforeEach(async () => {
+      monthCalendar = await fixture(html`<vaadin-month-calendar></vaadin-month-calendar>`);
       monthCalendar.i18n = getDefaultI18n();
       monthCalendar.month = new Date(2016, 1, 1);
-      setTimeout(done);
+      await nextFrame();
+      await aTimeout(1);
     });
 
     it('should have heading role on the title', () => {
       // Consistency and convenience. Announces title as a header.
-      expect(monthCalendar.root.querySelector('[part="month-header"]').getAttribute('role')).to.equal('heading');
+      expect(monthCalendar.shadowRoot.querySelector('[part="month-header"]').getAttribute('role')).to.equal('heading');
     });
 
     it('should have heading roles on the weekdays', () => {
       // iOS VoiceOver bug: visible text is spoken instead of aria-label otherwise.
-
-      var weekdays = monthCalendar.root.querySelectorAll('[part="weekday"]:not(:empty)');
-      Array.prototype.forEach.call(weekdays, weekday => {
+      const weekdays = monthCalendar.shadowRoot.querySelectorAll('[part="weekday"]:not(:empty)');
+      Array.from(weekdays).forEach((weekday) => {
         expect(weekday.getAttribute('role')).to.equal('heading');
       });
     });
 
     it('should have label properties on the weekdays', () => {
       // Speak week days with full words instead of acronyms.
-
-      var weekdays = monthCalendar.root.querySelectorAll('[part="weekday"]:not(:empty)');
-      var weekdayLabels = Array.prototype.map.call(weekdays, weekday => {
-        return weekday.getAttribute('aria-label');
-      });
+      const weekdays = monthCalendar.shadowRoot.querySelectorAll('[part="weekday"]:not(:empty)');
+      const weekdayLabels = Array.from(weekdays).map((weekday) => weekday.getAttribute('aria-label'));
 
       expect(weekdayLabels).to.eql(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
     });
 
     it('should have button roles and labels on date cells', () => {
       // The date cells should be spoken with a full date.
-
-      var dateElements = monthCalendar.root.querySelectorAll('[part="date"]:not(:empty)');
-
+      const dateElements = monthCalendar.shadowRoot.querySelectorAll('[part="date"]:not(:empty)');
       expect(dateElements).to.not.be.empty;
-      Array.prototype.forEach.call(dateElements, dateElement => {
+
+      Array.from(dateElements).forEach((dateElement) => {
         expect(dateElement.getAttribute('role')).to.equal('button');
         expect(dateElement.getAttribute('aria-label')).to.be.ok;
       });
@@ -259,103 +189,93 @@ describe('WAI-ARIA', () => {
       expect(dateElements[1].getAttribute('aria-label')).to.equal('2 February 2016, Tuesday');
     });
 
-    it('should indicate today on date cells', done => {
+    it('should indicate today on date cells', async () => {
       monthCalendar.month = new Date();
-
-      setTimeout(() => {
-        var todayElement = monthCalendar.root.querySelector('[part="date"]:not(:empty)[today]');
-        expect(todayElement.getAttribute('aria-label')).to.match(/, Today$/);
-        done();
-      });
+      await nextFrame();
+      const todayElement = monthCalendar.shadowRoot.querySelector('[part="date"]:not(:empty)[today]');
+      expect(todayElement.getAttribute('aria-label')).to.match(/, Today$/);
     });
 
     it('should have disabled state on disabled date cells', () => {
       // just [disabled] attribute is not enough for screen readers, should
       // also contain aria-disabled="true".
-
       monthCalendar.maxDate = new Date(2016, 1, 10); // 10 February 2016
 
-      var dateElements = monthCalendar.root.querySelectorAll('[part="date"]:not(:empty)');
+      const dateElements = monthCalendar.shadowRoot.querySelectorAll('[part="date"]:not(:empty)');
       expect(dateElements[9].getAttribute('aria-disabled')).to.not.equal('true');
       expect(dateElements[10].getAttribute('aria-disabled')).to.equal('true');
     });
 
     it('should not have button roles and label properties on empty cells', () => {
       // The empty cells should not be spoken.
-
-      var emptyDateElements = monthCalendar.root.querySelectorAll('[part="date"]:empty');
+      var emptyDateElements = monthCalendar.shadowRoot.querySelectorAll('[part="date"]:empty');
 
       expect(emptyDateElements).to.not.be.empty;
-      Array.prototype.forEach.call(emptyDateElements, emptyDateElement => {
+      Array.from(emptyDateElements).forEach((emptyDateElement) => {
         expect(emptyDateElement.getAttribute('role')).to.not.equal('button');
         expect(emptyDateElement.getAttribute('aria-label')).to.not.be.ok;
       });
     });
 
     it('should have presentation roles on empty date cells', () => {
-      var emptyDateElements = monthCalendar.root.querySelectorAll('[part="date"]:empty');
+      const emptyDateElements = monthCalendar.shadowRoot.querySelectorAll('[part="date"]:empty');
 
-      Array.prototype.forEach.call(emptyDateElements, emptyElement => {
+      Array.from(emptyDateElements).forEach((emptyElement) => {
         expect(emptyElement.getAttribute('role')).to.equal('presentation');
         expect(emptyElement.getAttribute('aria-label')).to.be.empty;
       });
     });
 
     describe('week numbers', () => {
-      beforeEach(done => {
+      beforeEach(async () => {
         monthCalendar.showWeekNumbers = true;
         monthCalendar.set('i18n.firstDayOfWeek', 1);
-        setTimeout(done);
+        await nextFrame();
       });
 
       it('should have heading roles on week numbers', () => {
         // iOS VoiceOver bug: visible text is spoken instead of aria-label otherwise.
+        const weekNumberElements = monthCalendar.shadowRoot.querySelectorAll('[part="week-number"]');
 
-        var weekNumberElements = monthCalendar.root.querySelectorAll('[part="week-number"]');
-
-        Array.prototype.forEach.call(weekNumberElements, weekNumberElement => {
+        Array.from(weekNumberElements).forEach((weekNumberElement) => {
           expect(weekNumberElement.getAttribute('role')).to.equal('heading');
         });
       });
 
       it('should have label properties on week numbers', () => {
-        var weekNumberElements = monthCalendar.root.querySelectorAll('[part="week-number"]');
+        const weekNumberElements = monthCalendar.shadowRoot.querySelectorAll('[part="week-number"]');
 
         expect(weekNumberElements[0].getAttribute('aria-label')).to.equal('Week 5');
         expect(weekNumberElements[1].getAttribute('aria-label')).to.equal('Week 6');
       });
     });
-
   });
 
   describe('announcements', () => {
     // NOTE: See <iron-a11y-announcer> API
+    let datepicker;
 
-    var datepicker;
-
-    beforeEach(() => {
-      datepicker = fixture('datepicker');
+    beforeEach(async () => {
+      datepicker = await fixture(html`<vaadin-date-picker label="ariatest"></vaadin-date-picker>`);
     });
 
     function waitForAnnounce(callback) {
-      var listener = event => {
+      const listener = (event) => {
         document.body.removeEventListener('iron-announce', listener);
         callback(event.detail.text);
       };
       document.body.addEventListener('iron-announce', listener);
     }
 
-    it('should request availability from IronA11yAnnouncer', done => {
-      var spy = sinon.spy(IronA11yAnnouncer, 'requestAvailability');
+    it('should request availability from IronA11yAnnouncer', async () => {
+      const spy = sinon.spy(IronA11yAnnouncer, 'requestAvailability');
       datepicker.open();
-      setTimeout(() => {
-        expect(spy.called).to.be.true;
-        done();
-      });
+      await nextFrame();
+      expect(spy.called).to.be.true;
     });
 
-    it('should announce focused date on open', done => {
-      waitForAnnounce(text => {
+    it('should announce focused date on open', (done) => {
+      waitForAnnounce((text) => {
         expect(text).to.equal('Monday 1 February 2016');
         done();
       });
@@ -364,10 +284,10 @@ describe('WAI-ARIA', () => {
       datepicker.open();
     });
 
-    it('should announce focused date changes when opened', done => {
+    it('should announce focused date changes when opened', (done) => {
       datepicker.open();
 
-      waitForAnnounce(text => {
+      waitForAnnounce((text) => {
         expect(text).to.equal('Tuesday 2 February 2016');
         done();
       });
@@ -375,19 +295,18 @@ describe('WAI-ARIA', () => {
       datepicker._focusedDate = new Date(2016, 1, 2);
     });
 
-    it('should not announce focused date changes when closed', done => {
-      var announceSpy = sinon.spy();
+    it('should not announce focused date changes when closed', () => {
+      const announceSpy = sinon.spy();
       document.body.addEventListener('iron-announce', announceSpy);
 
       datepicker._focusedDate = new Date(2016, 1, 2);
 
       expect(announceSpy.called).to.be.false;
       document.body.removeEventListener('iron-announce', announceSpy);
-      done();
     });
 
-    it('should announce value on open', done => {
-      waitForAnnounce(text => {
+    it('should announce value on open', (done) => {
+      waitForAnnounce((text) => {
         expect(text).to.equal('Monday 1 February 2016');
         done();
       });
@@ -396,8 +315,8 @@ describe('WAI-ARIA', () => {
       datepicker.open();
     });
 
-    it('should announce initial position on open', done => {
-      waitForAnnounce(text => {
+    it('should announce initial position on open', (done) => {
+      waitForAnnounce((text) => {
         expect(text).to.equal('Monday 1 February 2016');
         done();
       });
@@ -406,8 +325,8 @@ describe('WAI-ARIA', () => {
       datepicker.open();
     });
 
-    it('should announce today', done => {
-      waitForAnnounce(text => {
+    it('should announce today', (done) => {
+      waitForAnnounce((text) => {
         expect(text.indexOf('Today')).to.equal(0);
         done();
       });
@@ -415,12 +334,12 @@ describe('WAI-ARIA', () => {
       datepicker.open();
     });
 
-    it('should announce week numbers if enabled', done => {
+    it('should announce week numbers if enabled', (done) => {
       datepicker._focusedDate = new Date(2016, 1, 1);
       datepicker.showWeekNumbers = true;
       datepicker.set('i18n.firstDayOfWeek', 1);
 
-      waitForAnnounce(text => {
+      waitForAnnounce((text) => {
         expect(text).to.match(/ Week 5$/);
         done();
       });
@@ -429,11 +348,11 @@ describe('WAI-ARIA', () => {
     });
 
     if (!ios) {
-      it('should announce once', done => {
+      it('should announce once', (done) => {
         datepicker._focusedDate = new Date(2016, 1, 1);
 
         open(datepicker, () => {
-          var announceSpy = sinon.spy();
+          const announceSpy = sinon.spy();
           document.body.addEventListener('iron-announce', announceSpy);
           datepicker._focusedDate = new Date(2016, 1, 2);
 
@@ -448,15 +367,17 @@ describe('WAI-ARIA', () => {
 
     describe('i18n', () => {
       beforeEach(() => {
-        datepicker.set('i18n.monthNames',
-          'tammikuu_helmikuu_maaliskuu_huhtikuu_toukokuu_kesäkuu_heinäkuu_elokuu_syyskuu_lokakuu_marraskuu_joulukuu'.split('_'));
-        datepicker.set('i18n.weekdays', 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'));
+        const monthNames =
+          'tammikuu_helmikuu_maaliskuu_huhtikuu_toukokuu_kesäkuu_heinäkuu_elokuu_syyskuu_lokakuu_marraskuu_joulukuu';
+        const weekdays = 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai';
+        datepicker.set('i18n.monthNames', monthNames.split('_'));
+        datepicker.set('i18n.weekdays', weekdays.split('_'));
         datepicker.set('i18n.week', 'viikko');
         datepicker.set('i18n.today', 'Tänään');
       });
 
-      it('should announce dates in correct locale', done => {
-        waitForAnnounce(text => {
+      it('should announce dates in correct locale', (done) => {
+        waitForAnnounce((text) => {
           expect(text).to.equal('maanantai 1 helmikuu 2016');
           done();
         });
@@ -465,8 +386,8 @@ describe('WAI-ARIA', () => {
         datepicker.open();
       });
 
-      it('should announce today in correct locale', done => {
-        waitForAnnounce(text => {
+      it('should announce today in correct locale', (done) => {
+        waitForAnnounce((text) => {
           expect(text.indexOf('Tänään')).to.equal(0);
           done();
         });
@@ -474,12 +395,12 @@ describe('WAI-ARIA', () => {
         datepicker.open();
       });
 
-      it('should announce week numbers in correct locale', done => {
+      it('should announce week numbers in correct locale', (done) => {
         datepicker._focusedDate = new Date(2016, 1, 1);
         datepicker.showWeekNumbers = true;
         datepicker.set('i18n.firstDayOfWeek', 1);
 
-        waitForAnnounce(text => {
+        waitForAnnounce((text) => {
           expect(text).to.match(/ viikko 5$/);
           done();
         });
@@ -489,8 +410,3 @@ describe('WAI-ARIA', () => {
     });
   });
 });
-</script>
-
-</body>
-
-</html>

@@ -1,58 +1,38 @@
-<!doctype html>
-<html>
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { aTimeout, fixtureSync, nextFrame } from '@open-wc/testing-helpers';
+import '../src/vaadin-infinite-scroller.js';
+import { getFirstVisibleItem, listenForEvent } from './common.js';
 
-<head>
-  <meta charset="utf-8">
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script src="./common.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
+describe('vaadin-infinite-scroller', () => {
+  let scroller;
 
-  <script type="module" src="../../../@polymer/polymer/polymer-legacy.js"></script>
-  <script type="module" src="../../../@polymer/polymer/lib/elements/custom-style.js"></script>
-  <script type="module" src="../src/vaadin-infinite-scroller.js"></script>
-</head>
-
-<body>
-  <test-fixture id="scroller">
-    <template>
+  beforeEach(async () => {
+    scroller = fixtureSync(`
       <vaadin-infinite-scroller buffer-size="80">
         <template>
           <div>[[index]]</div>
         </template>
       </vaadin-infinite-scroller>
-    </template>
-  </test-fixture>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '@polymer/polymer/polymer-legacy.js';
-import '@polymer/polymer/lib/elements/custom-style.js';
-import '../src/vaadin-infinite-scroller.js';
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
-describe('vaadin-infinite-scroller', () => {
-  var scroller;
-
-  beforeEach(done => {
-    scroller = fixture('scroller');
+    `);
     scroller.style.setProperty('--vaadin-infinite-scroller-item-height', '30px');
-    scroller.updateStyles({'--vaadin-infinite-scroller-item-height': '30px'});
+    scroller.updateStyles({ '--vaadin-infinite-scroller-item-height': '30px' });
     scroller.active = true;
-    setTimeout(() => {
-      afterNextRender(scroller, () => {
-        scroller._debouncerUpdateClones.flush();
-        done();
-      });
-    }, 1);
+    // Setting `active` triggers `_finishInit` using afterNextRender + setTimeout(1),
+    // and afterNextRender internally uses requestAnimationFrame + setTimeout(0).
+    await aTimeout(0);
+    await nextFrame();
+    await aTimeout(1);
+    scroller._debouncerUpdateClones.flush();
   });
 
   function verifyPosition() {
-    var item = getFirstVisibleItem(scroller);
+    const item = getFirstVisibleItem(scroller);
     expect(item.textContent - scroller.position).to.be.below(1);
 
-    var scrollDiff = item.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-    var ratio = scrollDiff / scroller.itemHeight;
-    var remainder = scroller.position % 1;
+    const scrollDiff = item.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    const ratio = scrollDiff / scroller.itemHeight;
+    const remainder = scroller.position % 1;
     expect(Math.abs(remainder + ratio) - 1).to.be.below(0.1);
   }
 
@@ -65,7 +45,7 @@ describe('vaadin-infinite-scroller', () => {
   });
 
   it('should have correct buffer count', () => {
-    expect(scroller.root.querySelector('.buffer').children).to.have.length(80);
+    expect(scroller.shadowRoot.querySelector('.buffer').children).to.have.length(80);
   });
 
   it('should reflect currently visible item index as position scrolling down', done => {
@@ -117,7 +97,7 @@ describe('vaadin-infinite-scroller', () => {
   });
 
   it('should not fire custom-scroll events', done => {
-    var spy = sinon.spy();
+    const spy = sinon.spy();
     scroller.addEventListener('custom-scroll', spy);
     listenForEvent(scroller.$.scroller, 'scroll', () => {
       expect(spy.called).to.be.false;
@@ -126,30 +106,21 @@ describe('vaadin-infinite-scroller', () => {
     scroller.position = 10;
   });
 
-  it('should not animate on second attach', done => {
-    var spy = sinon.spy();
+  it('should not animate on second attach', async() => {
+    const spy = sinon.spy();
     scroller.addEventListener('animationstart', spy);
-    var parent = scroller.parentNode;
+    const parent = scroller.parentNode;
     parent.removeChild(scroller);
     parent.appendChild(scroller);
-    setTimeout(() => {
-      expect(spy.called).to.be.false;
-      done();
-    });
+    await aTimeout();
+    expect(spy.called).to.be.false;
   });
 
-  it('should have an instance stamped to every wrapper', done => {
+  it('should have an instance stamped to every wrapper', () => {
     scroller._buffers.forEach(buffer => {
-      [].forEach.call(buffer.children, insertionPoint => {
+      Array.from(buffer.children).forEach(insertionPoint => {
         expect(insertionPoint._itemWrapper.firstElementChild).to.be.ok;
       });
-    }, window);
-    done();
+    });
   });
-
 });
-</script>
-
-</body>
-
-</html>

@@ -1,77 +1,16 @@
-<!doctype html>
-<html>
-
-<head>
-  <meta charset="utf-8">
-  <script src="../../../wct-browser-legacy/browser.js"></script>
-  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
-  <script type="module" src="../../../@polymer/test-fixture/test-fixture.js"></script>
-
-  <script type="module" src="../vaadin-date-picker.js"></script>
-  <script type="module" src="./not-animated-styles.js"></script>
-  <script src="./common.js"></script>
-</head>
-
-<body>
-
-  <test-fixture id="datepicker">
-    <template>
-      <vaadin-date-picker></vaadin-date-picker>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="datepicker-prefix">
-    <template>
-      <vaadin-date-picker><div slot="prefix">foo</div></vaadin-date-picker>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="datepicker-wrapped">
-    <template>
-      <div style="height: 100px; overflow: scroll;">
-        <div style="height: 1000px;">
-          <vaadin-date-picker></vaadin-date-picker>
-        </div>
-      </div>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="datepicker-in-flexbox">
-    <template>
-      <div style="display: flex; flex-direction: column; width:500px;">
-        <vaadin-date-picker></vaadin-date-picker>
-      </div>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="datepicker-clear-button-visible">
-    <template>
-      <vaadin-date-picker clear-button-visible></vaadin-date-picker>
-    </template>
-  </test-fixture>
-
-  <test-fixture id="datepicker-with-slotted-helper">
-    <template>
-      <vaadin-date-picker>
-        <div slot="helper">foo</div>
-      </vaadin-date-picker>
-    </template>
-  </test-fixture>
-
-  <script type="module">
-import '@polymer/test-fixture/test-fixture.js';
-import '../vaadin-date-picker.js';
+import { expect } from '@esm-bundle/chai';
+import sinon from 'sinon';
+import { fixtureSync, nextFrame } from '@open-wc/testing-helpers';
 import './not-animated-styles.js';
-describe('Basic features', () => {
-  var datepicker, toggleButton;
+import '../vaadin-date-picker.js';
+import { click, close, getOverlayContent, ios, monthsEqual, open, listenForEvent, tap } from './common.js';
+
+describe('basic features', () => {
+  let datepicker, toggleButton;
 
   beforeEach(() => {
-    datepicker = fixture('datepicker');
-    toggleButton = datepicker.root.querySelector('[part="toggle-button"]');
-  });
-
-  afterEach(done => {
-    setTimeout(done, 1);
+    datepicker = fixtureSync(`<vaadin-date-picker></vaadin-date-picker>`);
+    toggleButton = datepicker.shadowRoot.querySelector('[part="toggle-button"]');
   });
 
   it('should parse date components with varying number of digits', () => {
@@ -82,11 +21,11 @@ describe('Basic features', () => {
       date.setDate(parseInt(day));
       return date;
     };
-    const _parseDate = datepicker._parseDate;
+    const parseDate = datepicker._parseDate;
 
-    expect(_parseDate('2017-11-11')).to.eql(composeDate('2017', '10', '11'));
-    expect(_parseDate('2016-1-1')).to.eql(composeDate('2016', '0', '1'));
-    expect(_parseDate('04-11-2')).to.eql(composeDate('04', '10', '2'));
+    expect(parseDate('2017-11-11')).to.eql(composeDate('2017', '10', '11'));
+    expect(parseDate('2016-1-1')).to.eql(composeDate('2016', '0', '1'));
+    expect(parseDate('04-11-2')).to.eql(composeDate('04', '10', '2'));
   });
 
   it('should have default value', () => {
@@ -94,7 +33,7 @@ describe('Basic features', () => {
   });
 
   it('should notify value change', () => {
-    var spy = sinon.spy();
+    const spy = sinon.spy();
     datepicker.addEventListener('value-changed', spy);
     datepicker.value = '2000-02-01';
     expect(spy.calledOnce).to.be.true;
@@ -103,16 +42,16 @@ describe('Basic features', () => {
   it('should blur when focused on fullscreen', () => {
     datepicker._fullscreen = true;
 
-    var spy = sinon.spy(datepicker, 'blur');
+    const spy = sinon.spy(datepicker, 'blur');
     datepicker.dispatchEvent(new CustomEvent('focus'));
 
     expect(spy.called).to.be.true;
   });
 
-  it('should blur when datepicker is opened on fullscreen', done => {
+  it('should blur when datepicker is opened on fullscreen', (done) => {
     datepicker._fullscreen = true;
 
-    var spy = sinon.spy(datepicker.focusElement, 'blur');
+    const spy = sinon.spy(datepicker.focusElement, 'blur');
 
     open(datepicker, () => {
       expect(spy.called).to.be.true;
@@ -120,20 +59,14 @@ describe('Basic features', () => {
     });
   });
 
-  it('should open with open call', done => {
-    open(datepicker, () => {
-      done();
-    });
-  });
-
-  it('should notify opened changed on open', done => {
+  it('should notify opened changed on open', (done) => {
     open(datepicker, () => {
       expect(datepicker.opened).to.be.true;
       done();
     });
   });
 
-  it('should notify opened changed on close', done => {
+  it('should notify opened changed on close', (done) => {
     open(datepicker, () => {
       listenForEvent(datepicker, 'opened-changed', () => {
         expect(datepicker.opened).to.be.false;
@@ -143,7 +76,7 @@ describe('Basic features', () => {
     });
   });
 
-  it('should close with close call', done => {
+  it('should close with close call', (done) => {
     open(datepicker, () => {
       close(datepicker, () => {
         setTimeout(() => {
@@ -154,7 +87,7 @@ describe('Basic features', () => {
     });
   });
 
-  it('should open on input tap', done => {
+  it('should open on input tap', (done) => {
     tap(datepicker.$.input);
     listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
   });
@@ -170,26 +103,26 @@ describe('Basic features', () => {
   });
 
   it('should pass the placeholder attribute to the input tag', () => {
-    var placeholder = 'Pick a date';
+    const placeholder = 'Pick a date';
     datepicker.set('placeholder', placeholder);
     expect(datepicker.$.input.placeholder).to.be.equal(placeholder);
   });
 
-  it('should scroll to today by default', done => {
+  it('should scroll to today by default', (done) => {
     const overlayContent = getOverlayContent(datepicker);
-    var spy = sinon.spy(overlayContent, 'scrollToDate');
+    const spy = sinon.spy(overlayContent, 'scrollToDate');
     open(datepicker, () => {
       expect(monthsEqual(spy.firstCall.args[0], new Date())).to.be.true;
       done();
     });
   });
 
-  it('should scroll to initial position', done => {
+  it('should scroll to initial position', (done) => {
     datepicker.initialPosition = '2016-01-01';
-    var initialPositionDate = new Date(2016, 0, 1);
+    const initialPositionDate = new Date(2016, 0, 1);
 
     const overlayContent = getOverlayContent(datepicker);
-    var spy = sinon.spy(overlayContent, 'scrollToDate');
+    const spy = sinon.spy(overlayContent, 'scrollToDate');
 
     open(datepicker, () => {
       expect(spy.firstCall.args[0]).to.eql(initialPositionDate);
@@ -197,9 +130,9 @@ describe('Basic features', () => {
     });
   });
 
-  it('should remember the original initial position on reopen', done => {
+  it('should remember the original initial position on reopen', (done) => {
     datepicker.initialPosition = null;
-    var initialPosition;
+    let initialPosition;
 
     datepicker.open();
     const overlayContent = getOverlayContent(datepicker);
@@ -216,9 +149,9 @@ describe('Basic features', () => {
     });
   });
 
-  it('should scroll to selected value by default', done => {
+  it('should scroll to selected value by default', (done) => {
     const overlayContent = getOverlayContent(datepicker);
-    var spy = sinon.spy(overlayContent, 'scrollToDate');
+    const spy = sinon.spy(overlayContent, 'scrollToDate');
     datepicker.value = '2000-02-01';
     open(datepicker, () => {
       expect(monthsEqual(spy.firstCall.args[0], new Date(2000, 1, 1))).to.be.true;
@@ -226,9 +159,9 @@ describe('Basic features', () => {
     });
   });
 
-  it('should close on overlay date tap', done => {
+  it('should close on overlay date tap', (done) => {
     open(datepicker, () => {
-      getOverlayContent(datepicker).dispatchEvent(new CustomEvent('date-tap', {bubbles: true, composed: true}));
+      getOverlayContent(datepicker).dispatchEvent(new CustomEvent('date-tap', { bubbles: true, composed: true }));
     });
     listenForEvent(datepicker.$.overlay, 'vaadin-overlay-close', done);
   });
@@ -256,27 +189,27 @@ describe('Basic features', () => {
     expect(datepicker._inputElement.value).to.equal('2/1/0099');
   });
 
-  it('should open by tapping the calendar icon', done => {
+  it('should open by tapping the calendar icon', (done) => {
     tap(toggleButton);
     listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
   });
 
-  it('should open by tapping the calendar icon even if autoOpenDisabled is true', done => {
+  it('should open by tapping the calendar icon even if autoOpenDisabled is true', (done) => {
     window.autoOpenDisabled = true;
     tap(toggleButton);
     listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
   });
 
-  it('should scroll to a date on open', done => {
+  it('should scroll to a date on open', (done) => {
     const overlayContent = getOverlayContent(datepicker);
     // We must scroll to a date on every open because at least IE11 seems to reset
     // scrollTop while the dropdown is closed. This will result in all kind of problems.
-    var spy = sinon.spy(overlayContent, 'scrollToDate');
+    const spy = sinon.spy(overlayContent, 'scrollToDate');
 
     open(datepicker, () => {
       expect(spy.called).to.be.true;
 
-      spy.reset();
+      spy.resetHistory();
       close(datepicker, () => {
         setTimeout(() => {
           open(datepicker, () => {
@@ -299,15 +232,15 @@ describe('Basic features', () => {
     expect(datepicker.clientWidth).to.equal(width);
   });
 
-  it('should realign on iron-resize', done => {
-    sinon.stub(datepicker, '_boundUpdateAlignmentAndPosition', () => {
+  it('should realign on iron-resize', (done) => {
+    sinon.stub(datepicker, '_boundUpdateAlignmentAndPosition').callsFake(() => {
       if (!done._called) {
         done._called = true;
         done();
       }
     });
     open(datepicker, () => {
-      datepicker.dispatchEvent(new CustomEvent('iron-resize', {bubbles: false}));
+      datepicker.dispatchEvent(new CustomEvent('iron-resize', { bubbles: false }));
     });
   });
 
@@ -317,13 +250,12 @@ describe('Basic features', () => {
   });
 
   describe('window scroll realign', () => {
-
-    beforeEach(done => {
+    beforeEach((done) => {
       open(datepicker, done);
     });
 
-    it('should realign on window scroll', done => {
-      sinon.stub(datepicker, '_updateAlignmentAndPosition', () => {
+    it('should realign on window scroll', (done) => {
+      sinon.stub(datepicker, '_updateAlignmentAndPosition').callsFake(() => {
         if (!done._called) {
           done._called = true;
           done();
@@ -332,37 +264,19 @@ describe('Basic features', () => {
       window.dispatchEvent(new CustomEvent('scroll'));
     });
 
-    it('should realign on container scroll', done => {
-      datepicker.close();
-
-      var container = fixture('datepicker-wrapped');
-      var datepickerWrapped = container.querySelector('vaadin-date-picker');
-
-      open(datepickerWrapped, () => {
-        sinon.stub(datepickerWrapped, '_updateAlignmentAndPosition', () => {
-          if (!done._called) {
-            done._called = true;
-            done();
-          }
-        });
-        container.scrollTop += 100;
-      });
+    // https://github.com/vaadin/vaadin-date-picker/issues/330
+    (ios ? it - skip : it)('should not realign on year/month scroll', (done) => {
+      const spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
+      getOverlayContent(datepicker).$.yearScroller.$.scroller.scrollTop += 100;
+      setTimeout(() => {
+        expect(spy.called).to.be.false;
+        done();
+      }, 1);
     });
 
-    if (!ios) { // https://github.com/vaadin/vaadin-date-picker/issues/330
-      it('should not realign on year/month scroll', done => {
-        var spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
-        getOverlayContent(datepicker).$.yearScroller.$.scroller.scrollTop += 100;
-        setTimeout(() => {
-          expect(spy.called).to.be.false;
-          done();
-        }, 1);
-      });
-    }
-
-    it('should not realign once closed', done => {
+    it('should not realign once closed', (done) => {
       datepicker.$.overlay.addEventListener('vaadin-overlay-close', () => {
-        var spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
+        const spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
         window.dispatchEvent(new CustomEvent('scroll'));
         setTimeout(() => {
           expect(spy.called).to.be.false;
@@ -371,21 +285,11 @@ describe('Basic features', () => {
       });
       datepicker.close();
     });
-
-    it('should match the parent width', () => {
-      var container = fixture('datepicker-wrapped').querySelector('div');
-      var datepickerWrapped = container.querySelector('vaadin-date-picker');
-      container.style.width = '120px';
-      datepickerWrapped.style.width = '100%';
-      expect(datepickerWrapped.$.input.clientWidth).to.equal(120);
-    });
-
   });
 
   describe('value property formats', () => {
-
     it('should accept ISO format', () => {
-      var date = new Date(0, 1, 3);
+      const date = new Date(0, 1, 3);
 
       datepicker.value = '0000-02-03';
       date.setFullYear(0);
@@ -423,7 +327,7 @@ describe('Basic features', () => {
     });
 
     it('should output ISO format', () => {
-      var date = new Date(0, 1, 3);
+      const date = new Date(0, 1, 3);
 
       date.setFullYear(0);
       datepicker._selectedDate = date;
@@ -437,17 +341,16 @@ describe('Basic features', () => {
       datepicker._selectedDate = new Date(date.getTime());
       expect(datepicker.value).to.equal('-010000-02-03');
     });
-
   });
+
   describe('i18n', () => {
     let overlayContent, clearButton;
-    beforeEach(done => {
-      clearButton = datepicker._inputElement
-        .shadowRoot.querySelector('[part="clear-button"]');
+    beforeEach((done) => {
+      clearButton = datepicker._inputElement.shadowRoot.querySelector('[part="clear-button"]');
       datepicker.set('i18n.weekdays', 'sunnuntai_maanantai_tiistai_keskiviikko_torstai_perjantai_lauantai'.split('_'));
       datepicker.set('i18n.weekdaysShort', 'su_ma_ti_ke_to_pe_la'.split('_'));
       datepicker.set('i18n.firstDayOfWeek', 1);
-      datepicker.set('i18n.formatDate', d => {
+      datepicker.set('i18n.formatDate', (d) => {
         if (d) {
           return [d.day, d.month + 1, d.year].join('.');
         }
@@ -460,22 +363,27 @@ describe('Basic features', () => {
       overlayContent = getOverlayContent(datepicker);
       overlayContent.$.monthScroller.bufferSize = 1;
 
-      open(datepicker,
-        () => {
-          overlayContent.$.monthScroller._finishInit();
-          overlayContent.$.yearScroller._finishInit();
-          setTimeout(done, 1);
-        });
+      open(datepicker, () => {
+        overlayContent.$.monthScroller._finishInit();
+        overlayContent.$.yearScroller._finishInit();
+        setTimeout(done, 1);
+      });
     });
 
     it('should notify i18n mutation to children', () => {
-      var monthCalendar = overlayContent.$.monthScroller.querySelector('vaadin-month-calendar');
-      var weekdays = monthCalendar.$.monthGrid.querySelectorAll('[part="weekday"]:not(:empty)');
-      var weekdayLabels = Array.prototype.map.call(weekdays,
-        weekday => weekday.getAttribute('aria-label'));
-      var weekdayTitles = Array.prototype.map.call(weekdays,
-        weekday => weekday.textContent);
-      expect(weekdayLabels).to.eql(['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai']);
+      const monthCalendar = overlayContent.$.monthScroller.querySelector('vaadin-month-calendar');
+      const weekdays = monthCalendar.$.monthGrid.querySelectorAll('[part="weekday"]:not(:empty)');
+      const weekdayLabels = Array.prototype.map.call(weekdays, (weekday) => weekday.getAttribute('aria-label'));
+      const weekdayTitles = Array.prototype.map.call(weekdays, (weekday) => weekday.textContent);
+      expect(weekdayLabels).to.eql([
+        'maanantai',
+        'tiistai',
+        'keskiviikko',
+        'torstai',
+        'perjantai',
+        'lauantai',
+        'sunnuntai'
+      ]);
       expect(weekdayTitles).to.eql(['ma', 'ti', 'ke', 'to', 'pe', 'la', 'su']);
     });
 
@@ -497,8 +405,9 @@ describe('Basic features', () => {
   });
 
   describe('Disabled', () => {
-
-    beforeEach(() => datepicker.disabled = true);
+    beforeEach(() => {
+      datepicker.disabled = true;
+    });
 
     it('dropdown should not open', () => {
       datepicker.open();
@@ -511,8 +420,9 @@ describe('Basic features', () => {
   });
 
   describe('Readonly', () => {
-
-    beforeEach(() => datepicker.readonly = true);
+    beforeEach(() => {
+      datepicker.readonly = true;
+    });
 
     it('dropdown should not open', () => {
       datepicker.open();
@@ -529,7 +439,6 @@ describe('Basic features', () => {
   });
 
   describe('Date limits', () => {
-
     beforeEach(() => {
       datepicker.min = '2016-01-01';
       datepicker.max = '2016-12-31';
@@ -555,7 +464,7 @@ describe('Basic features', () => {
       expect(datepicker.invalid).to.be.equal(false);
     });
 
-    it('should reflect correct invalid value on value-changed eventListener', done => {
+    it('should reflect correct invalid value on value-changed eventListener', (done) => {
       datepicker.value = '2016-01-01'; // valid
 
       datepicker.addEventListener('value-changed', () => {
@@ -567,42 +476,42 @@ describe('Basic features', () => {
       getOverlayContent(datepicker).selectedDate = new Date('2017-01-01'); // invalid
     });
 
-    it('should change invalid state only once', done => {
+    it('should change invalid state only once', (done) => {
       datepicker.addEventListener('value-changed', () => {
         expect(invalidChangedSpy.calledOnce).to.be.true;
         done();
       });
 
-      var invalidChangedSpy = sinon.spy();
+      const invalidChangedSpy = sinon.spy();
       datepicker.addEventListener('invalid-changed', invalidChangedSpy);
       datepicker.open();
       getOverlayContent(datepicker).selectedDate = new Date('2017-01-01');
     });
 
-    it('should scroll to min date when today is not allowed', done => {
+    it('should scroll to min date when today is not allowed', (done) => {
       datepicker.max = null;
       datepicker.min = '2100-01-01';
-      var minDate = new Date(2100, 0, 1);
+      const minDate = new Date(2100, 0, 1);
 
       datepicker.open();
       const overlayContent = getOverlayContent(datepicker);
 
-      var spy = sinon.spy(overlayContent, 'scrollToDate');
+      const spy = sinon.spy(overlayContent, 'scrollToDate');
       datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
         expect(spy.firstCall.args[0]).to.eql(minDate);
         done();
       });
     });
 
-    it('should scroll to max date when today is not allowed', done => {
+    it('should scroll to max date when today is not allowed', (done) => {
       datepicker.min = null;
       datepicker.max = '2000-01-01';
-      var maxDate = new Date(2000, 0, 1);
+      const maxDate = new Date(2000, 0, 1);
 
       datepicker.open();
       const overlayContent = getOverlayContent(datepicker);
 
-      var spy = sinon.spy(overlayContent, 'scrollToDate');
+      const spy = sinon.spy(overlayContent, 'scrollToDate');
       datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
         expect(spy.firstCall.args[0]).to.eql(maxDate);
         done();
@@ -610,14 +519,14 @@ describe('Basic features', () => {
       datepicker.open();
     });
 
-    it('should scroll to initial position even when not allowed', done => {
+    it('should scroll to initial position even when not allowed', (done) => {
       datepicker.initialPosition = '2015-01-01';
-      var initialPositionDate = new Date(2015, 0, 1);
+      const initialPositionDate = new Date(2015, 0, 1);
 
       datepicker.open();
       const overlayContent = getOverlayContent(datepicker);
 
-      var spy = sinon.spy(overlayContent, 'scrollToDate');
+      const spy = sinon.spy(overlayContent, 'scrollToDate');
       datepicker.$.overlay.addEventListener('vaadin-overlay-open', () => {
         expect(spy.firstCall.args[0]).to.eql(initialPositionDate);
         done();
@@ -626,67 +535,68 @@ describe('Basic features', () => {
     });
   });
 
-  describe('Slots', () => {
-    let textfield;
-    beforeEach(() => {
-      const datepicker = fixture('datepicker-prefix');
-      textfield = datepicker._inputElement;
-    });
-
-    it('should expose the text-field prefix slot', () => {
-      const slot = textfield.querySelector('slot[name=prefix]');
-      expect(slot.assignedNodes()[0].textContent).to.eql('foo');
-    });
-  });
-
-  describe('Inside flexbox', () => {
-    it('date-picker should stretch to fit the column flex container', () => {
-      const container = fixture('datepicker-in-flexbox');
-      const flexDatePicker = container.querySelector('vaadin-date-picker');
-      expect(window.getComputedStyle(container).width).to.eql('500px');
-      expect(window.getComputedStyle(flexDatePicker).width).to.eql('500px');
-    });
-  });
-
-  describe('clear-button-visible', () => {
-    let textfield;
+  describe('clear button', () => {
+    let input;
 
     beforeEach(() => {
-      textfield = datepicker._inputElement;
+      input = datepicker._inputElement;
     });
 
     it('should not have clear-button-visible by default', () => {
       expect(datepicker).to.have.property('clearButtonVisible', false);
-      expect(textfield).to.have.property('clearButtonVisible', false);
+      expect(input).to.have.property('clearButtonVisible', false);
     });
 
-    it('should bind clear-button-visible to textfield', () => {
+    it('should bind clear-button-visible to text-field', () => {
       datepicker.clearButtonVisible = true;
       expect(datepicker).to.have.property('clearButtonVisible', true);
-      expect(textfield).to.have.property('clearButtonVisible', true);
+      expect(input).to.have.property('clearButtonVisible', true);
     });
   });
 
-  it('should display the helper text when slotted helper available', () => {
-    const datepicker = fixture(`datepicker-with-slotted-helper`);
-    const evt = new CustomEvent('slotchange');
-    datepicker.shadowRoot.querySelector('[name="helper"]').dispatchEvent(evt);
-    expect(datepicker._inputElement.querySelector('[slot="helper"]').assignedNodes()[0].textContent).to.eql('foo');
+  describe('helper text', () => {
+    it('should display the helper text when provided', () => {
+      datepicker.helperText = 'Foo';
+      expect(datepicker._inputElement.helperText).to.equal(datepicker.helperText);
+    });
+  })
+});
+
+describe('slots', () => {
+  it('should expose the text-field prefix slot', async () => {
+    const datepicker = fixtureSync('<vaadin-date-picker><div slot="prefix">foo</div></vaadin-date-picker>');
+    const input = datepicker._inputElement;
+    await nextFrame();
+    const slot = input.querySelector('slot[name=prefix]');
+    expect(slot.assignedNodes()[0].textContent).to.eql('foo');
   });
 
-  it('should display the helper text when provided', () => {
-    datepicker.helperText = 'Foo';
-    expect(datepicker._inputElement.helperText).to.equal(datepicker.helperText);
+  it('should display the helper text when slotted helper available', async () => {
+    const datepicker = fixtureSync('<vaadin-date-picker><div slot="helper">foo</div></vaadin-date-picker>');
+    await nextFrame();
+    expect(datepicker._inputElement.querySelector('[slot="helper"]').assignedNodes()[0].textContent).to.eql('foo');
   });
 });
 
-describe('with clear-button-visible', () => {
+describe('inside flexbox', () => {
+  it('date-picker should stretch to fit the column flex container', () => {
+    const container = fixtureSync(`
+    <div style="display: flex; flex-direction: column; width: 500px;">
+      <vaadin-date-picker></vaadin-date-picker>
+    </div>
+    `);
+    const flexDatePicker = container.querySelector('vaadin-date-picker');
+    expect(window.getComputedStyle(container).width).to.eql('500px');
+    expect(window.getComputedStyle(flexDatePicker).width).to.eql('500px');
+  });
+});
+
+describe('clear-button-visible', () => {
   let datepicker, clearButton;
 
   beforeEach(() => {
-    datepicker = fixture('datepicker-clear-button-visible');
-    clearButton = datepicker._inputElement
-      .shadowRoot.querySelector('[part="clear-button"]');
+    datepicker = fixtureSync('<vaadin-date-picker clear-button-visible></vaadin-date-picker>');
+    clearButton = datepicker._inputElement.shadowRoot.querySelector('[part="clear-button"]');
   });
 
   it('should have clearButtonVisible property', () => {
@@ -701,7 +611,7 @@ describe('with clear-button-visible', () => {
 
   it('should not prevent touchend event on clear button', () => {
     datepicker.value = '2000-02-01';
-    const e = new CustomEvent('touchend', {cancelable: true});
+    const e = new CustomEvent('touchend', { cancelable: true });
     clearButton.dispatchEvent(e);
     expect(e.defaultPrevented).to.be.false;
   });
@@ -719,8 +629,36 @@ describe('with clear-button-visible', () => {
     expect(datepicker.hasAttribute('has-value')).to.be.false;
   });
 });
-</script>
 
-</body>
+describe('wrapped', () => {
+  let container, datepicker;
 
-</html>
+  beforeEach(() => {
+    container = fixtureSync(`
+      <div style="height: 100px; overflow: scroll;">
+        <div style="height: 1000px;">
+          <vaadin-date-picker></vaadin-date-picker>
+        </div>
+      </div>
+    `);
+    datepicker = container.querySelector('vaadin-date-picker');
+  });
+
+  it('should realign on container scroll', (done) => {
+    open(datepicker, () => {
+      sinon.stub(datepicker, '_updateAlignmentAndPosition').callsFake(() => {
+        if (!done._called) {
+          done._called = true;
+          done();
+        }
+      });
+      container.scrollTop += 100;
+    });
+  });
+
+  it.only('should match the parent width', () => {
+    container.querySelector('div').style.width = '120px';
+    datepicker.style.width = '100%';
+    expect(datepicker.$.input.clientWidth).to.equal(120);
+  });
+});
