@@ -53,8 +53,8 @@
     "@polymer/iron-input": "^3.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
     "@vaadin/vaadin-dialog": "^2.5.1",
-    "@web/test-runner": "^0.7.24",
-    "@web/test-runner-saucelabs": "0.0.2",
+    "@web/test-runner": "^0.7.26",
+    "@web/test-runner-saucelabs": "0.0.4",
     "sinon": "^9.0.3"
   }
 }
