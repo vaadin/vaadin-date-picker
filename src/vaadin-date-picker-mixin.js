@@ -4,9 +4,8 @@ Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 */
 import { IronA11yKeysBehavior } from '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js';
-
 import { IronResizableBehavior } from '@polymer/iron-resizable-behavior/iron-resizable-behavior.js';
-import { DatePickerHelper } from './vaadin-date-picker-helper.js';
+import { dateAllowed, dateEquals, extractDateParts, getClosestDate } from './vaadin-date-picker-helper.js';
 import { addListener } from '@polymer/polymer/lib/utils/gestures.js';
 import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class.js';
 
@@ -615,7 +614,7 @@ export const DatePickerMixin = (subclass) =>
         this.value = oldValue;
         return;
       }
-      if (!DatePickerHelper._dateEquals(this[property], date)) {
+      if (!dateEquals(this[property], date)) {
         this[property] = date;
         this.value && this.validate();
       }
@@ -694,13 +693,10 @@ export const DatePickerMixin = (subclass) =>
       var initialPosition =
         this._selectedDate || this._overlayContent.initialPosition || parsedInitialPosition || new Date();
 
-      if (parsedInitialPosition || DatePickerHelper._dateAllowed(initialPosition, this._minDate, this._maxDate)) {
+      if (parsedInitialPosition || dateAllowed(initialPosition, this._minDate, this._maxDate)) {
         this._overlayContent.initialPosition = initialPosition;
       } else {
-        this._overlayContent.initialPosition = DatePickerHelper._getClosestDate(initialPosition, [
-          this._minDate,
-          this._maxDate
-        ]);
+        this._overlayContent.initialPosition = getClosestDate(initialPosition, [this._minDate, this._maxDate]);
       }
 
       this._overlayContent.scrollToDate(this._overlayContent.focusedDate || this._overlayContent.initialPosition);
@@ -825,8 +821,7 @@ export const DatePickerMixin = (subclass) =>
       const inputValid =
         !this._inputValue ||
         (this._selectedDate && this._inputValue === this._getFormattedDate(this.i18n.formatDate, this._selectedDate));
-      const minMaxValid =
-        !this._selectedDate || DatePickerHelper._dateAllowed(this._selectedDate, this._minDate, this._maxDate);
+      const minMaxValid = !this._selectedDate || dateAllowed(this._selectedDate, this._minDate, this._maxDate);
 
       let inputValidity = true;
       if (this._inputElement) {
@@ -873,7 +868,7 @@ export const DatePickerMixin = (subclass) =>
 
     /** @private */
     _getFormattedDate(formatDate, date) {
-      return formatDate(DatePickerHelper._extractDateParts(date));
+      return formatDate(extractDateParts(date));
     }
 
     /** @private */
@@ -1014,7 +1009,7 @@ export const DatePickerMixin = (subclass) =>
 
         if (this._isValidDate(parsedDate)) {
           this._ignoreFocusedDateChange = true;
-          if (!DatePickerHelper._dateEquals(parsedDate, this._focusedDate)) {
+          if (!dateEquals(parsedDate, this._focusedDate)) {
             this._focusedDate = parsedDate;
           }
           this._ignoreFocusedDateChange = false;

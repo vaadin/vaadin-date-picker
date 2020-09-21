@@ -6,8 +6,8 @@ This program is available under Apache License Version 2.0, available at https:/
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/polymer/lib/elements/dom-repeat.js';
 import { GestureEventListeners } from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
-import { DatePickerHelper } from './vaadin-date-picker-helper.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
+import { dateAllowed, dateEquals, getISOWeekNumber } from './vaadin-date-picker-helper.js';
 
 /**
  * @extends PolymerElement
@@ -175,11 +175,11 @@ class MonthCalendarElement extends ThemableMixin(GestureEventListeners(PolymerEl
   }
 
   _dateEquals(date1, date2) {
-    return DatePickerHelper._dateEquals(date1, date2);
+    return dateEquals(date1, date2);
   }
 
   _dateAllowed(date, min, max) {
-    return DatePickerHelper._dateAllowed(date, min, max);
+    return dateAllowed(date, min, max);
   }
 
   /* Returns true if all the dates in the month are out of the allowed range */
@@ -314,7 +314,7 @@ class MonthCalendarElement extends ThemableMixin(GestureEventListeners(PolymerEl
       });
     }
 
-    return DatePickerHelper._getISOWeekNumber(date);
+    return getISOWeekNumber(date);
   }
 
   _getWeekNumbers(dates) {

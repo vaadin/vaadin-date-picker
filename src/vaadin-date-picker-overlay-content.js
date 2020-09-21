@@ -16,7 +16,7 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mix
 import { DirMixin } from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
 import './vaadin-month-calendar.js';
 import './vaadin-infinite-scroller.js';
-import { DatePickerHelper } from './vaadin-date-picker-helper.js';
+import { dateEquals, getClosestDate, getISOWeekNumber, extractDateParts } from './vaadin-date-picker-helper.js';
 import './vaadin-date-picker-styles.js';
 
 /**
@@ -353,7 +353,7 @@ class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEven
   announceFocusedDate() {
     var focusedDate = this._currentlyFocusedDate();
     var announce = [];
-    if (DatePickerHelper._dateEquals(focusedDate, new Date())) {
+    if (dateEquals(focusedDate, new Date())) {
       announce.push(this.i18n.today);
     }
     announce = announce.concat([
@@ -364,7 +364,7 @@ class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEven
     ]);
     if (this.showWeekNumbers && this.i18n.firstDayOfWeek === 1) {
       announce.push(this.i18n.week);
-      announce.push(DatePickerHelper._getISOWeekNumber(focusedDate));
+      announce.push(getISOWeekNumber(focusedDate));
     }
     this.dispatchEvent(
       new CustomEvent('iron-announce', {
@@ -475,7 +475,7 @@ class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEven
 
   _formatDisplayed(date, formatDate, label) {
     if (date) {
-      return formatDate(DatePickerHelper._extractDateParts(date));
+      return formatDate(extractDateParts(date));
     } else {
       return label;
     }
@@ -789,7 +789,7 @@ class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEven
             this._onTodayTap();
           } else {
             var focusedDate = this.focusedDate;
-            if (DatePickerHelper._dateEquals(focusedDate, this.selectedDate)) {
+            if (dateEquals(focusedDate, this.selectedDate)) {
               this.selectedDate = '';
               this.focusedDate = focusedDate;
             } else {
@@ -826,7 +826,7 @@ class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEven
   }
 
   _focusClosestDate(focus) {
-    this._focusDate(DatePickerHelper._getClosestDate(focus, [this.minDate, this.maxDate]));
+    this._focusDate(getClosestDate(focus, [this.minDate, this.maxDate]));
   }
 
   _moveFocusByDays(days) {
