@@ -86,7 +86,7 @@ import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
  * Note: the `theme` attribute value set on `<vaadin-date-picker>` is
  * propagated to the internal themable components listed above.
  *
- * @extends PolymerElement
+ * @extends HTMLElement
  * @mixes ElementMixin
  * @mixes ControlStateMixin
  * @mixes ThemableMixin

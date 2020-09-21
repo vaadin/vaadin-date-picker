@@ -31,8 +31,10 @@
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint src theme test",
     "lint:css": "stylelint src/*.js theme/**/*-styles.js",
+    "prestart": "polymer analyze vaadin-* > analysis.json",
     "preversion": "magi update-version",
     "screenshots": "hermione test/visual/test.js --update-refs",
+    "start": "web-dev-server --node-resolve demo/index.html --open",
     "test": "web-test-runner test/*.test.js --coverage",
     "test:sauce": "TEST_ENV=sauce npm test",
     "test:visual": "hermione test/visual/test.js"
@@ -71,6 +73,7 @@
     "@polymer/iron-input": "^3.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
     "@vaadin/vaadin-dialog": "^2.5.1",
+    "@web/dev-server": "0.0.10",
     "@web/test-runner": "^0.7.26",
     "@web/test-runner-saucelabs": "0.0.4",
     "eslint": "^7.9.0",

@@ -10,7 +10,7 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mix
 import { dateAllowed, dateEquals, getISOWeekNumber } from './vaadin-date-picker-helper.js';
 
 /**
- * @extends PolymerElement
+ * @extends HTMLElement
  * @private
  */
 class MonthCalendarElement extends ThemableMixin(GestureEventListeners(PolymerElement)) {

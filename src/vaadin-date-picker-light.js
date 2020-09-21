@@ -46,7 +46,7 @@ import { DatePickerMixin } from './vaadin-date-picker-mixin.js';
  * Note: the `theme` attribute value set on `<vaadin-date-picker-light>`
  * is propagated to the internal themable components listed above.
  *
- * @extends PolymerElement
+ * @extends HTMLElement
  * @mixes ThemableMixin
  * @mixes DatePickerMixin
  */

@@ -42,7 +42,7 @@ registerStyles(
  *
  * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
  *
- * @extends PolymerElement
+ * @extends TextFieldElement
  */
 class DatePickerTextFieldElement extends TextFieldElement {
   static get is() {

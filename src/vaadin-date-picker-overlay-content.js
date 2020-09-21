@@ -20,7 +20,7 @@ import { dateEquals, getClosestDate, getISOWeekNumber, extractDateParts } from '
 import './vaadin-date-picker-styles.js';
 
 /**
- * @extends PolymerElement
+ * @extends HTMLElement
  * @private
  */
 class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEventListeners(PolymerElement))) {

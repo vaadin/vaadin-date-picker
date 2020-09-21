@@ -10,7 +10,7 @@ import { templatize } from '@polymer/polymer/lib/utils/templatize.js';
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 
 /**
- * @extends PolymerElement
+ * @extends HTMLElement
  * @private
  */
 class InfiniteScrollerElement extends PolymerElement {
