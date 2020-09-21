@@ -21,6 +21,9 @@ jobs:
     - name: Run ESLint
       run: npm run lint:js
 
+    - name: Run Stylelint
+      run: npm run lint:css
+
     - name: Generate typings
       run: npm run generate-typings
 

@@ -28,7 +28,9 @@
     "check-version": "magi check-version",
     "debug": "web-test-runner test/*.test.js --node-resolve --watch",
     "generate-typings": "gen-typescript-declarations --outDir . --verify",
+    "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint src theme test",
+    "lint:css": "stylelint src/*.js theme/**/*-styles.js",
     "preversion": "magi update-version",
     "screenshots": "hermione test/visual/test.js --update-refs",
     "test": "web-test-runner test/*.test.js",
@@ -81,6 +83,8 @@
     "lint-staged": "^10.4.0",
     "magi-cli": "^0.27.0",
     "prettier": "^2.1.2",
-    "sinon": "^9.0.3"
+    "sinon": "^9.0.3",
+    "stylelint": "^13.7.1",
+    "stylelint-config-vaadin": "^0.2.6"
   }
 }
