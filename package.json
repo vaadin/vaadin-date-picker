@@ -25,9 +25,11 @@
     "theme"
   ],
   "scripts": {
+    "check-version": "magi check-version",
     "debug": "web-test-runner test/*.test.js --node-resolve --watch",
     "generate-typings": "gen-typescript-declarations --outDir . --verify",
     "lint:js": "eslint src theme test",
+    "preversion": "magi update-version",
     "screenshots": "hermione test/visual/test.js --update-refs",
     "test": "web-test-runner test/*.test.js",
     "test:sauce": "TEST_ENV=sauce npm test",
@@ -77,6 +79,7 @@
     "hermione-sauce": "^0.1.0",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
+    "magi-cli": "^0.27.0",
     "prettier": "^2.1.2",
     "sinon": "^9.0.3"
   }
