@@ -8,7 +8,7 @@
 <!-- Example: Overlay stays hidden. -->
 
 ### Live Demo
-<!-- The template, click "Remix This" to edit it: https://glitch.com/edit/#!/desert-duckling -->
+<!-- The template, click "Remix This" to edit it: https://glitch.com/edit/#!/vaadin-date-picker-issue -->
 
 ### Steps to reproduce
 <!-- Example
@@ -23,6 +23,5 @@
 - [ ] Firefox
 - [ ] Safari
 - [ ] Edge
-- [ ] IE 11
 - [ ] iOS Safari
 - [ ] Android Chrome
