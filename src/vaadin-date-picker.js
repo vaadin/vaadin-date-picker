@@ -3,8 +3,7 @@
 Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 */
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { GestureEventListeners } from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
 import '@polymer/iron-media-query/iron-media-query.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
@@ -14,10 +13,9 @@ import './vaadin-date-picker-overlay-content.js';
 import { DatePickerMixin } from './vaadin-date-picker-mixin.js';
 import './vaadin-date-picker-text-field.js';
 import { ElementMixin } from '@vaadin/vaadin-element-mixin/vaadin-element-mixin.js';
-import { html } from '@polymer/polymer/lib/utils/html-tag.js';
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+
 /**
- *
  * `<vaadin-date-picker>` is a date selection field which includes a scrollable
  * month calendar view.
  * ```html
@@ -96,50 +94,93 @@ import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
  * @mixes GestureEventListeners
  * @demo demo/index.html
  */
-class DatePickerElement extends
-  ElementMixin(
-    ControlStateMixin(
-      ThemableMixin(
-        DatePickerMixin(
-          GestureEventListeners(PolymerElement))))) {
+class DatePickerElement extends ElementMixin(
+  ControlStateMixin(ThemableMixin(DatePickerMixin(GestureEventListeners(PolymerElement))))
+) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: inline-block;
-      }
+      <style>
+        :host {
+          display: inline-block;
+        }
 
-      :host([hidden]) {
-        display: none !important;
-      }
+        :host([hidden]) {
+          display: none !important;
+        }
 
-      :host([opened]) {
-        pointer-events: auto;
-      }
+        :host([opened]) {
+          pointer-events: auto;
+        }
 
-      [part="text-field"] {
-        width: 100%;
-        min-width: 0;
-      }
-    </style>
+        [part='text-field'] {
+          width: 100%;
+          min-width: 0;
+        }
+      </style>
 
+      <vaadin-date-picker-text-field
+        id="input"
+        role="application"
+        autocomplete="off"
+        on-focus="_focus"
+        value="{{_userInputValue}}"
+        invalid="[[invalid]]"
+        label="[[label]]"
+        name="[[name]]"
+        placeholder="[[placeholder]]"
+        required="[[required]]"
+        disabled="[[disabled]]"
+        readonly="[[readonly]]"
+        error-message="[[errorMessage]]"
+        clear-button-visible="[[clearButtonVisible]]"
+        aria-label$="[[label]]"
+        part="text-field"
+        helper-text="[[helperText]]"
+        theme$="[[theme]]"
+      >
+        <slot name="prefix" slot="prefix"></slot>
+        <slot name="helper" slot="helper">[[helperText]]</slot>
+        <div
+          part="toggle-button"
+          slot="suffix"
+          on-tap="_toggle"
+          role="button"
+          aria-label$="[[i18n.calendar]]"
+          aria-expanded$="[[_getAriaExpanded(opened)]]"
+        ></div>
+      </vaadin-date-picker-text-field>
 
-    <vaadin-date-picker-text-field id="input" role="application" autocomplete="off" on-focus="_focus" value="{{_userInputValue}}" invalid="[[invalid]]" label="[[label]]" name="[[name]]" placeholder="[[placeholder]]" required="[[required]]" disabled="[[disabled]]" readonly="[[readonly]]" error-message="[[errorMessage]]" clear-button-visible="[[clearButtonVisible]]" aria-label\$="[[label]]" part="text-field" helper-text="[[helperText]]" theme\$="[[theme]]">
-      <slot name="prefix" slot="prefix"></slot>
-      <slot name="helper" slot="helper">[[helperText]]</slot>
-      <div part="toggle-button" slot="suffix" on-tap="_toggle" role="button" aria-label\$="[[i18n.calendar]]" aria-expanded\$="[[_getAriaExpanded(opened)]]"></div>
-    </vaadin-date-picker-text-field>
+      <vaadin-date-picker-overlay
+        id="overlay"
+        fullscreen$="[[_fullscreen]]"
+        theme$="[[__getOverlayTheme(theme, _overlayInitialized)]]"
+        on-vaadin-overlay-open="_onOverlayOpened"
+        on-vaadin-overlay-close="_onOverlayClosed"
+        disable-upgrade
+      >
+        <template>
+          <vaadin-date-picker-overlay-content
+            id="overlay-content"
+            i18n="[[i18n]]"
+            fullscreen$="[[_fullscreen]]"
+            label="[[label]]"
+            selected-date="{{_selectedDate}}"
+            slot="dropdown-content"
+            focused-date="{{_focusedDate}}"
+            show-week-numbers="[[showWeekNumbers]]"
+            min-date="[[_minDate]]"
+            max-date="[[_maxDate]]"
+            role="dialog"
+            on-date-tap="_close"
+            part="overlay-content"
+            theme$="[[__getOverlayTheme(theme, _overlayInitialized)]]"
+          >
+          </vaadin-date-picker-overlay-content>
+        </template>
+      </vaadin-date-picker-overlay>
 
-    <vaadin-date-picker-overlay id="overlay" fullscreen\$="[[_fullscreen]]" theme\$="[[__getOverlayTheme(theme, _overlayInitialized)]]" on-vaadin-overlay-open="_onOverlayOpened" on-vaadin-overlay-close="_onOverlayClosed" disable-upgrade="">
-      <template>
-        <vaadin-date-picker-overlay-content id="overlay-content" i18n="[[i18n]]" fullscreen\$="[[_fullscreen]]" label="[[label]]" selected-date="{{_selectedDate}}" slot="dropdown-content" focused-date="{{_focusedDate}}" show-week-numbers="[[showWeekNumbers]]" min-date="[[_minDate]]" max-date="[[_maxDate]]" role="dialog" on-date-tap="_close" part="overlay-content" theme\$="[[__getOverlayTheme(theme, _overlayInitialized)]]">
-        </vaadin-date-picker-overlay-content>
-      </template>
-    </vaadin-date-picker-overlay>
-
-    <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}">
-    </iron-media-query>
-`;
+      <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"> </iron-media-query>
+    `;
   }
 
   static get is() {
@@ -219,10 +260,7 @@ class DatePickerElement extends
   }
 
   static get observers() {
-    return [
-      '_userInputValueChanged(_userInputValue)',
-      '_setClearButtonLabel(i18n.clear)'
-    ];
+    return ['_userInputValueChanged(_userInputValue)', '_setClearButtonLabel(i18n.clear)'];
   }
 
   /** @protected */
@@ -230,7 +268,9 @@ class DatePickerElement extends
     super.ready();
 
     // In order to have synchronized invalid property, we need to use the same validate logic.
-    afterNextRender(this, () => this._inputElement.validate = () => {});
+    afterNextRender(this, () => {
+      this._inputElement.validate = () => {};
+    });
 
     this._inputElement.addEventListener('change', (e) => {
       // For change event on text-field blur, after the field is cleared,
@@ -256,7 +296,7 @@ class DatePickerElement extends
   /** @private */
   _toggle(e) {
     e.stopPropagation();
-    this[(this._overlayInitialized && this.$.overlay.opened) ? 'close' : 'open']();
+    this[this._overlayInitialized && this.$.overlay.opened ? 'close' : 'open']();
   }
 
   /**
@@ -294,8 +334,7 @@ class DatePickerElement extends
   _setClearButtonLabel(i18nClear) {
     // FIXME(platosha): expose i18n API in <vaadin-text-field>
     // https://github.com/vaadin/vaadin-text-field/issues/348
-    this._inputElement.shadowRoot.querySelector('[part="clear-button"]')
-      .setAttribute('aria-label', i18nClear);
+    this._inputElement.shadowRoot.querySelector('[part="clear-button"]').setAttribute('aria-label', i18nClear);
   }
 }
 

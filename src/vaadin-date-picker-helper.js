@@ -34,7 +34,7 @@ export const DatePickerHelper = class VaadinDatePickerHelper {
     // when the given date is inside daylight saving time period.
     var daysSinceFirstOfJanuary = Math.round(timeDiff / (24 * 3600 * 1000));
 
-    return Math.floor((daysSinceFirstOfJanuary) / 7 + 1);
+    return Math.floor(daysSinceFirstOfJanuary / 7 + 1);
   }
 
   /**
@@ -45,10 +45,13 @@ export const DatePickerHelper = class VaadinDatePickerHelper {
    * @return {Boolean} True if the given date objects refer to the same date
    */
   static _dateEquals(date1, date2) {
-    return date1 instanceof Date && date2 instanceof Date &&
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate();
+    return (
+      date1 instanceof Date &&
+      date2 instanceof Date &&
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
   }
 
   /**
@@ -71,7 +74,8 @@ export const DatePickerHelper = class VaadinDatePickerHelper {
    * @return {Date} Closest date
    */
   static _getClosestDate(date, dates) {
-    return dates.filter(date => date !== undefined)
+    return dates
+      .filter((date) => date !== undefined)
       .reduce((closestDate, candidate) => {
         if (!candidate) {
           return closestDate;

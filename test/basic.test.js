@@ -265,7 +265,7 @@ describe('basic features', () => {
     });
 
     // https://github.com/vaadin/vaadin-date-picker/issues/330
-    (ios ? it - skip : it)('should not realign on year/month scroll', (done) => {
+    (ios ? it.skip : it)('should not realign on year/month scroll', (done) => {
       const spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
       getOverlayContent(datepicker).$.yearScroller.$.scroller.scrollTop += 100;
       setTimeout(() => {
@@ -559,7 +559,7 @@ describe('basic features', () => {
       datepicker.helperText = 'Foo';
       expect(datepicker._inputElement.helperText).to.equal(datepicker.helperText);
     });
-  })
+  });
 });
 
 describe('slots', () => {

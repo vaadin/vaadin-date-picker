@@ -4,8 +4,8 @@ Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 */
 import { OverlayElement } from '@vaadin/vaadin-overlay/src/vaadin-overlay.js';
-
 import { DisableUpgradeMixin } from '@polymer/polymer/lib/mixins/disable-upgrade-mixin.js';
+
 /**
  * The overlay element.
  *
@@ -16,7 +16,6 @@ import { DisableUpgradeMixin } from '@polymer/polymer/lib/mixins/disable-upgrade
  *
  * See [ThemableMixin – how to apply styles for shadow parts](https://github.com/vaadin/vaadin-themable-mixin/wiki)
  *
- * @extends PolymerElement
  * @private
  */
 class DatePickerOverlayElement extends DisableUpgradeMixin(OverlayElement) {

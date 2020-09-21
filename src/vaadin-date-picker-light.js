@@ -3,15 +3,14 @@
 Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 */
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
+import { dashToCamelCase } from '@polymer/polymer/lib/utils/case-map.js';
 import '@polymer/iron-media-query/iron-media-query.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 import './vaadin-date-picker-overlay.js';
 import './vaadin-date-picker-overlay-content.js';
 import { DatePickerMixin } from './vaadin-date-picker-mixin.js';
-import { html } from '@polymer/polymer/lib/utils/html-tag.js';
-import { dashToCamelCase } from '@polymer/polymer/lib/utils/case-map.js';
+
 /**
  *
  * `<vaadin-date-picker-light>` is a customizable version of the `<vaadin-date-picker>` providing
@@ -20,23 +19,11 @@ import { dashToCamelCase } from '@polymer/polymer/lib/utils/case-map.js';
  * To create a custom input field, you need to add a child element which has a two-way
  * data-bindable property representing the input value. The property name is expected
  * to be `bindValue` by default. See the example below for a simplest possible example
- * using an `<input>` element extended with `iron-input`.
- *
- * ```html
- * <vaadin-date-picker-light>
- *   <iron-input>
- *     <input/>
- *   </iron-input>
- * </vaadin-date-picker-light>
- * ```
- *
- * If you are using other custom input fields like `<paper-input>`, you
- * need to define the name of value property using the `attrForValue` property.
+ * using an `<input>` element.
  *
  * ```html
  * <vaadin-date-picker-light attr-for-value="value">
- *   <paper-input label="Birthday">
- *   </paper-input>
+ *   <input class="input">
  * </vaadin-date-picker-light>
  * ```
  *
@@ -64,32 +51,51 @@ import { dashToCamelCase } from '@polymer/polymer/lib/utils/case-map.js';
  * @mixes ThemableMixin
  * @mixes DatePickerMixin
  */
-class DatePickerLightElement extends
-  ThemableMixin(
-    DatePickerMixin(PolymerElement)) {
+class DatePickerLightElement extends ThemableMixin(DatePickerMixin(PolymerElement)) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: inline-block;
-      }
+      <style>
+        :host {
+          display: inline-block;
+        }
 
-      :host([opened]) {
-        pointer-events: auto;
-      }
-    </style>
-    <slot></slot>
+        :host([opened]) {
+          pointer-events: auto;
+        }
+      </style>
+      <slot></slot>
 
-    <vaadin-date-picker-overlay id="overlay" fullscreen\$="[[_fullscreen]]" opened="{{opened}}" on-vaadin-overlay-open="_onOverlayOpened" on-vaadin-overlay-close="_onOverlayClosed" theme\$="[[__getOverlayTheme(theme, _overlayInitialized)]]">
-      <template>
-        <vaadin-date-picker-overlay-content id="overlay-content" i18n="[[i18n]]" fullscreen\$="[[_fullscreen]]" label="[[label]]" selected-date="{{_selectedDate}}" slot="dropdown-content" focused-date="{{_focusedDate}}" show-week-numbers="[[showWeekNumbers]]" min-date="[[_minDate]]" max-date="[[_maxDate]]" on-date-tap="_close" role="dialog" part="overlay-content" theme\$="[[__getOverlayTheme(theme, _overlayInitialized)]]">
-        </vaadin-date-picker-overlay-content>
-      </template>
-    </vaadin-date-picker-overlay>
+      <vaadin-date-picker-overlay
+        id="overlay"
+        fullscreen$="[[_fullscreen]]"
+        opened="{{opened}}"
+        on-vaadin-overlay-open="_onOverlayOpened"
+        on-vaadin-overlay-close="_onOverlayClosed"
+        theme$="[[__getOverlayTheme(theme, _overlayInitialized)]]"
+      >
+        <template>
+          <vaadin-date-picker-overlay-content
+            id="overlay-content"
+            i18n="[[i18n]]"
+            fullscreen$="[[_fullscreen]]"
+            label="[[label]]"
+            selected-date="{{_selectedDate}}"
+            slot="dropdown-content"
+            focused-date="{{_focusedDate}}"
+            show-week-numbers="[[showWeekNumbers]]"
+            min-date="[[_minDate]]"
+            max-date="[[_maxDate]]"
+            on-date-tap="_close"
+            role="dialog"
+            part="overlay-content"
+            theme$="[[__getOverlayTheme(theme, _overlayInitialized)]]"
+          >
+          </vaadin-date-picker-overlay-content>
+        </template>
+      </vaadin-date-picker-overlay>
 
-    <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}">
-    </iron-media-query>
-`;
+      <iron-media-query query="[[_fullscreenMediaQuery]]" query-matches="{{_fullscreen}}"> </iron-media-query>
+    `;
   }
 
   static get is() {

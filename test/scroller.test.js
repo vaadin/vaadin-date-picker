@@ -48,7 +48,7 @@ describe('vaadin-infinite-scroller', () => {
     expect(scroller.shadowRoot.querySelector('.buffer').children).to.have.length(80);
   });
 
-  it('should reflect currently visible item index as position scrolling down', done => {
+  it('should reflect currently visible item index as position scrolling down', (done) => {
     function scrollDown() {
       verifyPosition();
       if (scroller.position > scroller.bufferSize * 1.5) {
@@ -62,7 +62,7 @@ describe('vaadin-infinite-scroller', () => {
     scrollDown();
   });
 
-  it('should reflect currently visible item index as position scrolling up', done => {
+  it('should reflect currently visible item index as position scrolling up', (done) => {
     function scrollUp() {
       verifyPosition();
       if (scroller.position < -scroller.bufferSize * 1.5) {
@@ -84,7 +84,7 @@ describe('vaadin-infinite-scroller', () => {
     }
   });
 
-  it('should fire non-bubbling custom-scroll events', done => {
+  it('should fire non-bubbling custom-scroll events', (done) => {
     function customScrollListener(e) {
       scroller.removeEventListener('custom-scroll', customScrollListener);
       expect(e.bubbles).to.be.false;
@@ -96,7 +96,7 @@ describe('vaadin-infinite-scroller', () => {
     scroller.$.scroller.scrollTop += 10;
   });
 
-  it('should not fire custom-scroll events', done => {
+  it('should not fire custom-scroll events', (done) => {
     const spy = sinon.spy();
     scroller.addEventListener('custom-scroll', spy);
     listenForEvent(scroller.$.scroller, 'scroll', () => {
@@ -106,7 +106,7 @@ describe('vaadin-infinite-scroller', () => {
     scroller.position = 10;
   });
 
-  it('should not animate on second attach', async() => {
+  it('should not animate on second attach', async () => {
     const spy = sinon.spy();
     scroller.addEventListener('animationstart', spy);
     const parent = scroller.parentNode;
@@ -117,8 +117,8 @@ describe('vaadin-infinite-scroller', () => {
   });
 
   it('should have an instance stamped to every wrapper', () => {
-    scroller._buffers.forEach(buffer => {
-      Array.from(buffer.children).forEach(insertionPoint => {
+    scroller._buffers.forEach((buffer) => {
+      Array.from(buffer.children).forEach((insertionPoint) => {
         expect(insertionPoint._itemWrapper.firstElementChild).to.be.ok;
       });
     });

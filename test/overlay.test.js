@@ -252,7 +252,7 @@ describe('vaadin-date-picker-overlay', () => {
         overlay.scrollToDate(initialDate);
         var closeSpy = sinon.spy();
         overlay.addEventListener('close', closeSpy);
-        const scrollSpy = sinon.spy(overlay, 'scrollToDate');
+        // const scrollSpy = sinon.spy(overlay, 'scrollToDate');
 
         overlay.$.todayButton.disabled = true;
 

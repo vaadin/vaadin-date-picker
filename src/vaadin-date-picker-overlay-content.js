@@ -3,12 +3,14 @@
 Copyright (c) 2017 Vaadin Ltd.
 This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
 */
-import { PolymerElement } from '@polymer/polymer/polymer-element.js';
-
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { GestureEventListeners } from '@polymer/polymer/lib/mixins/gesture-event-listeners.js';
-import '@polymer/iron-media-query/iron-media-query.js';
+import { addListener, setTouchAction } from '@polymer/polymer/lib/utils/gestures.js';
+import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
+import { timeOut } from '@polymer/polymer/lib/utils/async.js';
 import { IronA11yKeysBehavior } from '@polymer/iron-a11y-keys-behavior/iron-a11y-keys-behavior.js';
 import { IronA11yAnnouncer } from '@polymer/iron-a11y-announcer/iron-a11y-announcer.js';
+import '@polymer/iron-media-query/iron-media-query.js';
 import '@vaadin/vaadin-button/src/vaadin-button.js';
 import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mixin.js';
 import { DirMixin } from '@vaadin/vaadin-element-mixin/vaadin-dir-mixin.js';
@@ -16,199 +18,228 @@ import './vaadin-month-calendar.js';
 import './vaadin-infinite-scroller.js';
 import { DatePickerHelper } from './vaadin-date-picker-helper.js';
 import './vaadin-date-picker-styles.js';
-import { html } from '@polymer/polymer/lib/utils/html-tag.js';
-import { addListener, setTouchAction } from '@polymer/polymer/lib/utils/gestures.js';
-import { Debouncer } from '@polymer/polymer/lib/utils/debounce.js';
-import { timeOut } from '@polymer/polymer/lib/utils/async.js';
+
 /**
  * @extends PolymerElement
  * @private
  */
-class DatePickerOverlayContentElement extends
-  ThemableMixin(
-    DirMixin(
-      GestureEventListeners(PolymerElement))) {
+class DatePickerOverlayContentElement extends ThemableMixin(DirMixin(GestureEventListeners(PolymerElement))) {
   static get template() {
     return html`
-    <style>
-      :host {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
-        outline: none;
-        background: #fff;
-      }
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+          outline: none;
+          background: #fff;
+        }
 
-      [part="overlay-header"] {
-        display: flex;
-        flex-shrink: 0;
-        flex-wrap: nowrap;
-        align-items: center;
-      }
+        [part='overlay-header'] {
+          display: flex;
+          flex-shrink: 0;
+          flex-wrap: nowrap;
+          align-items: center;
+        }
 
-      :host(:not([fullscreen])) [part="overlay-header"] {
-        display: none;
-      }
+        :host(:not([fullscreen])) [part='overlay-header'] {
+          display: none;
+        }
 
-      [part="label"] {
-        flex-grow: 1;
-      }
+        [part='label'] {
+          flex-grow: 1;
+        }
 
-      [part="clear-button"]:not([showclear]) {
-        display: none;
-      }
+        [part='clear-button']:not([showclear]) {
+          display: none;
+        }
 
-      [part="years-toggle-button"] {
-        display: flex;
-      }
+        [part='years-toggle-button'] {
+          display: flex;
+        }
 
-      [part="years-toggle-button"][desktop] {
-        display: none;
-      }
+        [part='years-toggle-button'][desktop] {
+          display: none;
+        }
 
-      :host(:not([years-visible])) [part="years-toggle-button"]::before {
-        transform: rotate(180deg);
-      }
+        :host(:not([years-visible])) [part='years-toggle-button']::before {
+          transform: rotate(180deg);
+        }
 
-      #scrollers {
-        display: flex;
-        height: 100%;
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-      }
+        #scrollers {
+          display: flex;
+          height: 100%;
+          width: 100%;
+          position: relative;
+          overflow: hidden;
+        }
 
-      [part="months"],
-      [part="years"] {
-        height: 100%;
-      }
+        [part='months'],
+        [part='years'] {
+          height: 100%;
+        }
 
-      [part="months"] {
-        --vaadin-infinite-scroller-item-height: 270px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-      }
+        [part='months'] {
+          --vaadin-infinite-scroller-item-height: 270px;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+        }
 
-      #scrollers[desktop] [part="months"] {
-        right: 50px;
-        transform: none !important;
-      }
+        #scrollers[desktop] [part='months'] {
+          right: 50px;
+          transform: none !important;
+        }
 
-      [part="years"] {
-        --vaadin-infinite-scroller-item-height: 80px;
-        width: 50px;
-        position: absolute;
-        right: 0;
-        transform: translateX(100%);
-        -webkit-tap-highlight-color: transparent;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        /* Center the year scroller position. */
-        --vaadin-infinite-scroller-buffer-offset: 50%;
-      }
+        [part='years'] {
+          --vaadin-infinite-scroller-item-height: 80px;
+          width: 50px;
+          position: absolute;
+          right: 0;
+          transform: translateX(100%);
+          -webkit-tap-highlight-color: transparent;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          /* Center the year scroller position. */
+          --vaadin-infinite-scroller-buffer-offset: 50%;
+        }
 
-      #scrollers[desktop] [part="years"] {
-        position: absolute;
-        transform: none !important;
-      }
+        #scrollers[desktop] [part='years'] {
+          position: absolute;
+          transform: none !important;
+        }
 
-      [part="years"]::before {
-        content: '';
-        display: block;
-        background: transparent;
-        width: 0;
-        height: 0;
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        border-width: 6px;
-        border-style: solid;
-        border-color: transparent;
-        border-left-color: #000;
-      }
+        [part='years']::before {
+          content: '';
+          display: block;
+          background: transparent;
+          width: 0;
+          height: 0;
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          border-width: 6px;
+          border-style: solid;
+          border-color: transparent;
+          border-left-color: #000;
+        }
 
-      :host(.animate) [part="months"],
-      :host(.animate) [part="years"] {
-        transition: all 200ms;
-      }
+        :host(.animate) [part='months'],
+        :host(.animate) [part='years'] {
+          transition: all 200ms;
+        }
 
-      [part="toolbar"] {
-        display: flex;
-        justify-content: space-between;
-        z-index: 2;
-        flex-shrink: 0;
-      }
+        [part='toolbar'] {
+          display: flex;
+          justify-content: space-between;
+          z-index: 2;
+          flex-shrink: 0;
+        }
 
-      [part~="overlay-header"]:not([desktop]) {
-        padding-bottom: 40px;
-      }
+        [part~='overlay-header']:not([desktop]) {
+          padding-bottom: 40px;
+        }
 
-      [part~="years-toggle-button"] {
-        position: absolute;
-        top: auto;
-        right: 8px;
-        bottom: 0;
-        z-index: 1;
-        padding: 8px;
-      }
+        [part~='years-toggle-button'] {
+          position: absolute;
+          top: auto;
+          right: 8px;
+          bottom: 0;
+          z-index: 1;
+          padding: 8px;
+        }
 
-      #announcer {
-        display: inline-block;
-        position: fixed;
-        clip: rect(0, 0, 0, 0);
-        clip-path: inset(100%);
-      }
-    </style>
+        #announcer {
+          display: inline-block;
+          position: fixed;
+          clip: rect(0, 0, 0, 0);
+          clip-path: inset(100%);
+        }
+      </style>
 
-    <div id="announcer" role="alert" aria-live="polite">
-      [[i18n.calendar]]
-    </div>
+      <div id="announcer" role="alert" aria-live="polite">[[i18n.calendar]]</div>
 
-    <div part="overlay-header" on-touchend="_preventDefault" desktop\$="[[_desktopMode]]" aria-hidden="true">
-      <div part="label">[[_formatDisplayed(selectedDate, i18n.formatDate, label)]]</div>
-      <div part="clear-button" on-tap="_clear" showclear\$="[[_showClear(selectedDate)]]"></div>
-      <div part="toggle-button" on-tap="_cancel"></div>
+      <div part="overlay-header" on-touchend="_preventDefault" desktop$="[[_desktopMode]]" aria-hidden="true">
+        <div part="label">[[_formatDisplayed(selectedDate, i18n.formatDate, label)]]</div>
+        <div part="clear-button" on-tap="_clear" showclear$="[[_showClear(selectedDate)]]"></div>
+        <div part="toggle-button" on-tap="_cancel"></div>
 
-      <div part="years-toggle-button" desktop\$="[[_desktopMode]]" on-tap="_toggleYearScroller" aria-hidden="true">
-        [[_yearAfterXMonths(_visibleMonthIndex)]]
+        <div part="years-toggle-button" desktop$="[[_desktopMode]]" on-tap="_toggleYearScroller" aria-hidden="true">
+          [[_yearAfterXMonths(_visibleMonthIndex)]]
+        </div>
       </div>
-    </div>
 
-    <div id="scrollers" desktop\$="[[_desktopMode]]" on-track="_track">
-      <vaadin-infinite-scroller id="monthScroller" on-custom-scroll="_onMonthScroll" on-touchstart="_onMonthScrollTouchStart" buffer-size="3" active="[[initialPosition]]" part="months">
-        <template>
-          <vaadin-month-calendar i18n="[[i18n]]" month="[[_dateAfterXMonths(index)]]" selected-date="{{selectedDate}}" focused-date="[[focusedDate]]" ignore-taps="[[_ignoreTaps]]" show-week-numbers="[[showWeekNumbers]]" min-date="[[minDate]]" max-date="[[maxDate]]" focused\$="[[_focused]]" part="month" theme\$="[[theme]]">
-          </vaadin-month-calendar>
-        </template>
-      </vaadin-infinite-scroller>
-      <vaadin-infinite-scroller id="yearScroller" on-tap="_onYearTap" on-custom-scroll="_onYearScroll" on-touchstart="_onYearScrollTouchStart" buffer-size="12" active="[[initialPosition]]" part="years">
-        <template>
-          <div part="year-number" role="button" current\$="[[_isCurrentYear(index)]]" selected\$="[[_isSelectedYear(index, selectedDate)]]">
-            [[_yearAfterXYears(index)]]
-          </div>
-          <div part="year-separator" aria-hidden="true"></div>
-        </template>
-      </vaadin-infinite-scroller>
-    </div>
+      <div id="scrollers" desktop$="[[_desktopMode]]" on-track="_track">
+        <vaadin-infinite-scroller
+          id="monthScroller"
+          on-custom-scroll="_onMonthScroll"
+          on-touchstart="_onMonthScrollTouchStart"
+          buffer-size="3"
+          active="[[initialPosition]]"
+          part="months"
+        >
+          <template>
+            <vaadin-month-calendar
+              i18n="[[i18n]]"
+              month="[[_dateAfterXMonths(index)]]"
+              selected-date="{{selectedDate}}"
+              focused-date="[[focusedDate]]"
+              ignore-taps="[[_ignoreTaps]]"
+              show-week-numbers="[[showWeekNumbers]]"
+              min-date="[[minDate]]"
+              max-date="[[maxDate]]"
+              focused$="[[_focused]]"
+              part="month"
+              theme$="[[theme]]"
+            >
+            </vaadin-month-calendar>
+          </template>
+        </vaadin-infinite-scroller>
+        <vaadin-infinite-scroller
+          id="yearScroller"
+          on-tap="_onYearTap"
+          on-custom-scroll="_onYearScroll"
+          on-touchstart="_onYearScrollTouchStart"
+          buffer-size="12"
+          active="[[initialPosition]]"
+          part="years"
+        >
+          <template>
+            <div
+              part="year-number"
+              role="button"
+              current$="[[_isCurrentYear(index)]]"
+              selected$="[[_isSelectedYear(index, selectedDate)]]"
+            >
+              [[_yearAfterXYears(index)]]
+            </div>
+            <div part="year-separator" aria-hidden="true"></div>
+          </template>
+        </vaadin-infinite-scroller>
+      </div>
 
-    <div on-touchend="_preventDefault" role="toolbar" part="toolbar">
-      <vaadin-button id="todayButton" theme="tertiary" part="today-button" disabled="[[!_isTodayAllowed(minDate, maxDate)]]" on-tap="_onTodayTap">
-        [[i18n.today]]
-      </vaadin-button>
-      <vaadin-button id="cancelButton" theme="tertiary" part="cancel-button" on-tap="_cancel">
-        [[i18n.cancel]]
-      </vaadin-button>
-    </div>
-
-    <iron-media-query query="(min-width: 375px)" query-matches="{{_desktopMode}}"></iron-media-query>
-`;
+      <div on-touchend="_preventDefault" role="toolbar" part="toolbar">
+        <vaadin-button
+          id="todayButton"
+          part="today-button"
+          theme="tertiary"
+          disabled="[[!_isTodayAllowed(minDate, maxDate)]]"
+          on-tap="_onTodayTap"
+        >
+          [[i18n.today]]
+        </vaadin-button>
+        <vaadin-button id="cancelButton" part="cancel-button" theme="tertiary" on-tap="_cancel">
+          [[i18n.cancel]]
+        </vaadin-button>
+      </div>
+      <iron-media-query query="(min-width: 375px)" query-matches="{{_desktopMode}}"></iron-media-query>
+    `;
   }
 
   static get is() {
@@ -335,13 +366,15 @@ class DatePickerOverlayContentElement extends
       announce.push(this.i18n.week);
       announce.push(DatePickerHelper._getISOWeekNumber(focusedDate));
     }
-    this.dispatchEvent(new CustomEvent('iron-announce', {
-      bubbles: true,
-      composed: true,
-      detail: {
-        text: announce.join(' ')
-      }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('iron-announce', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          text: announce.join(' ')
+        }
+      })
+    );
     return;
   }
 
@@ -426,7 +459,7 @@ class DatePickerOverlayContentElement extends
 
   _onYearScrollTouchStart() {
     this._notTapping = false;
-    setTimeout(() => this._notTapping = true, 300);
+    setTimeout(() => (this._notTapping = true), 300);
 
     this._repositionMonthScroller();
   }
@@ -437,8 +470,7 @@ class DatePickerOverlayContentElement extends
 
   _doIgnoreTaps() {
     this._ignoreTaps = true;
-    this._debouncer = Debouncer.debounce(this._debouncer,
-      timeOut.after(300), () => this._ignoreTaps = false);
+    this._debouncer = Debouncer.debounce(this._debouncer, timeOut.after(300), () => (this._ignoreTaps = false));
   }
 
   _formatDisplayed(date, formatDate, label) {
@@ -476,7 +508,8 @@ class DatePickerOverlayContentElement extends
 
   _onYearTap(e) {
     if (!this._ignoreTaps && !this._notTapping) {
-      var scrollDelta = e.detail.y - (this.$.yearScroller.getBoundingClientRect().top + this.$.yearScroller.clientHeight / 2);
+      var scrollDelta =
+        e.detail.y - (this.$.yearScroller.getBoundingClientRect().top + this.$.yearScroller.clientHeight / 2);
       var yearDelta = scrollDelta / this.$.yearScroller.itemHeight;
       this._scrollToPosition(this.$.monthScroller.position + yearDelta * 12, true);
     }
@@ -501,17 +534,17 @@ class DatePickerOverlayContentElement extends
     var easingFunction = (t, b, c, d) => {
       t /= d / 2;
       if (t < 1) {
-        return c / 2 * t * t + b;
+        return (c / 2) * t * t + b;
       }
       t--;
-      return -c / 2 * (t * (t - 2) - 1) + b;
+      return (-c / 2) * (t * (t - 2) - 1) + b;
     };
 
     var duration = animate ? 300 : 0;
     var start = 0;
     var initialPosition = this.$.monthScroller.position;
 
-    var smoothScroll = timestamp => {
+    var smoothScroll = (timestamp) => {
       start = start || timestamp;
       var currentTime = timestamp - start;
 
@@ -520,14 +553,16 @@ class DatePickerOverlayContentElement extends
         this.$.monthScroller.position = currentPos;
         window.requestAnimationFrame(smoothScroll);
       } else {
-        this.dispatchEvent(new CustomEvent('scroll-animation-finished', {
-          bubbles: true,
-          composed: true,
-          detail: {
-            position: this._targetPosition,
-            oldPosition: initialPosition
-          }
-        }));
+        this.dispatchEvent(
+          new CustomEvent('scroll-animation-finished', {
+            bubbles: true,
+            composed: true,
+            detail: {
+              position: this._targetPosition,
+              oldPosition: initialPosition
+            }
+          })
+        );
 
         this.$.monthScroller.position = this._targetPosition;
         this._targetPosition = undefined;
@@ -659,7 +694,7 @@ class DatePickerOverlayContentElement extends
       overlay.opened = false;
     }
 
-    this.dispatchEvent(new CustomEvent('close', {bubbles: true, composed: true}));
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   _cancel() {
@@ -704,10 +739,10 @@ class DatePickerOverlayContentElement extends
 
       if (isFullscreen) {
         e.preventDefault();
-      } else if (isShift && isScroller || !isShift && isCancel) {
+      } else if ((isShift && isScroller) || (!isShift && isCancel)) {
         // Return focus back to the input field
         e.preventDefault();
-        this.dispatchEvent(new CustomEvent('focus-input', {bubbles: true, composed: true}));
+        this.dispatchEvent(new CustomEvent('focus-input', { bubbles: true, composed: true }));
       } else if (isShift && isToday) {
         // Browser returns focus back to the scrollable area. We need to set
         // the focused flag, and move the scroll to focused date.
@@ -806,9 +841,11 @@ class DatePickerOverlayContentElement extends
     } else {
       if (this._dateAllowed(focus, this.minDate, this.maxDate)) {
         // Move to min or max date
-        if (days > 0) { // down or right
+        if (days > 0) {
+          // down or right
           this._focusDate(this.maxDate);
-        } else { // up or left
+        } else {
+          // up or left
           this._focusDate(this.minDate);
         }
       } else {
@@ -836,9 +873,11 @@ class DatePickerOverlayContentElement extends
     } else {
       if (this._dateAllowed(focus, this.minDate, this.maxDate)) {
         // Move to min or max date
-        if (months > 0) { // pagedown
+        if (months > 0) {
+          // pagedown
           this._focusDate(this.maxDate);
-        } else { // pageup
+        } else {
+          // pageup
           this._focusDate(this.minDate);
         }
       } else {

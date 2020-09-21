@@ -3,7 +3,7 @@ import { registerStyles, css } from '@vaadin/vaadin-themable-mixin/register-styl
 registerStyles(
   'vaadin-month-calendar',
   css`
-    :host(:not([focused])) [part="date"][focused]::before {
+    :host(:not([focused])) [part='date'][focused]::before {
       animation: none !important;
     }
   `,
