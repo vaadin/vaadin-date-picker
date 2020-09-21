@@ -1,5 +1,6 @@
 {
   "excludeFiles": [
+    ".hermione.conf.js",
     "web-test-runner.config.js",
     "index.html",
     "vaadin-date-picker.js",
