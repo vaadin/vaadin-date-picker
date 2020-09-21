@@ -42,8 +42,10 @@
   "scripts": {
     "debug": "web-test-runner test/*.test.js --node-resolve --watch",
     "generate-typings": "gen-typescript-declarations --outDir . --verify",
+    "screenshots": "hermione test/visual/test.js --update-refs",
     "test": "web-test-runner test/*.test.js",
-    "test:sauce": "TEST_ENV=sauce npm test"
+    "test:sauce": "TEST_ENV=sauce npm test",
+    "test:visual": "hermione test/visual/test.js"
   },
   "devDependencies": {
     "@esm-bundle/chai": "^4.1.5",
@@ -55,6 +57,9 @@
     "@vaadin/vaadin-dialog": "^2.5.1",
     "@web/test-runner": "^0.7.26",
     "@web/test-runner-saucelabs": "0.0.4",
+    "hermione": "^3.8.6",
+    "hermione-esm": "^0.4.0",
+    "hermione-sauce": "^0.1.0",
     "sinon": "^9.0.3"
   }
 }
