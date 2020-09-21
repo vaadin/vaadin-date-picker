@@ -1,8 +1,8 @@
 /**
-@license
-Copyright (c) 2017 Vaadin Ltd.
-This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
-*/
+ * @license
+ * Copyright (c) 2020 Vaadin Ltd.
+ * This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
+ */
 import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import { dashToCamelCase } from '@polymer/polymer/lib/utils/case-map.js';
 import '@polymer/iron-media-query/iron-media-query.js';
@@ -12,7 +12,6 @@ import './vaadin-date-picker-overlay-content.js';
 import { DatePickerMixin } from './vaadin-date-picker-mixin.js';
 
 /**
- *
  * `<vaadin-date-picker-light>` is a customizable version of the `<vaadin-date-picker>` providing
  * only the scrollable month calendar view and leaving the input field definition to the user.
  *
