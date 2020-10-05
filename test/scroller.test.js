@@ -1,8 +1,8 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
-import { aTimeout, fixtureSync, nextFrame } from '@open-wc/testing-helpers';
+import { aTimeout, fixtureSync } from '@open-wc/testing-helpers';
 import '../src/vaadin-infinite-scroller.js';
-import { getFirstVisibleItem, listenForEvent } from './common.js';
+import { activateScroller, getFirstVisibleItem, listenForEvent } from './common.js';
 
 describe('vaadin-infinite-scroller', () => {
   let scroller;
@@ -17,13 +17,7 @@ describe('vaadin-infinite-scroller', () => {
     `);
     scroller.style.setProperty('--vaadin-infinite-scroller-item-height', '30px');
     scroller.updateStyles({ '--vaadin-infinite-scroller-item-height': '30px' });
-    scroller.active = true;
-    // Setting `active` triggers `_finishInit` using afterNextRender + setTimeout(1),
-    // and afterNextRender internally uses requestAnimationFrame + setTimeout(0).
-    await aTimeout(0);
-    await nextFrame();
-    await aTimeout(1);
-    scroller._debouncerUpdateClones.flush();
+    await activateScroller(scroller);
   });
 
   function verifyPosition() {

@@ -1,4 +1,19 @@
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+
 export const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+export function activateScroller(scroller) {
+  scroller.active = true;
+  // Setting `active` triggers `_finishInit` using afterNextRender + setTimeout(1).
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      afterNextRender(scroller, () => {
+        scroller._debouncerUpdateClones.flush();
+        resolve();
+      });
+    }, 1);
+  });
+}
 
 export function getDefaultI18n() {
   return {

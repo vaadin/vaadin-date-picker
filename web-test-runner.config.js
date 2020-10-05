@@ -3,7 +3,9 @@ const { createSauceLabsLauncher } = require('@web/test-runner-saucelabs');
 
 const config = {
   nodeResolve: true,
-  testsFinishTimeout: 60000,
+  browserStartTimeout: 60000, // default 30000
+  testsStartTimeout: 60000, // default 10000
+  testsFinishTimeout: 60000, // default 20000
   coverageConfig: {
     include: ['**/src/*'],
     threshold: {
@@ -28,20 +30,29 @@ if (process.env.TEST_ENV === 'sauce') {
     }
   };
 
-  config.concurrency = 1;
+  // config.concurrentBrowsers = 1;
+  config.concurrency = 2;
   config.browsers = [
     sauceLabsLauncher({
       ...sharedCapabilities,
-      browserName: 'safari',
-      platform: 'macOS 10.14',
-      browserVersion: '13'
+      browserName: 'firefox',
+      platform: 'Windows 10',
+      browserVersion: 'latest'
     }),
     sauceLabsLauncher({
       ...sharedCapabilities,
       browserName: 'safari',
-      platform: 'iOS Simulator',
+      platform: 'macOS 10.15',
       browserVersion: '13.1'
     })
+    // TODO: this seems to also test desktop Safari.
+    // Setting "iphone" returns a WebDriverError.
+    // sauceLabsLauncher({
+    //   ...sharedCapabilities,
+    //   browserName: 'safari',
+    //   platform: 'iOS Simulator',
+    //   browserVersion: '13.1'
+    // })
   ];
 }
 

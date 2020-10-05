@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import { aTimeout, fixtureSync } from '@open-wc/testing-helpers';
 import { keyDownOn, pressEnter, pressSpace } from '@polymer/iron-test-helpers/mock-interactions.js';
 import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import './not-animated-styles.js';
 import '../vaadin-date-picker.js';
 import { getDefaultI18n, getOverlayContent, ios, listenForEvent, open } from './common.js';
 

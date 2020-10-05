@@ -1,6 +1,7 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { aTimeout, fixture, html } from '@open-wc/testing-helpers';
+import './not-animated-styles.js';
 import { DatePickerElement } from '../vaadin-date-picker.js';
 
 class DatePicker2016Element extends DatePickerElement {

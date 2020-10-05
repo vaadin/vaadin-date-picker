@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import { aTimeout, fixture, html, nextFrame } from '@open-wc/testing-helpers';
 import { IronA11yAnnouncer } from '@polymer/iron-a11y-announcer/iron-a11y-announcer.js';
 import '../vaadin-date-picker.js';
-import { ios, getDefaultI18n, open } from './common.js';
+import { activateScroller, ios, getDefaultI18n, open } from './common.js';
 
 describe('WAI-ARIA', () => {
   describe('date picker', () => {
@@ -114,12 +114,9 @@ describe('WAI-ARIA', () => {
       let yearScrollerContents;
 
       beforeEach(async () => {
-        let scroller = overlay.$.yearScroller;
-        scroller.active = true;
-        scroller._reset();
-        await nextFrame();
-        scroller._debouncerUpdateClones.flush();
-        yearScrollerContents = overlay.$.yearScroller.querySelectorAll('div > [part="year-number"]');
+        const scroller = overlay.$.yearScroller;
+        await activateScroller(scroller);
+        yearScrollerContents = scroller.querySelectorAll('div > [part="year-number"]');
       });
 
       it('should contain button role for years', () => {
