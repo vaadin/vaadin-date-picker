@@ -9,10 +9,10 @@ const config = {
   coverageConfig: {
     include: ['**/src/*'],
     threshold: {
-      statements: 95,
-      branches: 59,
+      statements: 94,
+      branches: 58,
       functions: 90,
-      lines: 95
+      lines: 94
     }
   }
 };
@@ -30,8 +30,8 @@ if (process.env.TEST_ENV === 'sauce') {
     }
   };
 
-  // config.concurrentBrowsers = 1;
-  config.concurrency = 2;
+  config.concurrentBrowsers = 2;
+  config.concurrency = 1;
   config.browsers = [
     sauceLabsLauncher({
       ...sharedCapabilities,
