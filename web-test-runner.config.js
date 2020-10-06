@@ -31,7 +31,7 @@ if (process.env.TEST_ENV === 'sauce') {
   };
 
   config.concurrentBrowsers = 2;
-  config.concurrency = 2;
+  config.concurrency = 1;
   config.browsers = [
     sauceLabsLauncher({
       ...sharedCapabilities,
