@@ -27,7 +27,6 @@
   "scripts": {
     "check-version": "magi check-version",
     "debug": "web-test-runner test/*.test.js --node-resolve --manual",
-    "generate-typings": "gen-typescript-declarations --outDir . --verify",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint src theme test",
     "lint:css": "stylelint src/*.js theme/**/*-styles.js",
@@ -68,7 +67,6 @@
   "devDependencies": {
     "@esm-bundle/chai": "^4.1.5",
     "@open-wc/testing-helpers": "^1.8.0",
-    "@polymer/gen-typescript-declarations": "^1.6.2",
     "@polymer/iron-component-page": "^4.0.0",
     "@polymer/iron-test-helpers": "^3.0.0",
     "@vaadin/vaadin-dialog": "^2.5.1",
