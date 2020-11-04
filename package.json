@@ -27,9 +27,10 @@
   "scripts": {
     "check-version": "magi check-version",
     "debug": "web-test-runner test/*.test.js --node-resolve --manual",
-    "lint": "npm run lint:js && npm run lint:css",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:types",
     "lint:js": "eslint src theme test",
     "lint:css": "stylelint src/*.js theme/**/*-styles.js",
+    "lint:types": "tsc",
     "prestart": "polymer analyze vaadin-* > analysis.json",
     "preversion": "magi update-version",
     "screenshots": "hermione test/visual/test.js --update-refs",
@@ -85,6 +86,7 @@
     "prettier": "^2.1.2",
     "sinon": "^9.2.0",
     "stylelint": "^13.7.2",
-    "stylelint-config-vaadin": "^0.2.6"
+    "stylelint-config-vaadin": "^0.2.6",
+    "typescript": "^4.0.3"
   }
 }
