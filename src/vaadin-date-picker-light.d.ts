@@ -2,6 +2,8 @@ import { ThemableMixin } from '@vaadin/vaadin-themable-mixin/vaadin-themable-mix
 
 import { DatePickerMixin } from './vaadin-date-picker-mixin.js';
 
+import { DatePickerEventMap } from './interfaces';
+
 /**
  * `<vaadin-date-picker-light>` is a customizable version of the `<vaadin-date-picker>` providing
  * only the scrollable month calendar view and leaving the input field definition to the user.
@@ -49,6 +51,18 @@ declare class DatePickerLightElement extends ThemableMixin(DatePickerMixin(HTMLE
   attrForValue: string;
 
   _input(): HTMLElement | null;
+
+  addEventListener<K extends keyof DatePickerEventMap>(
+    type: K,
+    listener: (this: DatePickerLightElement, ev: DatePickerEventMap[K]) => void,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+
+  removeEventListener<K extends keyof DatePickerEventMap>(
+    type: K,
+    listener: (this: DatePickerLightElement, ev: DatePickerEventMap[K]) => void,
+    options?: boolean | EventListenerOptions
+  ): void;
 }
 
 declare global {

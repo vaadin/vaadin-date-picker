@@ -8,7 +8,7 @@ import { DatePickerMixin } from './vaadin-date-picker-mixin.js';
 
 import { ElementMixin } from '@vaadin/vaadin-element-mixin/vaadin-element-mixin.js';
 
-import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { DatePickerEventMap } from './interfaces';
 
 /**
  * `<vaadin-date-picker>` is a date selection field which includes a scrollable
@@ -148,28 +148,3 @@ declare global {
 }
 
 export { DatePickerElement };
-
-export type DatePickerOpenedChanged = CustomEvent<{ value: boolean; path: 'opened' }>;
-
-export type DatePickerInvalidChanged = CustomEvent<{ value: boolean; path: 'invalid' }>;
-
-export type DatePickerValueChanged = CustomEvent<{ value: string; path: 'value' }>;
-
-export interface DatePickerElementEventMap {
-  /**
-   * Fired when the `opened` property changes.
-   */
-  'opened-changed': DatePickerOpenedChanged;
-
-  /**
-   * Fired when the `invalid` property changes.
-   */
-  'invalid-changed': DatePickerInvalidChanged;
-
-  /**
-   * Fired when the `value` property changes.
-   */
-  'value-changed': DatePickerValueChanged;
-}
-
-export interface DatePickerEventMap extends HTMLElementEventMap, DatePickerElementEventMap {}

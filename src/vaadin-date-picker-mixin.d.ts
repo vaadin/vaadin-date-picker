@@ -1,3 +1,5 @@
+import { DatePickerI18n } from './interfaces';
+
 export { DatePickerMixin };
 
 declare function DatePickerMixin<T extends new (...args: any[]) => {}>(base: T): T & DatePickerMixinConstructor;
@@ -207,5 +209,3 @@ interface DatePickerMixin {
 
   _focus(): void;
 }
-
-import { DatePickerI18n } from '../@types/interfaces';
