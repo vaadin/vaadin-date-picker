@@ -65,9 +65,11 @@ To use the Material theme, import the correspondent file from the `theme/materia
 
 1. Fork the `vaadin-date-picker` repository and clone it locally.
 
-1. Make sure you have [npm](https://www.npmjs.com/) and [Bower](https://bower.io) installed.
+1. Make sure you have [node.js](https://nodejs.org/) 12.x installed.
 
-1. When in the `vaadin-date-picker` directory, run `npm install` and then `bower install` to install dependencies.
+1. Make sure you have [npm](https://www.npmjs.com/) installed.
+
+1. When in the `vaadin-date-picker` directory, run `npm install` to install dependencies.
 
 1. Run `npm start`, browser will automatically open the component API documentation.
 
