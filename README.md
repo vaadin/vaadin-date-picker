@@ -81,6 +81,10 @@ To use the Material theme, import the correspondent file from the `theme/materia
 
 1. When in the `vaadin-date-picker` directory, run `npm test`
 
+## Debugging tests in the browser
+
+1. Run `npm run debug`, then choose manual mode (M) and open the link in browser.
+
 
 ## Following the coding style
 
