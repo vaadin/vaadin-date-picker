@@ -114,33 +114,3 @@ export function getOverlayContent(datepicker) {
   overlayContent.$.yearScroller.bufferSize = 0;
   return overlayContent;
 }
-
-// TODO: validate if the statement below is still valid when running in GitHub actions.
-// FF and Chrome are unable to focus input/button when tests are run in the headless window manager used in Travis
-function monkeyPatchNativeFocus() {
-  customElements.whenDefined('vaadin-text-field').then(() => {
-    const TextFieldElement = customElements.get('vaadin-text-field');
-    TextFieldElement.prototype.focus = function () {
-      this._setFocused(true);
-    };
-    TextFieldElement.prototype.blur = function () {
-      this._setFocused(false);
-    };
-  });
-
-  customElements.whenDefined('vaadin-button').then(() => {
-    const ButtonElement = customElements.get('vaadin-button');
-    ButtonElement.prototype.focus = function () {
-      this._setFocused(true);
-    };
-  });
-
-  customElements.whenDefined('vaadin-date-picker').then(() => {
-    const DatePickerElement = customElements.get('vaadin-date-picker');
-    DatePickerElement.prototype.blur = function () {
-      this._inputElement._setFocused(false);
-    };
-  });
-}
-
-window.addEventListener('WebComponentsReady', monkeyPatchNativeFocus);
