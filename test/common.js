@@ -56,14 +56,18 @@ export function listenForEvent(elem, type, callback) {
   elem.addEventListener(type, listener);
 }
 
-export function open(datepicker, callback) {
-  listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', callback);
-  datepicker.open();
+export function open(datepicker) {
+  return new Promise((resolve) => {
+    listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', resolve);
+    datepicker.open();
+  });
 }
 
-export function close(datepicker, callback) {
-  listenForEvent(datepicker.$.overlay, 'vaadin-overlay-close', callback);
-  datepicker.close();
+export function close(datepicker) {
+  return new Promise((resolve) => {
+    listenForEvent(datepicker.$.overlay, 'vaadin-overlay-close', resolve);
+    datepicker.close();
+  });
 }
 
 export function tap(element) {
