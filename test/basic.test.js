@@ -138,9 +138,9 @@ describe('basic features', () => {
 
   it('should close on overlay date tap', async () => {
     await open(datepicker);
+    const spy = sinon.spy(datepicker, 'close');
     getOverlayContent(datepicker).dispatchEvent(new CustomEvent('date-tap', { bubbles: true, composed: true }));
-    await aTimeout(1);
-    expect(datepicker.opened).to.be.false;
+    expect(spy.called).to.be.true;
   });
 
   it('should not have label defined by default', () => {
@@ -236,7 +236,6 @@ describe('basic features', () => {
       const spy = sinon.spy(datepicker, '_updateAlignmentAndPosition');
       await close(datepicker);
       window.dispatchEvent(new CustomEvent('scroll'));
-      await aTimeout(1);
       expect(spy.called).to.be.false;
     });
   });
