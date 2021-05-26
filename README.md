@@ -1,19 +1,21 @@
-[![npm version](https://badgen.net/npm/v/@vaadin/vaadin-date-picker)](https://www.npmjs.com/package/@vaadin/vaadin-date-picker)
-[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/vaadin/vaadin-date-picker)
-[![Build Status](https://travis-ci.org/vaadin/vaadin-date-picker.svg?branch=master)](https://travis-ci.org/vaadin/vaadin-date-picker)
-[![Coverage Status](https://coveralls.io/repos/github/vaadin/vaadin-date-picker/badge.svg?branch=master)](https://coveralls.io/github/vaadin/vaadin-date-picker?branch=master)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vaadin/web-components?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-[![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/vaadinvaadin-date-picker)
-[![Stars on vaadin.com/directory](https://img.shields.io/vaadin-directory/star/vaadinvaadin-date-picker.svg)](https://vaadin.com/directory/component/vaadinvaadin-date-picker)
-
 # &lt;vaadin-date-picker&gt;
+
+> ⚠️ Starting from Vaadin 20, the source code and issues for this component are migrated to the [`vaadin/web-components`](https://github.com/vaadin/web-components/tree/master/packages/vaadin-date-picker) monorepository.
+> This repository contains the source code and releases of `<vaadin-date-picker>` for the Vaadin versions 10 to 19.
+
+[&lt;vaadin-date-picker&gt;](https://vaadin.com/components/vaadin-date-picker) is a Web Component providing a date selection field which includes a scrollable month calendar view, part of the [Vaadin components](https://vaadin.com/components).
 
 [Live Demo ↗](https://vaadin.com/components/vaadin-date-picker/html-examples)
 |
 [API documentation ↗](https://vaadin.com/components/vaadin-date-picker/html-api)
 
-[&lt;vaadin-date-picker&gt;](https://vaadin.com/components/vaadin-date-picker) is a Web Component providing a date selection field which includes a scrollable month calendar view, part of the [Vaadin components](https://vaadin.com/components).
+[![npm version](https://badgen.net/npm/v/@vaadin/vaadin-date-picker)](https://www.npmjs.com/package/@vaadin/vaadin-date-picker)
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/vaadin/vaadin-date-picker)
+[![Build Status](https://travis-ci.org/vaadin/vaadin-date-picker.svg?branch=master)](https://travis-ci.org/vaadin/vaadin-date-picker)
+[![Coverage Status](https://coveralls.io/repos/github/vaadin/vaadin-date-picker/badge.svg?branch=master)](https://coveralls.io/github/vaadin/vaadin-date-picker?branch=master)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/vaadin/web-components?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/vaadinvaadin-date-picker)
+[![Stars on vaadin.com/directory](https://img.shields.io/vaadin-directory/star/vaadinvaadin-date-picker.svg)](https://vaadin.com/directory/component/vaadinvaadin-date-picker)
 
 ```html
 <vaadin-date-picker label="Label" placeholder="Placeholder">
