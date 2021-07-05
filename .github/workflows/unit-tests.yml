@@ -1,11 +1,11 @@
-name: Full QA
+name: Unit Tests
 
 # all pull requests
 on: pull_request
 
 jobs:
   unit-tests-p2:
-    name: Unit Tests / Polymer 2 on the CI agent
+    name: Polymer 2 on the CI agent
     runs-on: ubuntu-latest
     steps:
       - name: Set up Node 12.x
@@ -39,7 +39,7 @@ jobs:
         run: "xvfb-run -s '-screen 0 1024x768x24' wct"
 
   unit-tests-p3:
-    name: Unit Tests / Polymer 3 on SauceLabs
+    name: Polymer 3 on SauceLabs
     runs-on: ubuntu-latest
     steps:
       - name: Set up Node 12.x
@@ -76,39 +76,3 @@ jobs:
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-
-  visual-tests:
-    name: Visual Tests on SauceLabs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Node 12.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 12.x
-
-      - name: Check out the source code
-        uses: actions/checkout@v2
-
-      - name: Install global npm dependencies
-        # bower is needed to run 'bower install'
-        # gemini is needed to run the visual tests step
-        run: "npm install --quiet --no-progress --global bower gemini@^4.0.0 gemini-sauce gemini-polyserve"
-
-      - name: Install project npm dependencies
-        run: "npm install --quiet --no-progress"
-
-      - name: Install project Bower dependencies
-        run: "bower install --quiet"
-
-      - name: Run visual tests on SauceLabs
-        run: "gemini test --reporter html --reporter flat test/visual"
-        env:
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-
-      - name: Publish the Visual Tests failures report as an Artifact for this Workflow run
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: Visual tests failures report
-          path: gemini-report/
