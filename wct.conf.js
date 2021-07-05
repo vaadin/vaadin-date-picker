@@ -24,12 +24,12 @@ module.exports = {
       dir: './coverage',
       reporters: ['text-summary', 'lcov'],
       include: [
-        '**/vaadin-accordion/src/*.html'
+        '**/vaadin-date-picker/src/*.html'
       ],
       exclude: [],
       thresholds: {
         global: {
-          statements: 98
+          statements: 91
         }
       }
     }
