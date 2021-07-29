@@ -97,8 +97,8 @@
       describe('alignment', () => {
 
         function assertEdgesAligned(datepickerEdge, overlayEdge) {
-          expect(datepicker.getBoundingClientRect()[datepickerEdge]).to.equal(
-            datepicker.$.overlay.$.content.getBoundingClientRect()[overlayEdge]);
+          expect(datepicker.getBoundingClientRect()[datepickerEdge]).to.be.closeTo(
+            datepicker.$.overlay.$.content.getBoundingClientRect()[overlayEdge], 0.5);
         }
 
         it('should align below the field, by left edge', () => {
