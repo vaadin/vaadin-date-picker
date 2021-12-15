@@ -756,6 +756,8 @@
         input = datepicker.$.input;
         toggleButton = datepicker.shadowRoot.querySelector('[part="toggle-button"]');
         datepicker.autoOpenDisabled = true;
+        // Force non-ios mode
+        datepicker._ios = false;
       });
 
       it('should focus the input on touch tap', () => {
