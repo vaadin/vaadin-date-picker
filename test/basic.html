@@ -59,11 +59,39 @@
   </test-fixture>
 
   <script>
+
+    function makeSoloTouchEvent(type, target) {
+      const event = new CustomEvent(type, {bubbles: true, cancelable: true, composed: true});
+      event.changedTouches = [{}];
+      event.touches = [];
+      target.dispatchEvent(event);
+      return event;
+    }
+
+    /**
+     * Emulates a touch on the target resulting in clicking and focusing it.
+     * Returns true if the target was focused as a result.
+     */
+    function touchFocus(target, datePicker) {
+      const start = makeSoloTouchEvent('touchstart', target);
+      const end = makeSoloTouchEvent('touchend', target);
+      const isNoInput = datePicker && datePicker._noInput;
+      if (!start.defaultPrevented && !end.defaultPrevented && !isNoInput) {
+        target.click();
+        target.focus();
+        return true;
+      }
+      return false;
+    }
+
+    before(() => Polymer.cancelSyntheticClickEvents = false);
+
     describe('Basic features', () => {
-      var datepicker, toggleButton;
+      var datepicker, toggleButton, input;
 
       beforeEach(() => {
         datepicker = fixture('datepicker');
+        input = datepicker.$.input;
         toggleButton = datepicker.root.querySelector('[part="toggle-button"]');
       });
 
@@ -152,24 +180,33 @@
       });
 
       it('should open on input tap', done => {
-        tap(datepicker.$.input);
+        tap(input);
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
 
-      it('should not open on input tap when autoOpenDisabled is true and not on mobile', () => {
-        datepicker.autoOpenDisabled = true;
-        tap(datepicker.$.input);
-        if (!datepicker._noInput) {
-          expect(datepicker.opened).not.to.be.true;
-        } else {
-          expect(datepicker.opened).to.be.true;
-        }
+      it('should focus the input on touch tap', () => {
+        const focusedOnTouch = touchFocus(input);
+        expect(focusedOnTouch).to.be.true;
+      });
+
+      it('should not focus the input on touch tap on fullscreen', () => {
+        datepicker._fullscreen = true;
+        const focusedOnTouch = touchFocus(input, datepicker);
+        expect(focusedOnTouch).to.be.false;
+      });
+
+      it('should blur the input on fullscreen', () => {
+        datepicker._fullscreen = true;
+        const spy = sinon.spy();
+        datepicker.addEventListener('blur', spy);
+        datepicker.focus();
+        expect(spy.called).to.be.false;
       });
 
       it('should pass the placeholder attribute to the input tag', () => {
         var placeholder = 'Pick a date';
         datepicker.set('placeholder', placeholder);
-        expect(datepicker.$.input.placeholder).to.be.equal(placeholder);
+        expect(input.placeholder).to.be.equal(placeholder);
       });
 
       it('should scroll to today by default', done => {
@@ -254,12 +291,6 @@
       });
 
       it('should open by tapping the calendar icon', done => {
-        tap(toggleButton);
-        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
-      });
-
-      it('should open by tapping the calendar icon even if autoOpenDisabled is true', done => {
-        this.autoOpenDisabled = true;
         tap(toggleButton);
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
@@ -521,7 +552,7 @@
         });
 
         it('should be focusable', () => {
-          expect(datepicker.$.input.tabIndex).to.equal(0);
+          expect(input.tabIndex).to.equal(0);
         });
       });
 
@@ -645,7 +676,7 @@
         });
       });
 
-      describe('clear-button-visible', () => {
+      describe('clear button', () => {
         let textfield;
 
         beforeEach(() => {
@@ -677,7 +708,7 @@
       });
     });
 
-    describe('with clear-button-visible', () => {
+    describe('clear button', () => {
       let datepicker, clearButton;
 
       beforeEach(() => {
@@ -696,11 +727,10 @@
         expect(datepicker.value).to.equal('');
       });
 
-      it('should not prevent touchend event on clear button', () => {
+      it('should clear the value on touch tap', () => {
         datepicker.value = '2000-02-01';
-        const e = new CustomEvent('touchend', {cancelable: true});
-        clearButton.dispatchEvent(e);
-        expect(e.defaultPrevented).to.be.false;
+        touchFocus(clearButton);
+        expect(datepicker.value).to.equal('');
       });
 
       it('should validate on clear', () => {
@@ -714,6 +744,129 @@
         datepicker.value = '2000-02-01';
         click(clearButton);
         expect(datepicker.hasAttribute('has-value')).to.be.false;
+      });
+    });
+
+    describe('auto open disabled', () => {
+      let datepicker, input, toggleButton;
+
+      beforeEach(() => {
+        datepicker = fixture('datepicker');
+        datepicker.value = '2000-01-01';
+        input = datepicker.$.input;
+        toggleButton = datepicker.shadowRoot.querySelector('[part="toggle-button"]');
+        datepicker.autoOpenDisabled = true;
+      });
+
+      it('should focus the input on touch tap', () => {
+        const focusedOnTouch = touchFocus(input);
+        expect(focusedOnTouch).to.be.true;
+      });
+
+      it('should not blur the input on open', (done) => {
+        const inputBlur = sinon.stub(input, 'blur');
+        open(datepicker, () => {
+          expect(inputBlur.called).to.be.false;
+          done();
+        });
+      });
+
+      it('should blur the input on fullscreen open', (done) => {
+        datepicker._fullscreen = true;
+        const inputBlur = sinon.stub(input, 'blur');
+        open(datepicker, () => {
+          expect(inputBlur.called).to.be.true;
+          done();
+        });
+      });
+
+      it('should not open on input tap', () => {
+        tap(input);
+        expect(datepicker.opened).not.to.be.true;
+      });
+
+      it('should not open on input tap on fullscreen', () => {
+        datepicker._fullscreen = true;
+        tap(input);
+        expect(datepicker.opened).not.to.be.true;
+      });
+
+      it('should open by tapping the calendar icon even if autoOpenDisabled is true', done => {
+        tap(toggleButton);
+        listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
+      });
+    });
+
+    describe('ios', () => {
+      let datepicker, input;
+
+      beforeEach(() => {
+        datepicker = fixture('datepicker');
+        datepicker.value = '2000-01-01';
+        input = datepicker.$.input;
+        datepicker._ios = true;
+      });
+
+      it('should focus the input when closed', () => {
+        const inputBlur = sinon.stub(input, 'blur');
+        datepicker.focus();
+        expect(inputBlur.called).to.be.false;
+      });
+
+      it('should blur the input when opened', (done) => {
+        const inputBlur = sinon.stub(input, 'blur');
+        datepicker.focus();
+        open(datepicker, () => {
+          expect(inputBlur.called).to.be.true;
+          done();
+        });
+      });
+
+      describe('auto open disabled', () => {
+        let toggleButton;
+
+        beforeEach(() => {
+          datepicker.autoOpenDisabled = true;
+          toggleButton = datepicker.shadowRoot.querySelector('[part="toggle-button"]');
+        });
+
+        it('should focus the input on touch tap', () => {
+          const focusedOnTouch = touchFocus(input);
+          expect(focusedOnTouch).to.be.true;
+        });
+
+        it('should blur the input on open', (done) => {
+          const inputBlur = sinon.stub(input, 'blur');
+          open(datepicker, () => {
+            expect(inputBlur.called).to.be.true;
+            done();
+          });
+        });
+
+        it('should blur the input on fullscreen open', (done) => {
+          datepicker._fullscreen = true;
+          const inputBlur = sinon.stub(input, 'blur');
+          open(datepicker, () => {
+            expect(inputBlur.called).to.be.true;
+            done();
+          });
+        });
+
+        it('should not open on input tap', () => {
+          tap(input);
+          expect(datepicker.opened).not.to.be.true;
+        });
+
+        it('should not open on input tap on fullscreen', () => {
+          datepicker._fullscreen = true;
+          tap(input);
+          expect(datepicker.opened).not.to.be.true;
+        });
+
+        it('should open by tapping the calendar icon even if autoOpenDisabled is true', done => {
+          tap(toggleButton);
+          listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
+        });
       });
     });
   </script>
