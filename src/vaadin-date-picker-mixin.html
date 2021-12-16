@@ -308,7 +308,7 @@ This program is available under Apache License Version 2.0, available at https:/
         /** @private */
         _noInput: {
           type: Boolean,
-          computed: '_isNoInput(_fullscreen, _ios, i18n, i18n.*)'
+          computed: '_isNoInput(_fullscreen, _ios, i18n, i18n.*, opened, autoOpenDisabled)'
         },
 
         /** @private */
@@ -371,7 +371,7 @@ This program is available under Apache License Version 2.0, available at https:/
       });
 
       this.addEventListener('touchend', e => {
-        if (!isClearButton(e)) {
+        if (this._noInput && !isClearButton(e)) {
           e.preventDefault();
         }
       });
@@ -499,8 +499,16 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /** @private */
-    _isNoInput(fullscreen, ios, i18n) {
-      return !this._inputElement || fullscreen || ios || !i18n.parseDate;
+    _isNoInput(fullscreen, ios, i18n, i18nChanges, opened, autoOpenDisabled) {
+      // On fullscreen mode, text input is disabled if auto-open isn't disabled or
+      // whenever the dropdown is opened
+      const noInputOnFullscreenMode = fullscreen && (!autoOpenDisabled || opened);
+      // On iOS, text input is disabled whenever the dropdown is opened, because
+      // the virtual keyboard doesn't affect the viewport metrics and thus the
+      // dropdown could get covered by the keyboard.
+      const noInputOnIos = ios && opened;
+
+      return !this._inputElement || noInputOnFullscreenMode || noInputOnIos || !i18n.parseDate;
     }
 
     /** @private */
