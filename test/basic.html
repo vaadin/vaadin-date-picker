@@ -793,7 +793,7 @@
         expect(datepicker.opened).not.to.be.true;
       });
 
-      it('should open by tapping the calendar icon even if autoOpenDisabled is true', done => {
+      it('should open by tapping the calendar icon even if autoOpenDisabled is true', (done) => {
         tap(toggleButton);
         listenForEvent(datepicker.$.overlay, 'vaadin-overlay-open', done);
       });
