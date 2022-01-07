@@ -189,9 +189,9 @@ This program is available under Apache License Version 2.0, available at https:/
         }
 
         // Check if we scrolled enough to translate the buffer positions.
-        var bufferOffset = this.root.querySelector('.buffer').offsetTop;
-        var upperThresholdReached = scrollTop > this._buffers[1].translateY + this.itemHeight + bufferOffset;
-        var lowerThresholdReached = scrollTop < this._buffers[0].translateY + this.itemHeight + bufferOffset;
+        const offset = this.itemHeight + this.bufferOffset;
+        const upperThresholdReached = scrollTop > this._buffers[1].translateY + offset;
+        const lowerThresholdReached = scrollTop < this._buffers[0].translateY + offset;
 
         if (upperThresholdReached || lowerThresholdReached) {
           this._translateBuffer(lowerThresholdReached);
@@ -241,6 +241,13 @@ This program is available under Apache License Version 2.0, available at https:/
           }, 10);
         }
 
+      }
+
+      /**
+       * @return {number}
+       */
+      get bufferOffset() {
+        return this._buffers[0].offsetTop;
       }
 
       /**
