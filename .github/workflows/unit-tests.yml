@@ -16,14 +16,17 @@ jobs:
       - name: Check out the source code
         uses: actions/checkout@v2
 
+      - name: Install latest npm
+        # magi-cli 1.0 requires npm 7 or higher
+        run: "npm install -g npm@8"
+
       - name: Install global npm dependencies
         # bower is needed to run 'bower install'
         # polymer-cli is needed to run the lint step
-        # web-component-tester is needed to run the test step
-        run: "npm install --quiet --no-progress --global bower polymer-cli web-component-tester"
+        run: "npm install --quiet --no-progress --global bower polymer-cli"
 
       - name: Install project npm dependencies
-        run: "npm install --quiet --no-progress"
+        run: "npm ci"
 
       - name: Install project Bower dependencies
         run: "bower install --quiet"
@@ -36,7 +39,7 @@ jobs:
 
       # the full set of environments is tested with Polymer 3 below
       - name: Run unit tests locally (in the VM instance running this job)
-        run: "xvfb-run -s '-screen 0 1024x768x24' wct"
+        run: "xvfb-run -s '-screen 0 1024x768x24' npm test"
 
   unit-tests-p3:
     name: Polymer 3 on SauceLabs
@@ -50,10 +53,13 @@ jobs:
       - name: Check out the (Polymer 2) source code
         uses: actions/checkout@v2
 
+      - name: Install latest npm
+        # magi-cli 1.0 requires npm 7 or higher
+        run: "npm install -g npm@8"
+
       - name: Install global npm dependencies
-        # magi-cli, bower and polymer-modulizer are needed to run the Polymer 3 conversion step
-        # web-component-tester is needed to run the test step
-        run: "npm install --quiet --no-progress --global bower magi-cli web-component-tester polymer-modulizer"
+        # bower and polymer-modulizer are needed to run the Polymer 3 conversion step
+        run: "npm install --quiet --no-progress --global bower magi-cli@next polymer-modulizer"
 
       - name: Convert the source code to Polymer 3
         run: |
@@ -61,18 +67,12 @@ jobs:
           git config --local user.name "github-actions[bot]"
           magi p3-convert --out . --import-style=name
 
-      # Using yarn instead of npm here to check that the dependency tree does not have two
-      # versions of the same component. With P2 / Bower that is checked automatically, but
-      # with P3 / npm it is not.
-      - name: Install project npm dependencies
-        run: "yarn install --flat"
-
       # workaround for running tests on Android on SauceLabs (see wct.conf.js)
       - name: Add 'localhost-for-saucelabs' to /etc/hosts
         run: echo "127.0.0.1 localhost-for-saucelabs" | sudo tee -a /etc/hosts
 
       - name: Run unit tests on SauceLabs
-        run: "wct --npm --env saucelabs"
+        run: "npm test -- --env saucelabs"
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
