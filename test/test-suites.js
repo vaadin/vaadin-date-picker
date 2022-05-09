@@ -11,8 +11,7 @@ window.VaadinDatePickerSuites = [
   'keyboard-navigation.html',
   'keyboard-input.html',
   'theme-propagation.html',
-  'wai-aria.html',
-  'overlay.html'
+  'wai-aria.html'
 ];
 
 if (isPolymer2) {
