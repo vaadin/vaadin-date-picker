@@ -368,7 +368,7 @@
 
       function touchstart(node) {
         const event = new CustomEvent('touchstart', {bubbles: true, cancelable: true});
-    
+
         const nodeRect = node.getBoundingClientRect();
         const clientX = nodeRect.left;
         const clientY = nodeRect.top;
@@ -382,9 +382,9 @@
         const dialogOverlay = dialog.$.overlay;
         const datePicker = dialog.$.overlay.querySelector('vaadin-date-picker');
         const datePickerOverlay = datePicker.$.overlay;
-    
+
         datePicker.opened = true;
-    
+
         datePicker.dispatchEvent(new CustomEvent('mousedown', {bubbles: true, composed: true}));
         requestAnimationFrame(() => {
           expect(datePickerOverlay._last).to.be.true;
@@ -404,6 +404,106 @@
         requestAnimationFrame(() => {
           expect(datePickerOverlay._last).to.be.true;
           done();
+        });
+      });
+    });
+
+    describe('revealDate', () => {
+      let overlay, monthScroller;
+
+      function fixtureOverlayContent({monthScrollerItems, monthScrollerOffset}, done) {
+        overlay = fixture('overlay');
+        monthScroller = overlay.$.monthScroller;
+        monthScroller.style.setProperty('--vaadin-infinite-scroller-buffer-offset', monthScrollerOffset);
+        monthScroller.updateStyles({'--vaadin-infinite-scroller-buffer-offset': monthScrollerOffset});
+        monthScroller.style.height = `${270 * monthScrollerItems}px`;
+        overlay.i18n = getDefaultI18n();
+        overlay.$.monthScroller.bufferSize = 3;
+        overlay.$.yearScroller.bufferSize = 3;
+        overlay.initialPosition = new Date(2021, 1, 1);
+        setTimeout(() => {
+          Polymer.RenderStatus.afterNextRender(overlay, done);
+        }, 1);
+      }
+
+      describe('height(visible area) < height(item)', () => {
+        beforeEach((done) => {
+          fixtureOverlayContent({
+            monthScrollerItems: 0.5,
+            monthScrollerOffset: 0
+          }, done);
+        });
+
+        it('should scroll when the month is above the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 0, 1), false);
+          expect(monthScroller.position).to.equal(position - 1);
+        });
+
+        it('should not scroll when the month is the same', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 1, 10), false);
+          expect(monthScroller.position).to.equal(position);
+        });
+
+        it('should scroll when the month is below the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 2, 1), false);
+          expect(monthScroller.position).to.equal(position + 1);
+        });
+      });
+
+      describe('height(visible area) > height(item)', () => {
+        beforeEach((done) => {
+          fixtureOverlayContent({
+            monthScrollerItems: 2,
+            monthScrollerOffset: 0
+          }, done);
+        });
+
+        it('should scroll when the month is above the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 0, 1), false);
+          expect(monthScroller.position).to.equal(position - 1);
+        });
+
+        it('should not scroll when the month is within the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 2, 1), false);
+          expect(monthScroller.position).to.equal(position);
+        });
+
+        it('should scroll when the month is below the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 3, 1), false);
+          expect(monthScroller.position).to.equal(position + 1);
+        });
+      });
+
+      describe('offset', () => {
+        beforeEach((done) => {
+          fixtureOverlayContent({
+            monthScrollerItems: 3,
+            monthScrollerOffset: '10%'
+          }, done);
+        });
+
+        it('should scroll when the month is above the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 0, 1), false);
+          expect(monthScroller.position).to.equal(position - 1 /* The top 10% offset is ensured by CSS */);
+        });
+
+        it('should not scroll when the month is within the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 2, 1), false);
+          expect(monthScroller.position).to.equal(position);
+        });
+
+        it('should scroll when the month is below the visible area', () => {
+          const position = monthScroller.position;
+          overlay.revealDate(new Date(2021, 3, 1), false);
+          expect(monthScroller.position).to.equal(position + 0.6 /* The bottom 10% offset is ensured by JS */);
         });
       });
     });
