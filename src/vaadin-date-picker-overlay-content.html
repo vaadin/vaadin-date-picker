@@ -378,6 +378,7 @@ This program is available under Apache License Version 2.0, available at https:/
         scrollToDate(date, animate) {
           const offset = this.__useSubMonthScrolling ? this._calculateWeekScrollOffset(date) : 0;
           this._scrollToPosition(this._differenceInMonths(date, this._originDate) + offset, animate);
+          this.$.monthScroller.forceUpdate();
         }
 
         _focusedDateChanged(focusedDate) {
