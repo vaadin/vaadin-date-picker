@@ -1005,7 +1005,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     /** @private */
     _userInputValueChanged(value) {
-      if (this.opened && this._inputValue) {
+      if (this._inputValue) {
         const parsedDate = this._getParsedDate();
 
         if (this._isValidDate(parsedDate)) {
