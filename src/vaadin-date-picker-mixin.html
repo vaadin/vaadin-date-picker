@@ -179,12 +179,22 @@ This program is available under Apache License Version 2.0, available at https:/
               // Translation of the Cancel button text.
               cancel: 'Cancel',
 
+              // Used for adjusting the year value when parsing dates with short years.
+              // The year values between 0 and 99 are evaluated and adjusted.
+              // Example: for a referenceDate of 1970-10-30;
+              //   dateToBeParsed: 40-10-30, result: 1940-10-30
+              //   dateToBeParsed: 80-10-30, result: 1980-10-30
+              //   dateToBeParsed: 10-10-30, result: 2010-10-30
+              // Supported date format: ISO 8601 `"YYYY-MM-DD"` (default)
+              // The default value is the current date.
+              referenceDate: '',
+
               // A function to format given `Object` as
               // date string. Object is in the format `{ day: ..., month: ..., year: ... }`
               // Note: The argument month is 0-based. This means that January = 0 and December = 11.
-              formatDate: d => {
-                // returns a string representation of the given
-                // object in 'MM/DD/YYYY' -format
+              formatDate(d) {
+                const yearStr = String(d.year).replace(/\d+/, (y) => '0000'.substr(y.length) + y);
+                return [d.month + 1, d.day, yearStr].join('/');
               },
 
               // A function to parse the given text to an `Object` in the format `{ day: ..., month: ..., year: ... }`.
@@ -222,6 +232,7 @@ This program is available under Apache License Version 2.0, available at https:/
               clear: 'Clear',
               today: 'Today',
               cancel: 'Cancel',
+              referenceDate: '',
               formatDate: d => {
                 const yearStr = String(d.year).replace(/\d+/, y => '0000'.substr(y.length) + y);
                 return [d.month + 1, d.day, yearStr].join('/');
@@ -232,12 +243,15 @@ This program is available under Apache License Version 2.0, available at https:/
                 let date, month = today.getMonth(), year = today.getFullYear();
 
                 if (parts.length === 3) {
-                  year = parseInt(parts[2]);
-                  if (parts[2].length < 3 && year >= 0) {
-                    year += year < 50 ? 2000 : 1900;
-                  }
                   month = parseInt(parts[0]) - 1;
                   date = parseInt(parts[1]);
+                  if (parts[2].length < 3 && year >= 0) {
+                    year += year < 50 ? 2000 : 1900;
+                    // maybe it's not this.parseDate, but simple parseDate,
+                    const usedReferenceDate = this.referenceDate ? this.parseDate(this.referenceDate) : new Date();
+                    // maybe it's not this.getAdjustedYear, similarly:
+                    year = this.getAdjustedYear(usedReferenceDate, year, month, date);
+                  }
                 } else if (parts.length === 2) {
                   month = parseInt(parts[0]) - 1;
                   date = parseInt(parts[1]);
