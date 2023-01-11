@@ -50,7 +50,7 @@ This program is available under Apache License Version 2.0, available at https:/
      * @param {number} day
      * @return {!number} Adjusted year value
      */
-    static getAdjustedYear(referenceDate, year, month = 0, day = 1) {
+    static _getAdjustedYear(referenceDate, year, month = 0, day = 1) {
       if (year > 99) {
         throw new Error('The provided year cannot have more than 2 digits.');
       }

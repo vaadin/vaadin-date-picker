@@ -221,15 +221,22 @@ This program is available under Apache License Version 2.0, available at https:/
           value: () => {
             return {
               monthNames: [
-                'January', 'February', 'March', 'April', 'May',
-                'June', 'July', 'August', 'September', 'October', 'November', 'December'
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
               ],
               weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
               weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
               firstDayOfWeek: 0,
-              week: 'Week',
-              calendar: 'Calendar',
-              clear: 'Clear',
               today: 'Today',
               cancel: 'Cancel',
               referenceDate: '',
@@ -237,7 +244,7 @@ This program is available under Apache License Version 2.0, available at https:/
                 const yearStr = String(d.year).replace(/\d+/, y => '0000'.substr(y.length) + y);
                 return [d.month + 1, d.day, yearStr].join('/');
               },
-              parseDate: text => {
+              parseDate(text) {
                 const parts = text.split('/');
                 const today = new Date();
                 let date, month = today.getMonth(), year = today.getFullYear();
@@ -245,12 +252,10 @@ This program is available under Apache License Version 2.0, available at https:/
                 if (parts.length === 3) {
                   month = parseInt(parts[0]) - 1;
                   date = parseInt(parts[1]);
+                  year = parseInt(parts[2]);
                   if (parts[2].length < 3 && year >= 0) {
-                    year += year < 50 ? 2000 : 1900;
-                    // maybe it's not this.parseDate, but simple parseDate,
-                    const usedReferenceDate = this.referenceDate ? this.parseDate(this.referenceDate) : new Date();
-                    // maybe it's not this.getAdjustedYear, similarly:
-                    year = this.getAdjustedYear(usedReferenceDate, year, month, date);
+                    const usedReferenceDate = this.referenceDate ? this._parseDate(this.referenceDate) : new Date();
+                    year = Vaadin.DatePickerHelper._getAdjustedYear(usedReferenceDate, year, month, date);
                   }
                 } else if (parts.length === 2) {
                   month = parseInt(parts[0]) - 1;
@@ -264,10 +269,10 @@ This program is available under Apache License Version 2.0, available at https:/
                 }
               },
               formatTitle: (monthName, fullYear) => {
-                return monthName + ' ' + fullYear;
-              }
+                return `${monthName} ${fullYear}`;
+              },
             };
-          }
+          },
         },
 
         /**
@@ -1043,7 +1048,6 @@ This program is available under Apache License Version 2.0, available at https:/
     get _overlayContent() {
       return this.$.overlay.content.querySelector('#overlay-content');
     }
-
     /**
      * Fired when the user commits a value change.
      *

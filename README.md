@@ -112,7 +112,7 @@ and [Polymer](https://polymer-library.polymer-project.org/) installed.
 
 ## Running tests from the command line
 
-1. When in the `vaadin-date-picker` directory, run `npm wct`
+1. When in the `vaadin-date-picker` directory, run `npm test` (this will execute:"test": "wct")
    (tests will be fetched from the `test/basics.html` file)
 
 ## Following the coding style
