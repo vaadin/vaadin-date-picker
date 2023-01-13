@@ -528,7 +528,6 @@
 
           it('should parse with default day value when day is not provided', () => {
             expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1919, 11, 31), 70, 0)).to.equal(1870);
-            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1919, 11, 31), 70, 0)).to.equal(1870);
             expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 1), 70, 0)).to.equal(1970);
             expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 2), 70, 0)).to.equal(1970);
           });
