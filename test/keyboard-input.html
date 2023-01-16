@@ -538,69 +538,59 @@
             expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 2), 70)).to.equal(1970);
           });
 
-          // it('should parse short year with current date as reference date', async () => {
-          //   await checkYearOffsets();
-          // });
-          //
-          // it('should parse short year with a custom reference date later in century', async () => {
-          //   datepicker.i18n = {
-          //     ...datepicker.i18n,
-          //     referenceDate: '1999-01-01',
-          //   };
-          //   await checkYearOffsets();
-          // });
-          //
-          // it('should parse short year with a custom reference date earlier in century', async () => {
-          //   datepicker.i18n = {
-          //     ...datepicker.i18n,
-          //     referenceDate: '2001-01-01',
-          //   };
-          //   await checkYearOffsets();
-          // });
+          it('should parse short year with current date as reference date', () => {
+            checkYearOffsets();
+          });
 
-          // it('should parse short year with a custom reference date and ambiguous year difference', async () => {
-          //   datepicker.i18n = {
-          //     ...datepicker.i18n,
-          //     referenceDate: '2001-03-15',
-          //   };
-          //   await checkMonthAndDayOffset(0, 0, 0);
-          //   await checkMonthAndDayOffset(0, -1, 0);
-          //   await checkMonthAndDayOffset(0, 1, -100);
-          //   await checkMonthAndDayOffset(-1, 0, 0);
-          //   await checkMonthAndDayOffset(1, 0, -100);
-          // });
+          it('should parse short year with a custom reference date later in century', () => {
+            Object.assign(datepicker.i18n, {referenceDate: '1999-01-01'});
+            checkYearOffsets();
+          });
 
-          // async function checkMonthAndDayOffset(monthOffsetToAdd, dayOffsetToAdd, expectedYearOffset) {
-          //   input.value = '';
-          //   const referenceDate = new Date(datepicker.i18n.referenceDate);
-          //   const yearToTest = referenceDate.getFullYear() + 50;
-          //   await sendKeys({
-          //     type: `${referenceDate.getMonth() + 1 + monthOffsetToAdd}/${referenceDate.getDate() + dayOffsetToAdd}/${
-          //             yearToTest % 100
-          //     }`,
-          //   });
-          //   const result = focusedDate();
-          //   expect(result.getFullYear()).to.equal(yearToTest + expectedYearOffset);
-          // }
+          it('should parse short year with a custom reference date earlier in century', () => {
+            Object.assign(datepicker.i18n, {referenceDate: '2001-01-01'});
+            checkYearOffsets();
+          });
 
-          // async function checkYearOffsets() {
-          //   await checkYearOffset(0, 0);
-          //   await checkYearOffset(-49, 0);
-          //   await checkYearOffset(49, 0);
-          //   await checkYearOffset(-51, 100);
-          //   await checkYearOffset(51, -100);
-          // }
+          it('should parse short year with a custom reference date and ambiguous year difference', () => {
+            Object.assign(datepicker.i18n, {referenceDate: '2001-03-15'});
+            checkMonthAndDayOffset(0, 0, 0);
+            checkMonthAndDayOffset(0, -1, 0);
+            checkMonthAndDayOffset(0, 1, -100);
+            checkMonthAndDayOffset(-1, 0, 0);
+            checkMonthAndDayOffset(1, 0, -100);
+          });
 
-        //   async function checkYearOffset(offsetToAdd, expectedOffset) {
-        //     input.value = '';
-        //     const referenceDateYear = datepicker.i18n.referenceDate
-        //             ? new Date(datepicker.i18n.referenceDate).getFullYear()
-        //             : today.getFullYear();
-        //     const yearToTest = referenceDateYear + offsetToAdd;
-        //     await sendKeys({ type: `6/20/${String(yearToTest).slice(2, 4)}` });
-        //     const result = focusedDate();
-        //     expect(result.getFullYear()).to.equal(yearToTest + expectedOffset);
-        //   }
+          function checkMonthAndDayOffset(monthOffsetToAdd, dayOffsetToAdd, expectedYearOffset) {
+            const referenceDate = new Date(datepicker.i18n.referenceDate);
+            const yearToTest = referenceDate.getFullYear() + 50;
+            target.value = '';
+            inputText(`${referenceDate.getMonth() + 1 + monthOffsetToAdd}/${referenceDate.getDate() + dayOffsetToAdd}/${
+              yearToTest % 100
+            }`);
+
+            const result = focusedDate();
+            expect(result.getFullYear()).to.equal(yearToTest + expectedYearOffset);
+          }
+
+          function checkYearOffsets() {
+            checkYearOffset(0, 0);
+            checkYearOffset(-49, 0);
+            checkYearOffset(49, 0);
+            checkYearOffset(-51, 100);
+            checkYearOffset(51, -100);
+          }
+
+          function checkYearOffset(offsetToAdd, expectedOffset) {
+            const referenceDateYear = datepicker.i18n.referenceDate
+              ? new Date(datepicker.i18n.referenceDate).getFullYear()
+              : today.getFullYear();
+            const yearToTest = referenceDateYear + offsetToAdd;
+            target.value = '';
+            inputText(`6/20/${String(yearToTest).slice(2, 4)}`);
+            const result = focusedDate();
+            expect(result.getFullYear()).to.equal(yearToTest + expectedOffset);
+          }
         });
 
         describe('focus modes', () => {
