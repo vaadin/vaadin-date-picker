@@ -58,6 +58,22 @@
       </template>
     </vaadin-demo-snippet>
 
+
+    <h3>Date picker with reference Date</h3>
+    <p> Testing reference date. (If the given date, year given with two digit, so like: 11/11/61 is closer to the reference date, then the century will be the reference's date century)</p>
+    <vaadin-demo-snippet id="date-picker-with-week-numbers" when-defined="vaadin-date-picker">
+      <template preserve-content>
+        <vaadin-date-picker show-week-numbers label="Label"></vaadin-date-picker>
+        <script>
+          window.addDemoReadyListener('#date-picker-with-week-numbers', function(document) {
+            const datepicker = document.querySelector('vaadin-date-picker');
+            datepicker.set('i18n.referenceDate', 1950);
+          });
+        </script>
+      </template>
+    </vaadin-demo-snippet>
+
+
   </template>
   <script>
     class DatePickerPresentationDemos extends DemoReadyEventEmitter(DatePickerDemo(Polymer.Element)) {
