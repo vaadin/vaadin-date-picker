@@ -60,14 +60,14 @@
 
 
     <h3>Date picker with reference Date</h3>
-    <p> Testing reference date. (If the given date, year given with two digit, so like: 11/11/61 is closer to the reference date, then the century will be the reference's date century)</p>
-    <vaadin-demo-snippet id="date-picker-with-week-numbers" when-defined="vaadin-date-picker">
+    <p> Testing reference date. (Stting up reference date to: 1919-11-31, so giving the following as input dd/MM/70(year) will be year 1870, and dd/MM/68(year) will be year 1968, where dd is days, MM is months)</p>
+    <vaadin-demo-snippet id="date-picker-with-reference-date" when-defined="vaadin-date-picker">
       <template preserve-content>
-        <vaadin-date-picker show-week-numbers label="Label"></vaadin-date-picker>
+        <vaadin-date-picker label="Label"></vaadin-date-picker>
         <script>
-          window.addDemoReadyListener('#date-picker-with-week-numbers', function(document) {
+          window.addDemoReadyListener('#date-picker-with-reference-date', function(document) {
             const datepicker = document.querySelector('vaadin-date-picker');
-            datepicker.set('i18n.referenceDate', 1950);
+            datepicker.set('i18n.referenceDate', '1919-11-31');
           });
         </script>
       </template>
