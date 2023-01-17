@@ -58,6 +58,22 @@
       </template>
     </vaadin-demo-snippet>
 
+
+    <h3>Date picker with reference date</h3>
+    <p>Dates with 2-digit years will be interpreted according to the reference date, 1919-11-31 in this example. Therefore 70 will be interpreted as 1870, while 68 will be interpreted as 1968.</p>
+    <vaadin-demo-snippet id="date-picker-with-reference-date" when-defined="vaadin-date-picker">
+      <template preserve-content>
+        <vaadin-date-picker label="Label"></vaadin-date-picker>
+        <script>
+          window.addDemoReadyListener('#date-picker-with-reference-date', function(document) {
+            const datepicker = document.querySelector('vaadin-date-picker');
+            datepicker.set('i18n.referenceDate', '1919-11-31');
+          });
+        </script>
+      </template>
+    </vaadin-demo-snippet>
+
+
   </template>
   <script>
     class DatePickerPresentationDemos extends DemoReadyEventEmitter(DatePickerDemo(Polymer.Element)) {

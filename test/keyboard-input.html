@@ -7,6 +7,7 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <script src="common.js"></script>
   <script src="../../iron-test-helpers/mock-interactions.js"></script>
+  <link rel="import" href="vaadin-date-picker-helper.html">
   <link rel="import" href="../../test-fixture/test-fixture.html">
 
   <link rel="import" href="../vaadin-date-picker.html">
@@ -517,11 +518,83 @@
             expect(result.getDate()).to.equal(9);
           });
 
+          it('should throw when passing a year < 0', () => {
+            expect(() => Vaadin.DatePickerHelper._getAdjustedYear(today, -1, 1, 1)).to.throw(Error);
+          });
+
+          it('should throw when passing a year >= 100', () => {
+            expect(() => Vaadin.DatePickerHelper._getAdjustedYear(today, 100, 1, 1)).to.throw(Error);
+          });
+
+          it('should parse with default day value when day is not provided', () => {
+            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1919, 11, 30), 70, 0)).to.equal(1870);
+            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 1), 70, 0)).to.equal(1970);
+            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 2), 70, 0)).to.equal(1970);
+          });
+
+          it('should parse with default month and day values when only year is provided', () => {
+            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1919, 11, 30), 70)).to.equal(1870);
+            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 1), 70)).to.equal(1970);
+            expect(Vaadin.DatePickerHelper._getAdjustedYear(new Date(1920, 0, 2), 70)).to.equal(1970);
+          });
+
+          it('should parse short year with current date as reference date', () => {
+            checkYearOffsets();
+          });
+
+          it('should parse short year with a custom reference date later in century', () => {
+            Object.assign(datepicker.i18n, {referenceDate: '1999-01-01'});
+            checkYearOffsets();
+          });
+
+          it('should parse short year with a custom reference date earlier in century', () => {
+            Object.assign(datepicker.i18n, {referenceDate: '2001-01-01'});
+            checkYearOffsets();
+          });
+
+          it('should parse short year with a custom reference date and ambiguous year difference', () => {
+            Object.assign(datepicker.i18n, {referenceDate: '2001-03-15'});
+            checkMonthAndDayOffset(0, 0, 0);
+            checkMonthAndDayOffset(0, -1, 0);
+            checkMonthAndDayOffset(0, 1, -100);
+            checkMonthAndDayOffset(-1, 0, 0);
+            checkMonthAndDayOffset(1, 0, -100);
+          });
+
+          function checkMonthAndDayOffset(monthOffsetToAdd, dayOffsetToAdd, expectedYearOffset) {
+            const referenceDate = new Date(datepicker.i18n.referenceDate);
+            const yearToTest = referenceDate.getFullYear() + 50;
+            target.value = '';
+            inputText(`${referenceDate.getMonth() + 1 + monthOffsetToAdd}/${referenceDate.getDate() + dayOffsetToAdd}/${
+              yearToTest % 100
+            }`);
+
+            const result = focusedDate();
+            expect(result.getFullYear()).to.equal(yearToTest + expectedYearOffset);
+          }
+
+          function checkYearOffsets() {
+            checkYearOffset(0, 0);
+            checkYearOffset(-49, 0);
+            checkYearOffset(49, 0);
+            checkYearOffset(-51, 100);
+            checkYearOffset(51, -100);
+          }
+
+          function checkYearOffset(offsetToAdd, expectedOffset) {
+            const referenceDateYear = datepicker.i18n.referenceDate
+              ? new Date(datepicker.i18n.referenceDate).getFullYear()
+              : today.getFullYear();
+            const yearToTest = referenceDateYear + offsetToAdd;
+            target.value = '';
+            inputText(`6/20/${String(yearToTest).slice(2, 4)}`);
+            const result = focusedDate();
+            expect(result.getFullYear()).to.equal(yearToTest + expectedOffset);
+          }
         });
 
         describe('focus modes', () => {
 
-          var today;
           var overlayContent;
 
           beforeEach(() => overlayContent = getOverlayContent(datepicker));
