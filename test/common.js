@@ -125,4 +125,11 @@ function monkeyPatchNativeFocus() {
   });
 }
 
+async function nextRender(element) {
+  return new Promise(resolve => {
+    Polymer.RenderStatus.afterNextRender(element, resolve);
+  });
+}
+
+
 window.addEventListener('WebComponentsReady', monkeyPatchNativeFocus);

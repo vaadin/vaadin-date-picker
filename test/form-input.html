@@ -103,6 +103,50 @@
         });
       });
 
+      describe('initial', () => {
+        let validateSpy;
+
+        beforeEach(() => {
+          datePicker = document.createElement('vaadin-date-picker');
+          validateSpy = sinon.spy(datePicker, 'validate');
+        });
+
+        afterEach(() => {
+          datePicker.remove();
+        });
+
+        it('should not validate by default', async() => {
+          document.body.appendChild(datePicker);
+          await nextRender();
+          expect(validateSpy.called).to.be.false;
+        });
+
+        it('should not validate when the field has an initial value', async() => {
+          datePicker.value = '2020-01-01';
+          document.body.appendChild(datePicker);
+          await nextRender();
+          expect(validateSpy.called).to.be.false;
+        });
+
+        it('should not validate when the field has an initial value and invalid', async() => {
+          datePicker.value = '2020-01-01';
+          datePicker.invalid = true;
+          document.body.appendChild(datePicker);
+          await nextRender();
+          expect(validateSpy.called).to.be.false;
+        });
+
+        it('should not validate on min change when no value is provided', () => {
+          datePicker.min = '2020-01-01';
+          expect(validateSpy.called).to.be.false;
+        });
+
+        it('should not validate on max change when no value is provided', () => {
+          datePicker.max = '2020-01-01';
+          expect(validateSpy.called).to.be.false;
+        });
+      });
+
       describe('custom validator', () => {
         beforeEach(done => {
           datepicker = fixture('custom-validation');
