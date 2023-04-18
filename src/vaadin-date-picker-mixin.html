@@ -819,16 +819,20 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * Returns true if `value` is valid, and sets the `invalid` flag appropriately.
+     * Validates the field and sets the `invalid` property based on the result.
      *
-     * @param {string=} value Value to validate. Optional, defaults to user's input value.
-     * @return {boolean} True if the value is valid and sets the `invalid` flag appropriately
+     * The method fires a `validated` event with the result of the validation.
+     *
+     * @return {boolean} True if the value is valid.
      */
     validate() {
       // Note (Yuriy): Workaround `this._inputValue` is used in order
       // to avoid breaking change on custom `checkValidity`.
       // Can be removed with next major.
-      return !(this.invalid = !this.checkValidity(this._inputValue));
+      const isValid = this.checkValidity(this._inputValue);
+      this.invalid = !isValid;
+      this.dispatchEvent(new CustomEvent('validated', {detail: {valid: isValid}}));
+      return isValid;
     }
 
     /**
@@ -858,7 +862,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       }
 
-      return inputValid && minMaxValid && inputValidity;
+      return !!(inputValid && minMaxValid && inputValidity);
     }
 
     /** @private */
@@ -1055,6 +1059,14 @@ This program is available under Apache License Version 2.0, available at https:/
      * Fired when the user commits a value change.
      *
      * @event change
+     */
+
+    /**
+     * Fired whenever the field is validated.
+     *
+     * @event validated
+     * @param {Object} detail
+     * @param {boolean} detail.valid the result of the validation.
      */
   };
 </script>

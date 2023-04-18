@@ -1,0 +1,48 @@
+<!doctype html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>vaadin-date-picker validation tests</title>
+   <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../test-fixture/test-fixture.html">
+  <link rel="import" href="../vaadin-date-picker.html">
+</head>
+
+<body>
+  <test-fixture id="date-picker">
+    <template>
+      <vaadin-date-picker></vaadin-date-picker>
+    </template>
+  </test-fixture>
+  <script>
+  describe('basic', () => {
+    let datePicker;
+
+    beforeEach(() => {
+      datePicker = fixture('date-picker');
+    });
+
+    it('should fire a validated event on validation success', () => {
+      const validatedSpy = sinon.spy();
+      datePicker.addEventListener('validated', validatedSpy);
+      datePicker.validate();
+
+      expect(validatedSpy.calledOnce).to.be.true;
+      const event = validatedSpy.firstCall.args[0];
+      expect(event.detail.valid).to.be.true;
+    });
+
+    it('should fire a validated event on validation failure', () => {
+      const validatedSpy = sinon.spy();
+      datePicker.addEventListener('validated', validatedSpy);
+      datePicker.required = true;
+      datePicker.validate();
+
+      expect(validatedSpy.calledOnce).to.be.true;
+      const event = validatedSpy.firstCall.args[0];
+      expect(event.detail.valid).to.be.false;
+    });
+  });
+  </script>
+</body>
