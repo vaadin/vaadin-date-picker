@@ -832,7 +832,7 @@ This program is available under Apache License Version 2.0, available at https:/
       const isValid = this.checkValidity(this._inputValue);
       this.invalid = !isValid;
       this.dispatchEvent(new CustomEvent('validated', {detail: {valid: isValid}}));
-      return !this.invalid;
+      return isValid;
     }
 
     /**
