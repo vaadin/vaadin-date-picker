@@ -1,0 +1,14 @@
+<!doctype html>
+
+<head>
+  <link rel="import" href="../../polymer/polymer.html">
+</head>
+<body>
+<script>
+  window.nextRender = (element) => {
+    return new Promise(resolve => {
+      Polymer.RenderStatus.afterNextRender(element, resolve);
+    });
+  };
+</script>
+</body>
