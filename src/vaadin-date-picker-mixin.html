@@ -333,6 +333,16 @@ This program is available under Apache License Version 2.0, available at https:/
           computed: '_isNoInput(_fullscreen, _ios, i18n, i18n.*, opened, autoOpenDisabled)'
         },
 
+        /**
+         * When true, the input element has a non-empty value entered by the user.
+         * @protected
+         */
+        _hasInputValue: {
+          type: Boolean,
+          value: false,
+          observer: '_hasInputValueChanged',
+        },
+
         /** @private */
         _ios: {
           type: Boolean,
@@ -399,6 +409,7 @@ This program is available under Apache License Version 2.0, available at https:/
       });
       this.addEventListener('keydown', this._onKeydown.bind(this));
       this.addEventListener('input', this._onUserInput.bind(this));
+      this._inputElement.addEventListener('input', this.__onUserInput.bind(this));
       this.addEventListener('focus', e => this._noInput && e.target.blur());
       this.addEventListener('blur', e => {
         if (!this.opened) {
@@ -1033,6 +1044,38 @@ This program is available under Apache License Version 2.0, available at https:/
       const parsedDate = dateObject &&
         this._parseDate(dateObject.year + '-' + (dateObject.month + 1) + '-' + dateObject.day);
       return parsedDate;
+    }
+
+    /**
+     * Sets the `_hasInputValue` property based on the `input` event.
+     *
+     * @param {InputEvent} event
+     * @protected
+     */
+    _setHasInputValue(event) {
+      this._hasInputValue = event.target.value.length > 0;
+    }
+
+    /**
+     * An input event listener used to update `_hasInputValue` property.
+     * Do not override this method.
+     *
+     * @param {Event} event
+     * @private
+     */
+    __onUserInput(event) {
+      this._setHasInputValue(event);
+    }
+
+    /**
+      * Observer to notify about the change of private property.
+      *
+      * @private
+      */
+    _hasInputValueChanged(hasValue, oldHasValue) {
+      if (hasValue || oldHasValue) {
+        this.dispatchEvent(new CustomEvent('has-input-value-changed'));
+      }
     }
 
     /** @private */
