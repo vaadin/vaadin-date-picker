@@ -1068,10 +1068,10 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-      * Observer to notify about the change of private property.
-      *
-      * @private
-      */
+     * Observer to notify about the change of private property.
+     *
+     * @private
+     */
     _hasInputValueChanged(hasValue, oldHasValue) {
       if (hasValue || oldHasValue) {
         this.dispatchEvent(new CustomEvent('has-input-value-changed'));
