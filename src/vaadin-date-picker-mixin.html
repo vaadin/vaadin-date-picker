@@ -408,8 +408,7 @@ This program is available under Apache License Version 2.0, available at https:/
         }
       });
       this.addEventListener('keydown', this._onKeydown.bind(this));
-      this.addEventListener('input', this._onUserInput.bind(this));
-      this._inputElement.addEventListener('input', this.__onUserInput.bind(this));
+      this.addEventListener('input', this.__onUserInput.bind(this));
       this.addEventListener('focus', e => this._noInput && e.target.blur());
       this.addEventListener('blur', e => {
         if (!this.opened) {
@@ -1053,7 +1052,8 @@ This program is available under Apache License Version 2.0, available at https:/
      * @protected
      */
     _setHasInputValue(event) {
-      this._hasInputValue = event.target.value.length > 0;
+      const target = event.composedPath()[0];
+      this._hasInputValue = target.value.length > 0;
     }
 
     /**
@@ -1065,6 +1065,7 @@ This program is available under Apache License Version 2.0, available at https:/
      */
     __onUserInput(event) {
       this._setHasInputValue(event);
+      this._onUserInput(event);
     }
 
     /**
