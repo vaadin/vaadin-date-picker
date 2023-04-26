@@ -419,7 +419,7 @@ This program is available under Apache License Version 2.0, available at https:/
             }
           }
 
-          if (this._inputElement.value === '' && this.__dispatchChange) {
+          if (this._inputElementValue === '' && this.__dispatchChange) {
             this.validate();
             this.value = '';
             this.__dispatchChange = false;
@@ -785,7 +785,7 @@ This program is available under Apache License Version 2.0, available at https:/
       // Select the parsed input or focused date
       this._ignoreFocusedDateChange = true;
       if (this.i18n.parseDate) {
-        const inputValue = this._inputValue || '';
+        const inputValue = this._inputElementValue || '';
         const parsedDate = this._getParsedDate(inputValue);
 
         if (this._isValidDate(parsedDate)) {
@@ -829,6 +829,39 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
+     * A property for accessing the input element's value.
+     *
+     * Override this getter if the property is different from the default `value` one.
+     *
+     * @protected
+     * @return {string}
+     */
+    get _inputElementValueProperty() {
+      return 'value';
+    }
+
+    /**
+     * The input element's value.
+     *
+     * @protected
+     * @return {string}
+     */
+    get _inputElementValue() {
+      return this._inputElement ? this._inputElement[this._inputElementValueProperty] : undefined;
+    }
+
+    /**
+     * The input element's value.
+     *
+     * @protected
+     */
+    set _inputElementValue(value) {
+      if (this._inputElement) {
+        this._inputElement[this._inputElementValueProperty] = value;
+      }
+    }
+
+    /**
      * @param {boolean} invalid
      * @protected
      */
@@ -860,7 +893,8 @@ This program is available under Apache License Version 2.0, available at https:/
       // Note (Yuriy): Workaround `this._inputValue` is used in order
       // to avoid breaking change on custom `checkValidity`.
       // Can be removed with next major.
-      const isValid = this.checkValidity(this._inputValue);
+      // Note : this._inputElementValue is used instead of this._inputValue
+      const isValid = this.checkValidity(this._inputElementValue);
       this._setInvalid(!isValid);
       this.dispatchEvent(new CustomEvent('validated', {detail: {valid: isValid}}));
       return isValid;
@@ -875,8 +909,8 @@ This program is available under Apache License Version 2.0, available at https:/
      * @return {boolean} True if the value is valid
      */
     checkValidity() {
-      const inputValid = !this._inputValue ||
-        (this._selectedDate && this._inputValue === this._getFormattedDate(this.i18n.formatDate, this._selectedDate));
+      const inputValid = !this._inputElementValue ||
+        (this._selectedDate && this._inputElementValue === this._getFormattedDate(this.i18n.formatDate, this._selectedDate));
       const minMaxValid = !this._selectedDate ||
         Vaadin.DatePickerHelper._dateAllowed(this._selectedDate, this._minDate, this._maxDate);
 
@@ -915,12 +949,12 @@ This program is available under Apache License Version 2.0, available at https:/
     /** @private */
     _focusAndSelect() {
       this._focus();
-      this._setSelectionRange(0, this._inputValue.length);
+      this._setSelectionRange(0, this._inputElementValue.length);
     }
 
     /** @private */
     _applyInputValue(date) {
-      this._inputValue = date ? this._getFormattedDate(this.i18n.formatDate, date) : '';
+      this._inputElementValue = date ? this._getFormattedDate(this.i18n.formatDate, date) : '';
     }
 
     /** @private */
@@ -993,7 +1027,7 @@ This program is available under Apache License Version 2.0, available at https:/
             }
             this.close();
           } else {
-            if (!isValidDate && this._inputElement.value !== '') {
+            if (!isValidDate && this._inputElementValue !== '') {
               this.validate();
             } else {
               const oldValue = this.value;
@@ -1011,7 +1045,7 @@ This program is available under Apache License Version 2.0, available at https:/
             this._close();
           } else if (this.autoOpenDisabled) {
             // Do not restore selected date if Esc was pressed after clearing input field
-            if (this._inputElement.value === '') {
+            if (this._inputElementValue === '') {
               this._selectedDate = null;
             }
             this._applyInputValue(this._selectedDate);
@@ -1038,7 +1072,7 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /** @private */
-    _getParsedDate(inputValue = this._inputValue) {
+    _getParsedDate(inputValue = this._inputElementValue) {
       const dateObject = this.i18n.parseDate && this.i18n.parseDate(inputValue);
       const parsedDate = dateObject &&
         this._parseDate(dateObject.year + '-' + (dateObject.month + 1) + '-' + dateObject.day);
@@ -1081,7 +1115,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     /** @private */
     _onUserInput(e) {
-      if (!this.opened && this._inputElement.value && !this.autoOpenDisabled) {
+      if (!this.opened && this._inputElementValue && !this.autoOpenDisabled) {
         this.open();
       }
       this._userInputValueChanged();
@@ -1096,7 +1130,7 @@ This program is available under Apache License Version 2.0, available at https:/
 
     /** @private */
     _userInputValueChanged(value) {
-      if (this._inputValue) {
+      if (this._inputElementValue) {
         const parsedDate = this._getParsedDate();
 
         if (this._isValidDate(parsedDate)) {

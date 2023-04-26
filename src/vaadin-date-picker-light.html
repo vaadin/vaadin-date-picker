@@ -151,15 +151,16 @@ This program is available under Apache License Version 2.0, available at https:/
           return this.querySelector('vaadin-text-field,iron-input,paper-input,.paper-input-input,.input');
         }
 
-        set _inputValue(value) {
-          if (this._inputElement) {
-            this._inputElement[Polymer.CaseMap.dashToCamelCase(this.attrForValue)] = value;
-          }
-        }
-
-        /** @return {string | undefined} */
-        get _inputValue() {
-          return this._inputElement && this._inputElement[Polymer.CaseMap.dashToCamelCase(this.attrForValue)];
+        /**
+          * This method from InputMixin is overridden to make
+          * the input element value property customizable.
+          *
+          * @protected
+          * @override
+          * @return {string}
+          */
+        get _inputElementValueProperty() {
+          return Polymer.CaseMap.dashToCamelCase(this.attrForValue);
         }
       }
 

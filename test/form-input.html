@@ -202,7 +202,7 @@
         inputValue('foo');
 
         datepicker.addEventListener('value-changed', () => {
-          expect(datepicker._inputValue).to.equal('foo');
+          expect(datepicker._inputElement.value).to.equal('foo');
           done();
         });
         datepicker.close();
