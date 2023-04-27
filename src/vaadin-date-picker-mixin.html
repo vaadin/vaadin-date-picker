@@ -890,10 +890,9 @@ This program is available under Apache License Version 2.0, available at https:/
      * @return {boolean} True if the value is valid.
      */
     validate() {
-      // Note (Yuriy): Workaround `this._inputValue` is used in order
-      // to avoid breaking change on custom `checkValidity`.
-      // Can be removed with next major.
-      // Note : this._inputElementValue is used instead of this._inputValue
+      // Note (Yuriy): this._inputElementValue is passed to checkValidity() as an argument to maintain
+      // backward compatibility in case it's being used in a custom implementation of checkValidity().
+      // The workaround can be removed with the next major.
       const isValid = this.checkValidity(this._inputElementValue);
       this._setInvalid(!isValid);
       this.dispatchEvent(new CustomEvent('validated', {detail: {valid: isValid}}));
