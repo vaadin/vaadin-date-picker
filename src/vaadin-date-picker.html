@@ -275,7 +275,7 @@ This program is available under Apache License Version 2.0, available at https:/
           this._inputElement.addEventListener('change', (e) => {
             // For change event on text-field blur, after the field is cleared,
             // we schedule change event to be dispatched on date-picker blur.
-            if (this._inputElement.value === '' && !e.__fromClearButton) {
+            if (this._inputElementValue === '' && !e.__fromClearButton) {
               this.__dispatchChange = true;
             }
           });
@@ -305,15 +305,6 @@ This program is available under Apache License Version 2.0, available at https:/
          */
         _input() {
           return this.$.input;
-        }
-
-        set _inputValue(value) {
-          this._inputElement.value = value;
-        }
-
-        /** @return {string} */
-        get _inputValue() {
-          return this._inputElement.value;
         }
 
         /** @private */
