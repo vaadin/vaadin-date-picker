@@ -10,5 +10,38 @@
       Polymer.RenderStatus.afterNextRender(element, resolve);
     });
   };
+
+  function type(sequence, input) {
+    input.value += sequence;
+    input.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+  }
+  
+  function pressEsc(input) {
+    const event = new CustomEvent('keydown', {bubbles: true, composed: true});
+    event.keyCode = 27;
+    event.code = 27;
+    input.dispatchEvent(event);
+  }
+
+  function pressEnter(input) {
+    const event = new CustomEvent('keydown', {bubbles: true, composed: true});
+    event.keyCode = 13;
+    event.code = 13;
+    input.dispatchEvent(event);
+  }
+
+  function pressArrowDown(input) {
+    const event = new CustomEvent('keydown', {bubbles: true, composed: true});
+    event.keyCode = 40;
+    event.code = 40;
+    input.dispatchEvent(event);
+  }
+
+  function pressSpace(input) {
+    const event = new CustomEvent('keydown', {bubbles: true, composed: true});
+    event.keyCode = 32;
+    event.code = 32;
+    input.dispatchEvent(event);
+  }
 </script>
 </body>
