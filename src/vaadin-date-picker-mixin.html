@@ -334,7 +334,11 @@ This program is available under Apache License Version 2.0, available at https:/
         },
 
         /**
-         * When true, the input element has a non-empty value entered by the user.
+         * The property indicates true only if the input has been entered by the user.
+         * In the case of programmatic changes, the property is reset to false.
+         * Read more about why this workaround is needed:
+         * https://github.com/vaadin/web-components/issues/5639
+         *
          * @protected
          */
         _hasInputValue: {
@@ -851,13 +855,19 @@ This program is available under Apache License Version 2.0, available at https:/
     }
 
     /**
-     * The input element's value.
+     * The setter resets the `_hasInputValue` property
+     * to false when the input element's value is updated programmatically.
+     * In date-picker, `_hasInputValue` is supposed to indicate true only
+     * if the input has been entered by the user.
+     * Read more about why this workaround is needed:
+     * https://github.com/vaadin/web-components/issues/5639
      *
      * @protected
      */
     set _inputElementValue(value) {
       if (this._inputElement) {
         this._inputElement[this._inputElementValueProperty] = value;
+        this._hasInputValue = false;
       }
     }
 
@@ -954,9 +964,6 @@ This program is available under Apache License Version 2.0, available at https:/
     /** @private */
     _applyInputValue(date) {
       this._inputElementValue = date ? this._getFormattedDate(this.i18n.formatDate, date) : '';
-      // It is no longer input entered by the user,
-      // so reset the `hasInputValue` property.
-      this._hasInputValue = false;
     }
 
     /** @private */
