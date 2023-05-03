@@ -8,6 +8,7 @@
   <script src="../../iron-test-helpers/mock-interactions.js"></script>
   <link rel="import" href="../../test-fixture/test-fixture.html">
   <link rel="import" href="../vaadin-date-picker.html">
+  <script src="common.js"></script>
 </head>
 
 <body>
@@ -80,7 +81,7 @@
             expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
           });
 
-          it('should be fired when selecting a date with Space', async() => {
+          (ios ? it.skip : it)('should be fired when selecting a date with Space', async() => {
             arrowDown(input);
             space(datePicker._overlayContent);
             expect(valueChangedSpy.calledOnce).to.be.true;
