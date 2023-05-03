@@ -25,7 +25,7 @@
       target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
     }
 
-    function inputText(text, target) {
+    function inputText(target, text) {
       for (var i = 0; i < text.length; i++) {
         inputChar(text[i], target);
       }
@@ -63,7 +63,7 @@
       describe('without value', () => {
         describe('with user input', () => {
           beforeEach(async() => {
-            inputText('1/1/2022', input);
+            inputText(input, '1/1/2022');
             hasInputValueChangedSpy.reset();
           });
 
@@ -92,7 +92,7 @@
 
       describe('with value', () => {
         beforeEach(async() => {
-          inputText('1/1/2022', input);
+          inputText(input, '1/1/2022');
           enter(input);
           valueChangedSpy.reset();
           hasInputValueChangedSpy.reset();
@@ -100,7 +100,7 @@
 
         describe('with user input', () => {
           beforeEach(async() => {
-            inputText('foo', input);
+            inputText(input, 'foo');
             hasInputValueChangedSpy.reset();
           });
 
