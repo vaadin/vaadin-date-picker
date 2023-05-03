@@ -18,112 +18,109 @@
     </template>
   </test-fixture>
   <script>
-    // iOS doesn't support arrow keys etc.
-    if (!ios) {
-      describe('events', () => {
+    (ios ? describe.skip : describe)('events', () => {
     
-        function inputChar(char, target) {
-          target.value += char;
-          MockInteractions.keyDownOn(target, char.charCodeAt(0));
-          target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+      function inputChar(target, char) {
+        target.value += char;
+        MockInteractions.keyDownOn(target, char.charCodeAt(0));
+        target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
+      }
+    
+      function inputText(target, text) {
+        for (var i = 0; i < text.length; i++) {
+          inputChar(target, text[i]);
         }
+      }
     
-        function inputText(target, text) {
-          for (var i = 0; i < text.length; i++) {
-            inputChar(text[i], target);
-          }
-        }
+      function arrowDown(target) {
+        MockInteractions.keyDownOn(target, 40);
+      }
     
-        function arrowDown(target) {
-          MockInteractions.keyDownOn(target, 40);
-        }
+      function enter(target) {
+        MockInteractions.pressEnter(target);
+      }
     
-        function enter(target) {
-          MockInteractions.pressEnter(target);
-        }
+      function space(target) {
+        MockInteractions.pressSpace(target);
+      }
     
-        function space(target) {
-          MockInteractions.pressSpace(target);
-        }
+      function esc(target) {
+        MockInteractions.keyDownOn(target, 27, null, 'Escape');
+      }
     
-        function esc(target) {
-          MockInteractions.keyDownOn(target, 27, null, 'Escape');
-        }
+      describe('has-input-value-changed event', () => {
+        let input, datePicker, clearButton, hasInputValueChangedSpy, valueChangedSpy;
     
-        describe('has-input-value-changed event', () => {
-          let input, datePicker, clearButton, hasInputValueChangedSpy, valueChangedSpy;
+        beforeEach(async() => {
+          hasInputValueChangedSpy = sinon.spy();
+          valueChangedSpy = sinon.spy();
+          datePicker = fixture('date-picker');
+          input = datePicker._inputElement;
+          clearButton = input.shadowRoot.querySelector('[part="clear-button"]');
+          datePicker.addEventListener('has-input-value-changed', hasInputValueChangedSpy);
+          datePicker.addEventListener('value-changed', valueChangedSpy);
+        });
     
-          beforeEach(async() => {
-            hasInputValueChangedSpy = sinon.spy();
-            valueChangedSpy = sinon.spy();
-            datePicker = fixture('date-picker');
-            input = datePicker._inputElement;
-            clearButton = input.shadowRoot.querySelector('[part="clear-button"]');
-            datePicker.addEventListener('has-input-value-changed', hasInputValueChangedSpy);
-            datePicker.addEventListener('value-changed', valueChangedSpy);
-          });
-    
-          describe('without value', () => {
-            describe('with user input', () => {
-              beforeEach(async() => {
-                inputText(input, '1/1/2022');
-                hasInputValueChangedSpy.reset();
-              });
-    
-              it('should be fired when clearing the user input with Esc', async() => {
-                esc(input);
-                expect(input.value).to.be.empty;
-                expect(hasInputValueChangedSpy.calledOnce).to.be.true;
-              });
-    
-              it('should be fired when comitting the user input with Enter', async() => {
-                enter(input);
-                expect(valueChangedSpy.calledOnce).to.be.true;
-                expect(hasInputValueChangedSpy.calledOnce).to.be.true;
-                expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
-              });
-    
-              it('should be fired when selecting a date with Space', async() => {
-                arrowDown(input);
-                space(datePicker._overlayContent);
-                expect(valueChangedSpy.calledOnce).to.be.true;
-                expect(hasInputValueChangedSpy.calledOnce).to.be.true;
-                expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
-              });
-            });
-          });
-    
-          describe('with value', () => {
+        describe('without value', () => {
+          describe('with user input', () => {
             beforeEach(async() => {
               inputText(input, '1/1/2022');
-              enter(input);
-              valueChangedSpy.reset();
               hasInputValueChangedSpy.reset();
             });
     
-            describe('with user input', () => {
-              beforeEach(async() => {
-                inputText(input, 'foo');
-                hasInputValueChangedSpy.reset();
-              });
+            it('should be fired when clearing the user input with Esc', async() => {
+              esc(input);
+              expect(input.value).to.be.empty;
+              expect(hasInputValueChangedSpy.calledOnce).to.be.true;
+            });
     
-              it('should be fired on clear button click', () => {
-                clearButton.click();
-                expect(input.value).to.be.empty;
-                expect(valueChangedSpy.calledOnce).to.be.true;
-                expect(hasInputValueChangedSpy.calledOnce).to.be.true;
-                expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
-              });
+            it('should be fired when comitting the user input with Enter', async() => {
+              enter(input);
+              expect(valueChangedSpy.calledOnce).to.be.true;
+              expect(hasInputValueChangedSpy.calledOnce).to.be.true;
+              expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
+            });
     
-              it('should be fired when reverting the user input to the value with Esc', async() => {
-                esc(datePicker._overlayContent);
-                expect(input.value).to.equal('1/1/2022');
-                expect(hasInputValueChangedSpy.calledOnce).to.be.true;
-              });
+            it('should be fired when selecting a date with Space', async() => {
+              arrowDown(input);
+              space(datePicker._overlayContent);
+              expect(valueChangedSpy.calledOnce).to.be.true;
+              expect(hasInputValueChangedSpy.calledOnce).to.be.true;
+              expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
+            });
+          });
+        });
+    
+        describe('with value', () => {
+          beforeEach(async() => {
+            inputText(input, '1/1/2022');
+            enter(input);
+            valueChangedSpy.reset();
+            hasInputValueChangedSpy.reset();
+          });
+    
+          describe('with user input', () => {
+            beforeEach(async() => {
+              inputText(input, 'foo');
+              hasInputValueChangedSpy.reset();
+            });
+    
+            it('should be fired on clear button click', () => {
+              clearButton.click();
+              expect(input.value).to.be.empty;
+              expect(valueChangedSpy.calledOnce).to.be.true;
+              expect(hasInputValueChangedSpy.calledOnce).to.be.true;
+              expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
+            });
+    
+            it('should be fired when reverting the user input to the value with Esc', async() => {
+              esc(datePicker._overlayContent);
+              expect(input.value).to.equal('1/1/2022');
+              expect(hasInputValueChangedSpy.calledOnce).to.be.true;
             });
           });
         });
       });
-    }
+    });
   </script>
 </body>
