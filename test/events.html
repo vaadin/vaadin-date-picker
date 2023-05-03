@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <test-fixture id="datepicker">
+  <test-fixture id="date-picker">
     <template>
       <vaadin-date-picker clear-button-visible></vaadin-date-picker>
     </template>
@@ -19,45 +19,43 @@
   <script>
   describe('events', () => {
 
-    var target;
-
-    function inputChar(char) {
+    function inputChar(char, target) {
       target.value += char;
       MockInteractions.keyDownOn(target, char.charCodeAt(0));
       target.dispatchEvent(new CustomEvent('input', {bubbles: true, composed: true}));
     }
 
-    function inputText(text) {
+    function inputText(text, target) {
       for (var i = 0; i < text.length; i++) {
-        inputChar(text[i]);
+        inputChar(text[i], target);
       }
     }
 
-    function arrowDown() {
+    function arrowDown(target) {
       MockInteractions.keyDownOn(target, 40);
     }
   
-    function enter() {
+    function enter(target) {
       MockInteractions.pressEnter(target);
     }
 
-    function space() {
+    function space(target) {
       MockInteractions.pressSpace(target);
     }
 
-    function esc() {
+    function esc(target) {
       MockInteractions.keyDownOn(target, 27, null, 'Escape');
     }
 
     describe('has-input-value-changed event', () => {
-      let datePicker, clearButton, hasInputValueChangedSpy, valueChangedSpy;
+      let input, datePicker, clearButton, hasInputValueChangedSpy, valueChangedSpy;
   
       beforeEach(async() => {
         hasInputValueChangedSpy = sinon.spy();
         valueChangedSpy = sinon.spy();
-        datePicker = fixture('datepicker');
-        target = datePicker._inputElement;
-        clearButton = target.shadowRoot.querySelector('[part="clear-button"]');
+        datePicker = fixture('date-picker');
+        input = datePicker._inputElement;
+        clearButton = input.shadowRoot.querySelector('[part="clear-button"]');
         datePicker.addEventListener('has-input-value-changed', hasInputValueChangedSpy);
         datePicker.addEventListener('value-changed', valueChangedSpy);
       });
@@ -65,27 +63,26 @@
       describe('without value', () => {
         describe('with user input', () => {
           beforeEach(async() => {
-            inputText('1/1/2022');
+            inputText('1/1/2022', input);
             hasInputValueChangedSpy.reset();
           });
 
           it('should be fired when clearing the user input with Esc', async() => {
-            esc();
+            esc(input);
             expect(datePicker._inputElement.value).to.be.empty;
             expect(hasInputValueChangedSpy.calledOnce).to.be.true;
           });
 
           it('should be fired when comitting the user input with Enter', async() => {
-            enter();
+            enter(input);
             expect(valueChangedSpy.calledOnce).to.be.true;
             expect(hasInputValueChangedSpy.calledOnce).to.be.true;
             expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
           });
 
           it('should be fired when selecting a date with Space', async() => {
-            arrowDown();
-            target = datePicker._overlayContent;
-            space();
+            arrowDown(input);
+            space(datePicker._overlayContent);
             expect(valueChangedSpy.calledOnce).to.be.true;
             expect(hasInputValueChangedSpy.calledOnce).to.be.true;
             expect(hasInputValueChangedSpy.calledBefore(valueChangedSpy)).to.be.true;
@@ -95,15 +92,15 @@
 
       describe('with value', () => {
         beforeEach(async() => {
-          inputText('1/1/2022');
-          enter();
+          inputText('1/1/2022', input);
+          enter(input);
           valueChangedSpy.reset();
           hasInputValueChangedSpy.reset();
         });
 
         describe('with user input', () => {
           beforeEach(async() => {
-            inputText('foo');
+            inputText('foo', input);
             hasInputValueChangedSpy.reset();
           });
 
@@ -116,8 +113,7 @@
           });
 
           it('should be fired when reverting the user input to the value with Esc', async() => {
-            target = datePicker._overlayContent;
-            esc();
+            esc(datePicker._overlayContent);
             expect(datePicker._inputElement.value).to.equal('1/1/2022');
             expect(hasInputValueChangedSpy.calledOnce).to.be.true;
           });
