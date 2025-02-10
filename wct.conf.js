@@ -19,21 +19,6 @@ module.exports = {
         ]
       }
     },
-    // MAGI REMOVE START
-    istanbul: {
-      dir: './coverage',
-      reporters: ['text-summary', 'lcov'],
-      include: [
-        '**/vaadin-date-picker/src/*.html'
-      ],
-      exclude: [],
-      thresholds: {
-        global: {
-          statements: 91
-        }
-      }
-    }
-    // MAGI REMOVE END
   },
 
   registerHooks: function(context) {
@@ -47,11 +32,9 @@ module.exports = {
       'iOS Simulator/iphone@10.3', // should be 9.x, but SauceLabs does not provide that
       'macOS 11/safari@latest',
       'Windows 10/microsoftedge@latest',
-      'Windows 10/microsoftedge@18',
       'Windows 10/internet explorer@11',
       'Windows 10/chrome@latest',
       'Windows 10/firefox@latest',
-      'Windows 10/firefox@78', // latest ESR as of 2021-06-30
     ];
 
     if (env === 'saucelabs') {
@@ -63,5 +46,14 @@ module.exports = {
 
       context.options.plugins.sauce.browsers = testBrowsers;
     }
+
+    // Map legacy tunnel-identifier option to new tunnel-name option
+    context.hookLate('prepare', (done) => {
+      context.options.activeBrowsers.forEach((browser) => {
+        browser['tunnel-name'] = browser['tunnel-identifier'];
+        delete browser['tunnel-identifier'];
+      });
+      done();
+    });
   }
 };
