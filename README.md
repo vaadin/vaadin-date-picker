@@ -112,6 +112,9 @@ and [Polymer](https://polymer-library.polymer-project.org/) installed.
 
 ## Running tests from the command line
 
+> [!WARNING]
+> Running tests locally from the CLI does not work due to outdated dependencies. Run tests via SauceLabs or in the browser instead.
+
 1. When in the `vaadin-date-picker` directory, run `npm test` (this will execute:"test": "wct")
    (tests will be fetched from the `test/basics.html` file)
 

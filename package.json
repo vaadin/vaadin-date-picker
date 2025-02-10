@@ -45,5 +45,10 @@
   },
   "devDependencies": {
     "@vaadin/vaadin-component-dev-dependencies": "^3.2.0"
+  },
+  "overrides": {
+    "wct-sauce": {
+      "sauce-connect-launcher": "vaadin/sauce-connect-launcher#upgrade-sauce-connect-5"
+    }
   }
 }
